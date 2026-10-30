@@ -1,0 +1,27 @@
+# kiln's answers for this project: never edit by hand, `kiln set` changes them.
+_commit: v0.4.9-279-gbad9cd3
+_src_path: https://github.com/antoine-tena/kiln.git
+backend: none
+ci_runner: github
+compact_window: 400000
+created: '2026-10-30'
+description: Learnagement.
+frontend: none
+kept:
+- .gitignore
+- README.md
+language: en
+language_custom: false
+name: learnagement
+north_star: Learnagement in service
+owner: FlavienVernier
+podman: false
+prod_health_url: ''
+project_type: app
+serena: false
+size: medium
+statusline_ci: true
+team:
+- FlavienVernier
+timezone: Europe/Paris
+title: Learnagement
