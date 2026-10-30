@@ -5,10 +5,10 @@ from fastapi.testclient import TestClient
 
 from access_control.rules import evaluate_rule
 from api.dependencies import Rows, get_current_active_user
+from domains import lnm_university
+from domains.lnm_university import StudentDecisionPayload
 from models.request import SQLRequest
 from models.user import User
-from user import lnm_university
-from user.lnm_university import StudentDecisionPayload
 
 # ─────────────────────────────────────────────
 # Helpers

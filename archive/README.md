@@ -9,6 +9,8 @@ fichier reste dans git (`git log --follow archive/<chemin>`).
 | `phpbackend/` | L'ancien backend PHP (CRUD, listes, connexion), absent du docker-compose depuis février 2026 | `backend/` (API FastAPI) |
 | `front_DashPlotly/multi_page_integration_example.py` | Exemple d'intégration multipage, jamais importé | `dashboards/main.py` |
 | `scrapping/testIcal.py` | Essai de lecture d'un iCal, jamais appelé | `scraping/recup_agenda.py` |
+| `launcher/compose.py` | Générateur de compose jamais branché au lanceur | `docker/docker-compose.yml.skeleton` |
+| `db/new_tables.sql` | Ancien script de tables de rôles, référencé nulle part ; ses tables sont dans le schéma | `db/sql/` |
 | `web/utils/connectDB.php` | Connexion MySQL directe du front PHP, commentée depuis le passage par l'API ; ne faisait plus que recharger le `.env` | `web/utils/apiProxy.php` |
 
 Pour ressortir un fichier : `git mv archive/<chemin> <destination>`, puis le remettre aux règles
