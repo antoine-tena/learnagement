@@ -4,7 +4,6 @@
 **/*venv*
 **/vendor/*
 **/tmp/*
-*.lock
 
 # data and backup directories store private data, NEVER PUT IN ON GIT
 **/data
