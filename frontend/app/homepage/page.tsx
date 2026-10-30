@@ -14,9 +14,7 @@ export default function Home() {
 
     useEffect(() => {
         if (session && !charged){
-            const form_data = new FormData
-            form_data.append("userId", session.user.id)
-            axios.post("/api/proxy/list/listResponsableModule", form_data, {withCredentials: true})
+            axios.get("/api/proxy/enseignant/" + session.user.id + "/module_responsabilities")
                 .then(response => {
                     setListModules(response.data)
                     setCharged(true) // Permet de charger une seule fois ListModules, quand l'utilisateur se connecte pour la première fois
