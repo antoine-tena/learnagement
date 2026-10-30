@@ -1,14 +1,13 @@
 import logging
-import inspect
-
-from api.route_factory import register_auto_routes
-from fastapi import APIRouter, Depends
 from typing import Annotated
 
+from fastapi import APIRouter, Depends
+
 from api.dependencies import db_request, get_current_active_user
+from api.route_factory import register_auto_routes
 from models.request import SQLRequest
 from models.user import User
-from repositories.LNM_filiere_requests import requests, __requests
+from repositories.LNM_filiere_requests import __requests, requests
 
 logger = logging.getLogger(__name__)
 
@@ -68,39 +67,47 @@ register_auto_routes(router, __requests)
 #     return db_request(None, SQLRequest(**request))
 
 
-@router.get("/filieres/stages",
-            tags=["filiere", "internship"],
-            summary="Filiere",
-            description="Return the list of filieres")
+@router.get(
+    "/filieres/stages",
+    tags=["filiere", "internship"],
+    summary="Filiere",
+    description="Return the list of filieres",
+)
 def stages(
     current_user: Annotated[User, Depends(get_current_active_user)],
 ):
-    #request = requests("get_" + inspect.currentframe().f_code.co_name)
+    # request = requests("get_" + inspect.currentframe().f_code.co_name)
     request = requests("get_stages")
 
     # Résolution de nom_filiere :
     # 1. Si l'user a une responsabilité stage avec une dimension filiere → on l'utilise
     # 2. Sinon on utilise la valeur "id_filiere" pour que la requête test id_filiere=id_filiere
     stage_resp = next(
-        (r for r in current_user.responsibilities if r["type_objet"] in ("stage", "all")),
-        None
+        (r for r in current_user.responsibilities if r["type_objet"] in ("stage", "all")), None
     )
-    nom_filiere = stage_resp["dimensions"]["filiere"] \
-                    if stage_resp and "filiere" in stage_resp["dimensions"] \
-                    else "%"
+    nom_filiere = (
+        stage_resp["dimensions"]["filiere"]
+        if stage_resp and "filiere" in stage_resp["dimensions"]
+        else "%"
+    )
 
-    annee = stage_resp["dimensions"]["annee"] \
-                    if stage_resp and "annee" in stage_resp["dimensions"] \
-                    else "%"
+    annee = (
+        stage_resp["dimensions"]["annee"]
+        if stage_resp and "annee" in stage_resp["dimensions"]
+        else "%"
+    )
 
-    request["params"] = request["params"](nom_filiere, annee) \
-                            if callable(request["params"]) \
-                            else request["params"]
-    request["allowedRolesRequester"] = request["allowedRolesRequester"](nom_filiere) \
-                                        if callable(request["allowedRolesRequester"]) \
-                                        else request["allowedRolesRequester"]
-    
+    request["params"] = (
+        request["params"](nom_filiere, annee) if callable(request["params"]) else request["params"]
+    )
+    request["allowedRolesRequester"] = (
+        request["allowedRolesRequester"](nom_filiere)
+        if callable(request["allowedRolesRequester"])
+        else request["allowedRolesRequester"]
+    )
+
     return db_request(current_user, SQLRequest(**request))
+
 
 # @router.get("/promos/",
 #             tags=["filiere"],

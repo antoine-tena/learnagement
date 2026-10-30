@@ -1,7 +1,7 @@
 import logging
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends
-from typing import Annotated, Dict, Any, Optional
 from pydantic import BaseModel, model_validator
 
 from api.dependencies import db_request, get_current_active_user
@@ -19,16 +19,16 @@ router = APIRouter()
 #
 ######################################################
 
-@router.get("/etudiants",
-            tags=["student"],
-            summary="Students",
-            description="Return the list of students")
+
+@router.get(
+    "/etudiants", tags=["student"], summary="Students", description="Return the list of students"
+)
 def get_etudiants(
     current_user: Annotated[User, Depends(get_current_active_user)],
 ):
     request = {
-        "request" : """
-                        SELECT 
+        "request": """
+                        SELECT
                             LNM_etudiant.`id_etudiant`,
                             LNM_etudiant.`nom`,
                             LNM_etudiant.`prenom`,
@@ -36,62 +36,77 @@ def get_etudiants(
                             ExplicitSecondaryKs_LNM_etudiant.ExplicitSecondaryK,
                             ExplicitSecondaryKs_LNM_promo.ExplicitSecondaryK as 'promo'
                         FROM LNM_etudiant
-                        JOIN ExplicitSecondaryKs_LNM_etudiant ON ExplicitSecondaryKs_LNM_etudiant.id_etudiant = LNM_etudiant.id_etudiant
-                        LEFT JOIN ExplicitSecondaryKs_LNM_promo ON ExplicitSecondaryKs_LNM_promo.id_promo = LNM_etudiant.id_promo
+                        JOIN ExplicitSecondaryKs_LNM_etudiant
+                            ON ExplicitSecondaryKs_LNM_etudiant.id_etudiant
+                                = LNM_etudiant.id_etudiant
+                        LEFT JOIN ExplicitSecondaryKs_LNM_promo
+                            ON ExplicitSecondaryKs_LNM_promo.id_promo = LNM_etudiant.id_promo
                         ORDER BY ExplicitSecondaryK;
                     """,
-        "allowedRolesRequester" : ["connected_user"],
+        "allowedRolesRequester": ["connected_user"],
     }
     return db_request(current_user, SQLRequest(**request))
 
 
 class AbsencesFilters(BaseModel):
-    id_responsable: Optional[int] = None
-    id_enseignant: Optional[int] = None
+    id_responsable: int | None = None
+    id_enseignant: int | None = None
 
     @model_validator(mode="after")
     def check_exclusive(self):
         if self.id_responsable is not None and self.id_enseignant is not None:
-            raise ValueError(
-                "Fournissez soit id_responsable, soit id_enseignant, pas les deux"
-            )
+            raise ValueError("Fournissez soit id_responsable, soit id_enseignant, pas les deux")
         return self
 
-@router.get("/etudiants/absences",
-            tags=["student", "administratif"],
-            summary="Students",
-            description="Return the list of students")
+
+@router.get(
+    "/etudiants/absences",
+    tags=["student", "administratif"],
+    summary="Students",
+    description="Return the list of students",
+)
 def get_etudiants_absences(
     current_user: Annotated[User, Depends(get_current_active_user)],
-    #id_responsable: int = -1,
-    #id_enseignant: int = -1,
+    # id_responsable: int = -1,
+    # id_enseignant: int = -1,
     filters: Annotated[AbsencesFilters, Depends()],
 ):
     request = {
-        "request" : f"""SELECT ExplicitSecondaryKs_LNM_etudiant.ExplicitSecondaryK as etudiant, 
-                              ExplicitSecondaryKs_LNM_promo.ExplicitSecondaryK as promo, 
-                              MAQUETTE_module.code_module, 
+        "request": """SELECT ExplicitSecondaryKs_LNM_etudiant.ExplicitSecondaryK as etudiant,
+                              ExplicitSecondaryKs_LNM_promo.ExplicitSecondaryK as promo,
+                              MAQUETTE_module.code_module,
                               DATE_FORMAT(CLASS_session.schedule, '%Y-%m-%dT%H:%i') AS schedule
-                       FROM `CLASS_absence` 
-                                JOIN CLASS_session ON CLASS_session.id_session = CLASS_absence.id_session
-                                JOIN MAQUETTE_module_sequence ON MAQUETTE_module_sequence.id_module_sequence = CLASS_session.id_module_sequence
-                                JOIN MAQUETTE_module_sequencage ON MAQUETTE_module_sequencage.id_module_sequencage = MAQUETTE_module_sequence.id_module_sequencage
-                                JOIN MAQUETTE_module ON MAQUETTE_module.id_module = MAQUETTE_module_sequencage.id_module
-                                JOIN LNM_etudiant ON LNM_etudiant.id_etudiant = CLASS_absence.id_etudiant
+                       FROM `CLASS_absence`
+                                JOIN CLASS_session
+                                    ON CLASS_session.id_session = CLASS_absence.id_session
+                                JOIN MAQUETTE_module_sequence
+                                    ON MAQUETTE_module_sequence.id_module_sequence
+                                        = CLASS_session.id_module_sequence
+                                JOIN MAQUETTE_module_sequencage
+                                    ON MAQUETTE_module_sequencage.id_module_sequencage
+                                        = MAQUETTE_module_sequence.id_module_sequencage
+                                JOIN MAQUETTE_module
+                                    ON MAQUETTE_module.id_module
+                                        = MAQUETTE_module_sequencage.id_module
+                                JOIN LNM_etudiant
+                                    ON LNM_etudiant.id_etudiant = CLASS_absence.id_etudiant
                                 JOIN LNM_promo ON LNM_promo.id_promo = LNM_etudiant.id_promo
                                 JOIN LNM_filiere ON LNM_filiere.id_filiere = LNM_promo.id_filiere
                                 JOIN LNM_statut ON LNM_statut.id_statut = LNM_promo.id_statut
-                                JOIN ExplicitSecondaryKs_LNM_etudiant ON ExplicitSecondaryKs_LNM_etudiant.id_etudiant = LNM_etudiant.id_etudiant
-                                JOIN ExplicitSecondaryKs_LNM_promo ON ExplicitSecondaryKs_LNM_promo.id_promo = LNM_promo.id_promo
+                                JOIN ExplicitSecondaryKs_LNM_etudiant
+                                    ON ExplicitSecondaryKs_LNM_etudiant.id_etudiant
+                                        = LNM_etudiant.id_etudiant
+                                JOIN ExplicitSecondaryKs_LNM_promo
+                                    ON ExplicitSecondaryKs_LNM_promo.id_promo = LNM_promo.id_promo
                     """,
         "allowedRolesRequester": {
             "roles": ["responsable_etudes"],
-        }
+        },
     }
 
     # if id_responsable filter is set
     if current_user.mmain_role == "enseignant" and filters.id_responsable is not None:
-        request["request"] += f""" WHERE MAQUETTE_module.id_responsable = %(id_responsable)s"""
+        request["request"] += """ WHERE MAQUETTE_module.id_responsable = %(id_responsable)s"""
         request["params"] = {
             "id_responsable": filters.id_responsable,
         }
@@ -99,7 +114,7 @@ def get_etudiants_absences(
 
     # if id_enseignant filter is set
     elif current_user.mmain_role == "enseignant" and filters.id_enseignant is not None:
-        request["request"]  += f""" WHERE CLASS_session.id_enseignant = %(id_enseignant)s"""
+        request["request"] += """ WHERE CLASS_session.id_enseignant = %(id_enseignant)s"""
         request["params"] = {
             "id_enseignant": filters.id_enseignant,
         }
@@ -108,23 +123,29 @@ def get_etudiants_absences(
     return db_request(current_user, SQLRequest(**request))
 
 
-@router.get("/etudiants/stages",
-            tags=["administratif", "student",  "internship",],
-            summary="Students",
-            description="Return the list of students")
+@router.get(
+    "/etudiants/stages",
+    tags=[
+        "administratif",
+        "student",
+        "internship",
+    ],
+    summary="Students",
+    description="Return the list of students",
+)
 def get_etudiants_stages(
     current_user: Annotated[User, Depends(get_current_active_user)],
 ):
     request = {
-        "request" : """
-            SELECT 
+        "request": """
+            SELECT
                 LNM_stage.id_stage,
-                LNM_stage.`entreprise`, 
-                LNM_stage.`intitulé`, 
-                LNM_stage.`description`, 
-                LNM_stage.`ville`, 
-                DATE_FORMAT(LNM_stage.`date_debut`, '%Y-%m-%d') AS date_debut, 
-                DATE_FORMAT(LNM_stage.`date_fin`, '%Y-%m-%d') AS date_fin, 
+                LNM_stage.`entreprise`,
+                LNM_stage.`intitulé`,
+                LNM_stage.`description`,
+                LNM_stage.`ville`,
+                DATE_FORMAT(LNM_stage.`date_debut`, '%Y-%m-%d') AS date_debut,
+                DATE_FORMAT(LNM_stage.`date_fin`, '%Y-%m-%d') AS date_fin,
                 LNM_stage.`nature`,
                 ExplicitSecondaryKs_LNM_etudiant.ExplicitSecondaryK AS student_fullname,
                 LNM_etudiant.mail,
@@ -139,35 +160,41 @@ def get_etudiants_stages(
                     ELSE 'completed'
                 END AS status
             FROM LNM_etudiant
-            JOIN ExplicitSecondaryKs_LNM_etudiant ON ExplicitSecondaryKs_LNM_etudiant.id_etudiant = LNM_etudiant.id_etudiant
+            JOIN ExplicitSecondaryKs_LNM_etudiant
+                ON ExplicitSecondaryKs_LNM_etudiant.id_etudiant = LNM_etudiant.id_etudiant
             JOIN LNM_promo ON LNM_promo.id_promo = LNM_etudiant.id_promo
             JOIN LNM_filiere ON LNM_filiere.id_filiere = LNM_promo.id_filiere
-            JOIN ExplicitSecondaryKs_LNM_promo ON ExplicitSecondaryKs_LNM_promo.id_promo = LNM_promo.id_promo
+            JOIN ExplicitSecondaryKs_LNM_promo
+                ON ExplicitSecondaryKs_LNM_promo.id_promo = LNM_promo.id_promo
             LEFT JOIN LNM_stage ON LNM_stage.id_etudiant = LNM_etudiant.id_etudiant
             LEFT JOIN LNM_enseignant ON LNM_enseignant.id_enseignant = LNM_stage.id_enseignant
-            LEFT JOIN ExplicitSecondaryKs_LNM_enseignant ON ExplicitSecondaryKs_LNM_enseignant.id_enseignant = LNM_enseignant.id_enseignant;
+            LEFT JOIN ExplicitSecondaryKs_LNM_enseignant
+                ON ExplicitSecondaryKs_LNM_enseignant.id_enseignant = LNM_enseignant.id_enseignant;
                     """,
         "allowedRolesRequester": ["responsable_etudes", "responsable_stages", "enseignant"],
     }
     return db_request(current_user, SQLRequest(**request))
 
 
-@router.get("/etudiants/without_stage",
-            tags=["administratif", "student", "internship"],
-            summary="Students",
-            description="Return the list of students")
+@router.get(
+    "/etudiants/without_stage",
+    tags=["administratif", "student", "internship"],
+    summary="Students",
+    description="Return the list of students",
+)
 def get_etudiants_stages(
     current_user: Annotated[User, Depends(get_current_active_user)],
 ):
     request = {
-        "request" : """
-            SELECT `LNM_etudiant`.`id_etudiant`, 
+        "request": """
+            SELECT `LNM_etudiant`.`id_etudiant`,
                    `LNM_etudiant`.`nom`,
                    `LNM_etudiant`.`prenom`,
                    ExplicitSecondaryKs_LNM_promo.ExplicitSecondaryK AS "promo"
-            FROM `LNM_etudiant` 
-                     JOIN ExplicitSecondaryKs_LNM_promo ON ExplicitSecondaryKs_LNM_promo.id_promo = LNM_etudiant.id_promo
-            WHERE `LNM_etudiant`.`id_etudiant` 
+            FROM `LNM_etudiant`
+                     JOIN ExplicitSecondaryKs_LNM_promo
+                         ON ExplicitSecondaryKs_LNM_promo.id_promo = LNM_etudiant.id_promo
+            WHERE `LNM_etudiant`.`id_etudiant`
                       NOT IN ( SELECT `LNM_stage`.`id_etudiant` FROM `LNM_stage` WHERE 1)
                     """,
         "allowedRolesRequester": ["responsable_etudes", "responsable_stages"],
@@ -181,17 +208,20 @@ def get_etudiants_stages(
 #
 ######################################################
 
-@router.get("/etudiants/{id_etudiant:int}",
-            tags=["student"],
-            summary="Students",
-            description="Return the list of students")
+
+@router.get(
+    "/etudiants/{id_etudiant:int}",
+    tags=["student"],
+    summary="Students",
+    description="Return the list of students",
+)
 def get_etudiant(
     id_etudiant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
 ):
     request = {
-        "request" : """
-                        SELECT 
+        "request": """
+                        SELECT
                             LNM_etudiant.`id_etudiant`,
                             LNM_etudiant.`nom`,
                             LNM_etudiant.`prenom`,
@@ -201,7 +231,9 @@ def get_etudiant(
                             LNM_filiere.nom_filiere,
                             LNM_statut.nom_statut
                         FROM LNM_etudiant
-                                 JOIN ExplicitSecondaryKs_LNM_etudiant ON ExplicitSecondaryKs_LNM_etudiant.id_etudiant = LNM_etudiant.id_etudiant
+                                 JOIN ExplicitSecondaryKs_LNM_etudiant
+                                     ON ExplicitSecondaryKs_LNM_etudiant.id_etudiant
+                                         = LNM_etudiant.id_etudiant
                                  JOIN LNM_promo ON LNM_promo.id_promo = LNM_etudiant.id_promo
                                  JOIN LNM_filiere ON LNM_filiere.id_filiere = LNM_promo.id_filiere
                                  JOIN LNM_statut ON LNM_statut.id_statut=LNM_promo.id_statut
@@ -210,31 +242,46 @@ def get_etudiant(
         "params": {
             "id_etudiant": id_etudiant,
         },
-        "allowedRolesRequester" : {
-            #"roles": ["connected_user"]},
-            "roles": []},
-            "owner": {"role": "etudiant", 'id':"id_etudiant"},
+        "allowedRolesRequester": {
+            # "roles": ["connected_user"]},
+            "roles": []
+        },
+        "owner": {"role": "etudiant", "id": "id_etudiant"},
     }
     return db_request(current_user, SQLRequest(**request))
 
-@router.get("/etudiants/{id_etudiant:int}/absences",
-            tags=["administratif", "student",],
-            summary="Students",
-            description="Return the list of students")
+
+@router.get(
+    "/etudiants/{id_etudiant:int}/absences",
+    tags=[
+        "administratif",
+        "student",
+    ],
+    summary="Students",
+    description="Return the list of students",
+)
 def get_etudiant_absences(
     id_etudiant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
 ):
     # ToDo convert parameters to be SQLAlchemy Core compatible when it will be up
     request = {
-        "request" : """SELECT MAQUETTE_module.code_module, 
+        "request": """SELECT MAQUETTE_module.code_module,
                               DATE_FORMAT(CLASS_session.schedule, '%Y-%m-%dT%H:%i') AS schedule
-                       FROM `CLASS_absence` 
-                                JOIN CLASS_session ON CLASS_session.id_session = CLASS_absence.id_session
-                                JOIN MAQUETTE_module_sequence ON MAQUETTE_module_sequence.id_module_sequence = CLASS_session.id_module_sequence
-                                JOIN MAQUETTE_module_sequencage ON MAQUETTE_module_sequencage.id_module_sequencage = MAQUETTE_module_sequence.id_module_sequencage
-                                JOIN MAQUETTE_module ON MAQUETTE_module.id_module = MAQUETTE_module_sequencage.id_module
-                                JOIN LNM_etudiant ON LNM_etudiant.id_etudiant = CLASS_absence.id_etudiant
+                       FROM `CLASS_absence`
+                                JOIN CLASS_session
+                                    ON CLASS_session.id_session = CLASS_absence.id_session
+                                JOIN MAQUETTE_module_sequence
+                                    ON MAQUETTE_module_sequence.id_module_sequence
+                                        = CLASS_session.id_module_sequence
+                                JOIN MAQUETTE_module_sequencage
+                                    ON MAQUETTE_module_sequencage.id_module_sequencage
+                                        = MAQUETTE_module_sequence.id_module_sequencage
+                                JOIN MAQUETTE_module
+                                    ON MAQUETTE_module.id_module
+                                        = MAQUETTE_module_sequencage.id_module
+                                JOIN LNM_etudiant
+                                    ON LNM_etudiant.id_etudiant = CLASS_absence.id_etudiant
                        WHERE LNM_etudiant.`id_etudiant` = %(id_etudiant)s
         """,
         "params": {
@@ -245,33 +292,41 @@ def get_etudiant_absences(
             "owner": {"role": "etudiant", "id": "id_etudiant"},
         },
     }
-    #if current_user.id == id_etudiant:
+    # if current_user.id == id_etudiant:
     #    request["allowedRolesRequester"] += [current_user.ExplicitSecondaryK]
     return db_request(current_user, SQLRequest(**request))
 
-@router.get("/etudiants/{id_etudiant:int}/load",
-            tags=["student", "administratif", ],
-            summary="Students",
-            description="Return the list of students")
+
+@router.get(
+    "/etudiants/{id_etudiant:int}/load",
+    tags=[
+        "student",
+        "administratif",
+    ],
+    summary="Students",
+    description="Return the list of students",
+)
 def get_etudiant_load(
-        id_etudiant: int,
-        current_user: Annotated[User, Depends(get_current_active_user)],
+    id_etudiant: int,
+    current_user: Annotated[User, Depends(get_current_active_user)],
 ):
     # ToDo convert parameters to be SQLAlchemy Core compatible when it will be up
     request = {
-        "request": f"""
-                SELECT 
-                    DATE_FORMAT(session.schedule, '%Y-%m-%dT%H:%i') AS schedule, 
-                    CAST(sequencage.duree_h AS FLOAT) AS duree_h, 
-                    module.nom 
-                FROM CLASS_session as session 
-                    JOIN LNM_groupe as grp ON session.id_groupe = grp.id_groupe 
-                    JOIN LNM_promo as promo ON grp.id_promo = promo.id_promo 
-                    JOIN LNM_etudiant as etu ON grp.id_promo = etu.id_promo 
-                    JOIN MAQUETTE_module_sequence as sequence ON session.id_module_sequence=sequence.id_module_sequence 
-                    JOIN MAQUETTE_module_sequencage as sequencage ON sequence.id_module_sequencage=sequencage.id_module_sequencage 
-                    JOIN MAQUETTE_module as module ON sequencage.id_module=module.id_module 
-                WHERE etu.id_etudiant = %(id_etudiant)s 
+        "request": """
+                SELECT
+                    DATE_FORMAT(session.schedule, '%Y-%m-%dT%H:%i') AS schedule,
+                    CAST(sequencage.duree_h AS FLOAT) AS duree_h,
+                    module.nom
+                FROM CLASS_session as session
+                    JOIN LNM_groupe as grp ON session.id_groupe = grp.id_groupe
+                    JOIN LNM_promo as promo ON grp.id_promo = promo.id_promo
+                    JOIN LNM_etudiant as etu ON grp.id_promo = etu.id_promo
+                    JOIN MAQUETTE_module_sequence as sequence
+                        ON session.id_module_sequence=sequence.id_module_sequence
+                    JOIN MAQUETTE_module_sequencage as sequencage
+                        ON sequence.id_module_sequencage=sequencage.id_module_sequencage
+                    JOIN MAQUETTE_module as module ON sequencage.id_module=module.id_module
+                WHERE etu.id_etudiant = %(id_etudiant)s
             """,
         "params": {
             "id_etudiant": id_etudiant,
@@ -281,77 +336,92 @@ def get_etudiant_load(
             "owner": {"role": "etudiant", "id": "id_etudiant"},
         },
     }
-    #if current_user.id == id_etudiant:
+    # if current_user.id == id_etudiant:
     #    request["allowedRolesRequester"] += [current_user.ExplicitSecondaryK]
     return db_request(current_user, SQLRequest(**request))
 
 
-@router.get("/etudiants/{id_etudiant:int}/edt",
-            tags=["student", "administratif", ],
-            summary="Students",
-            description="Return the list of students")
+@router.get(
+    "/etudiants/{id_etudiant:int}/edt",
+    tags=[
+        "student",
+        "administratif",
+    ],
+    summary="Students",
+    description="Return the list of students",
+)
 def get_etudiant_edt(
-        id_etudiant: int,
-        current_user: Annotated[User, Depends(get_current_active_user)],
+    id_etudiant: int,
+    current_user: Annotated[User, Depends(get_current_active_user)],
 ):
     # ToDo convert parameters to be SQLAlchemy Core compatible when it will be up
     request = {
-        "request": f"""
-                    SELECT 
-                        etu.nom, 
-                        DATE_FORMAT(session.schedule, '%Y-%m-%dT%H:%i') AS date_prevue, 
-                        promo.annee, 
-                        CAST(sequencage.duree_h AS FLOAT) AS nb_heure, 
+        "request": """
+                    SELECT
+                        etu.nom,
+                        DATE_FORMAT(session.schedule, '%Y-%m-%dT%H:%i') AS date_prevue,
+                        promo.annee,
+                        CAST(sequencage.duree_h AS FLOAT) AS nb_heure,
                         module.nom AS matiere
                     FROM CLASS_session as session
                         JOIN LNM_groupe as grp ON session.id_groupe = grp.id_groupe
                         JOIN LNM_promo as promo ON grp.id_promo = promo.id_promo
                         JOIN LNM_etudiant as etu ON grp.id_promo = etu.id_promo
-                        JOIN MAQUETTE_module_sequence as sequence ON session.id_module_sequence=sequence.id_module_sequence
-                        JOIN MAQUETTE_module_sequencage as sequencage ON sequence.id_module_sequencage=sequencage.id_module_sequencage
+                        JOIN MAQUETTE_module_sequence as sequence
+                            ON session.id_module_sequence=sequence.id_module_sequence
+                        JOIN MAQUETTE_module_sequencage as sequencage
+                            ON sequence.id_module_sequencage=sequencage.id_module_sequencage
                         JOIN MAQUETTE_module as module ON sequencage.id_module=module.id_module
                     WHERE etu.id_etudiant =   %(id_etudiant)s
-                    ORDER BY session.schedule; 
+                    ORDER BY session.schedule;
             """,
         "params": {
             "id_etudiant": id_etudiant,
         },
         "allowedRolesRequester": {
-            "roles": ["administratif",],
+            "roles": [
+                "administratif",
+            ],
             "owner": {"role": "etudiant", "id": "id_etudiant"},
         },
     }
-    #if current_user.id == id_etudiant:
+    # if current_user.id == id_etudiant:
     #    request["allowedRolesRequester"] += [current_user.ExplicitSecondaryK]
     return db_request(current_user, SQLRequest(**request))
 
 
-@router.get("/etudiants/{id_etudiant:int}/pastedt",
-            tags=["student",],
-            summary="Students",
-            description="Return the list of students")
+@router.get(
+    "/etudiants/{id_etudiant:int}/pastedt",
+    tags=[
+        "student",
+    ],
+    summary="Students",
+    description="Return the list of students",
+)
 def get_etudiant_pastedt(
-        id_etudiant: int,
-        current_user: Annotated[User, Depends(get_current_active_user)],
+    id_etudiant: int,
+    current_user: Annotated[User, Depends(get_current_active_user)],
 ):
     # ToDo convert parameters to be SQLAlchemy Core compatible when it will be up
     request = {
-        "request": f"""
-                    SELECT etu.nom, 
-                        DATE_FORMAT(session.schedule, '%Y-%m-%dT%H:%i') AS date_prevue, 
-                        promo.annee, 
-                        CAST(sequencage.duree_h AS FLOAT) AS nb_heure, 
+        "request": """
+                    SELECT etu.nom,
+                        DATE_FORMAT(session.schedule, '%Y-%m-%dT%H:%i') AS date_prevue,
+                        promo.annee,
+                        CAST(sequencage.duree_h AS FLOAT) AS nb_heure,
                         module.nom AS matiere
                     FROM CLASS_session as session
                         JOIN LNM_groupe as grp ON session.id_groupe = grp.id_groupe
                         JOIN LNM_promo as promo ON grp.id_promo = promo.id_promo
                         JOIN LNM_etudiant as etu ON grp.id_promo = etu.id_promo
-                        JOIN MAQUETTE_module_sequence as sequence ON session.id_module_sequence=sequence.id_module_sequence
-                        JOIN MAQUETTE_module_sequencage as sequencage ON sequence.id_module_sequencage=sequencage.id_module_sequencage
+                        JOIN MAQUETTE_module_sequence as sequence
+                            ON session.id_module_sequence=sequence.id_module_sequence
+                        JOIN MAQUETTE_module_sequencage as sequencage
+                            ON sequence.id_module_sequencage=sequencage.id_module_sequencage
                         JOIN MAQUETTE_module as module ON sequencage.id_module=module.id_module
-                    WHERE session.schedule < CURRENT_DATE 
+                    WHERE session.schedule < CURRENT_DATE
                         AND etu.id_etudiant = %(id_etudiant)s
-                    ORDER BY session.schedule; 
+                    ORDER BY session.schedule;
             """,
         "params": {
             "id_etudiant": id_etudiant,
@@ -361,24 +431,29 @@ def get_etudiant_pastedt(
             "owner": {"role": "etudiant", "id": "id_etudiant"},
         },
     }
-    #if current_user.id == id_etudiant:
+    # if current_user.id == id_etudiant:
     #    request["allowedRolesRequester"] += [current_user.ExplicitSecondaryK]
     return db_request(current_user, SQLRequest(**request))
 
-@router.get("/etudiants/{id_etudiant}/polypoints",
-            tags=["student", ],
-            summary="Students",
-            description="Return the list of students")
+
+@router.get(
+    "/etudiants/{id_etudiant}/polypoints",
+    tags=[
+        "student",
+    ],
+    summary="Students",
+    description="Return the list of students",
+)
 def get_etudiant_pastedt(
-        id_etudiant: int,
-        current_user: Annotated[User, Depends(get_current_active_user)],
+    id_etudiant: int,
+    current_user: Annotated[User, Depends(get_current_active_user)],
 ):
     # ToDo convert parameters to be SQLAlchemy Core compatible when it will be up
     request = {
-        "request": f"""
+        "request": """
             SELECT * FROM ETU_polypoint
             WHERE id_etudiant = %(id_etudiant)s
-            ORDER BY annee_universitaire DESC; 
+            ORDER BY annee_universitaire DESC;
             """,
         "params": {
             "id_etudiant": id_etudiant,
@@ -388,32 +463,38 @@ def get_etudiant_pastedt(
             "owner": {"role": "etudiant", "id": "id_etudiant"},
         },
     }
-    #if current_user.id == id_etudiant:
+    # if current_user.id == id_etudiant:
     #    request["allowedRolesRequester"] += [current_user.ExplicitSecondaryK]
     return db_request(current_user, SQLRequest(**request))
 
-@router.get("/etudiants/{id_etudiant}/rendus",
-            tags=["student", ],
-            summary="Students",
-            description="Return the list of students")
+
+@router.get(
+    "/etudiants/{id_etudiant}/rendus",
+    tags=[
+        "student",
+    ],
+    summary="Students",
+    description="Return the list of students",
+)
 def get_etudiant_pastedt(
-        id_etudiant: int,
-        current_user: Annotated[User, Depends(get_current_active_user)],
+    id_etudiant: int,
+    current_user: Annotated[User, Depends(get_current_active_user)],
 ):
     # ToDo convert parameters to be SQLAlchemy Core compatible when it will be up
     request = {
-        "request": f"""
-            SELECT rm.description, 
-            module.nom, 
-            ue.learning_unit_name, 
+        "request": """
+            SELECT rm.description,
+            module.nom,
+            ue.learning_unit_name,
             rm_etu.avancement,
             rm.date
-            FROM LNM_rendu_module as rm 
-                JOIN LNM_rendu_module_as_etudiant as rm_etu ON rm_etu.id_rendu_module=rm.id_rendu_module 
-                JOIN LNM_etudiant as etu ON etu.id_etudiant=rm_etu.id_etudiant 
-                JOIN MAQUETTE_module_as_learning_unit as mue ON rm.id_module=mue.id_module 
-                JOIN MAQUETTE_module as module ON mue.id_module=module.id_module 
-                JOIN MAQUETTE_learning_unit as ue ON mue.id_learning_unit=ue.id_learning_unit 
+            FROM LNM_rendu_module as rm
+                JOIN LNM_rendu_module_as_etudiant as rm_etu
+                    ON rm_etu.id_rendu_module=rm.id_rendu_module
+                JOIN LNM_etudiant as etu ON etu.id_etudiant=rm_etu.id_etudiant
+                JOIN MAQUETTE_module_as_learning_unit as mue ON rm.id_module=mue.id_module
+                JOIN MAQUETTE_module as module ON mue.id_module=module.id_module
+                JOIN MAQUETTE_learning_unit as ue ON mue.id_learning_unit=ue.id_learning_unit
             WHERE etu.id_etudiant = %(id_etudiant)s
             """,
         "params": {
@@ -424,37 +505,49 @@ def get_etudiant_pastedt(
             "owner": {"role": "etudiant", "id": "id_etudiant"},
         },
     }
-    #if current_user.id == id_etudiant:
+    # if current_user.id == id_etudiant:
     #    request["allowedRolesRequester"] += [current_user.ExplicitSecondaryK]
     return db_request(current_user, SQLRequest(**request))
 
-@router.get("/etudiants/{id_etudiant:int}/stages",
-            tags=["administratif", "student",  "internship",],
-            summary="Students",
-            description="Return the list of students")
+
+@router.get(
+    "/etudiants/{id_etudiant:int}/stages",
+    tags=[
+        "administratif",
+        "student",
+        "internship",
+    ],
+    summary="Students",
+    description="Return the list of students",
+)
 def get_etudiants_stages(
-        id_etudiant: int,
-        current_user: Annotated[User, Depends(get_current_active_user)],
+    id_etudiant: int,
+    current_user: Annotated[User, Depends(get_current_active_user)],
 ):
     request = {
-        "request" : """
-            SELECT LNM_stage.`id_stage`, 
-                   ExplicitSecondaryKs_LNM_etudiant.ExplicitSecondaryK AS "étudiant", 
-                   ExplicitSecondaryKs_LNM_promo.ExplicitSecondaryK AS "promo", 
-                   LNM_stage.`entreprise`, 
-                   LNM_stage.`intitulé`, 
-                   LNM_stage.`description`, 
-                   LNM_stage.`ville`, 
-                   DATE_FORMAT(LNM_stage.`date_debut`, '%Y-%m-%d') AS date_debut, 
-                   DATE_FORMAT(LNM_stage.`date_fin`, '%Y-%m-%d') AS date_fin, 
-                   LNM_stage.`nature`, 
+        "request": """
+            SELECT LNM_stage.`id_stage`,
+                   ExplicitSecondaryKs_LNM_etudiant.ExplicitSecondaryK AS "étudiant",
+                   ExplicitSecondaryKs_LNM_promo.ExplicitSecondaryK AS "promo",
+                   LNM_stage.`entreprise`,
+                   LNM_stage.`intitulé`,
+                   LNM_stage.`description`,
+                   LNM_stage.`ville`,
+                   DATE_FORMAT(LNM_stage.`date_debut`, '%Y-%m-%d') AS date_debut,
+                   DATE_FORMAT(LNM_stage.`date_fin`, '%Y-%m-%d') AS date_fin,
+                   LNM_stage.`nature`,
                    ExplicitSecondaryKs_LNM_enseignant.ExplicitSecondaryK AS "enseignant"
-            FROM `LNM_stage` 
+            FROM `LNM_stage`
                      JOIN LNM_etudiant ON LNM_etudiant.id_etudiant = LNM_stage.id_etudiant
-                     LEFT JOIN LNM_enseignant ON LNM_enseignant.id_enseignant = LNM_stage.id_enseignant
-                     JOIN ExplicitSecondaryKs_LNM_promo ON ExplicitSecondaryKs_LNM_promo.id_promo = LNM_etudiant.id_promo
-                     JOIN ExplicitSecondaryKs_LNM_etudiant ON ExplicitSecondaryKs_LNM_etudiant.id_etudiant = LNM_etudiant.id_etudiant
-                     LEFT JOIN ExplicitSecondaryKs_LNM_enseignant ON ExplicitSecondaryKs_LNM_enseignant.id_enseignant = LNM_enseignant.id_enseignant
+                     LEFT JOIN LNM_enseignant
+                         ON LNM_enseignant.id_enseignant = LNM_stage.id_enseignant
+                     JOIN ExplicitSecondaryKs_LNM_promo
+                         ON ExplicitSecondaryKs_LNM_promo.id_promo = LNM_etudiant.id_promo
+                     JOIN ExplicitSecondaryKs_LNM_etudiant
+                         ON ExplicitSecondaryKs_LNM_etudiant.id_etudiant = LNM_etudiant.id_etudiant
+                     LEFT JOIN ExplicitSecondaryKs_LNM_enseignant
+                         ON ExplicitSecondaryKs_LNM_enseignant.id_enseignant
+                             = LNM_enseignant.id_enseignant
             WHERE LNM_stage.id_etudiant = %(id_etudiant)s;
                     """,
         "params": {
@@ -465,9 +558,10 @@ def get_etudiants_stages(
             "owner": {"role": "etudiant", "id": "id_etudiant"},
         },
     }
-    #if(current_user.id == id_etudiant):
+    # if(current_user.id == id_etudiant):
     #    request["allowedRolesRequester"] += [current_user.ExplicitSecondaryK]
     return db_request(current_user, SQLRequest(**request))
+
 
 ######################################################
 #
@@ -475,45 +569,59 @@ def get_etudiants_stages(
 #
 ######################################################
 
-@router.post("/etudiants/{id_etudiant:int}/stage",
-            tags=["administratif", "student", "internship",],
-            summary="Students",
-            description="Return the list of students")
+
+@router.post(
+    "/etudiants/{id_etudiant:int}/stage",
+    tags=[
+        "administratif",
+        "student",
+        "internship",
+    ],
+    summary="Students",
+    description="Return the list of students",
+)
 def post_etudiant_stage(
     id_etudiant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-    data: Dict[str, Any],
+    data: dict[str, Any],
 ):
     # ToDo convert parameters to be SQLAlchemy Core compatible when it will be up
-    if not 'id_enseignant' in data or not data['id_enseignant']:
-        data['id_enseignant'] = 'null'
+    if "id_enseignant" not in data or not data["id_enseignant"]:
+        data["id_enseignant"] = "null"
         request = {
-            "request" : """ 
-                        INSERT INTO `LNM_stage` (`entreprise`, `intitulé`, `description`, `ville`, `date_debut`, `date_fin`, `nature`, `id_etudiant`) 
-                        VALUES (%(entreprise)s, %(intitule)s, %(description)s, %(ville)s, %(date_debut)s, %(date_fin)s, %(nature)s, %(id_etudiant)s)
+            "request": """
+                        INSERT INTO `LNM_stage` (`entreprise`, `intitulé`, `description`, `ville`,
+                            `date_debut`, `date_fin`, `nature`, `id_etudiant`)
+                        VALUES (%(entreprise)s, %(intitule)s, %(description)s, %(ville)s,
+                            %(date_debut)s, %(date_fin)s, %(nature)s, %(id_etudiant)s)
             """,
         }
     else:
         request = {
-            "request" : """ 
-                        INSERT INTO `LNM_stage` (`entreprise`, `intitulé`, `description`, `ville`, `date_debut`, `date_fin`, `nature`, `id_etudiant`, `id_enseignant`) 
-                        VALUES (%(entreprise)s, %(intitule)s, %(description)s, %(ville)s, %(date_debut)s, %(date_fin)s, %(nature)s, %(id_etudiant)s, %(id_enseignant)s)
+            "request": """
+                        INSERT INTO `LNM_stage` (`entreprise`, `intitulé`, `description`, `ville`,
+                            `date_debut`, `date_fin`, `nature`, `id_etudiant`, `id_enseignant`)
+                        VALUES (%(entreprise)s, %(intitule)s, %(description)s, %(ville)s,
+                            %(date_debut)s, %(date_fin)s, %(nature)s, %(id_etudiant)s,
+                            %(id_enseignant)s)
             """,
         }
-    request.update({
-        "params": {
-            "entreprise": data['entreprise'],
-            "intitule": data['intitule'],
-            "description": data['description'],
-            "ville": data['ville'],
-            "date_debut": data['date_debut'],
-            "date_fin": data['date_fin'],
-            "nature": data['nature'],
-            "id_etudiant": id_etudiant,
-            "id_enseignant": data['id_enseignant'],
-        },
-        "allowedRolesRequester": ["responsable_stages"],
-    })
+    request.update(
+        {
+            "params": {
+                "entreprise": data["entreprise"],
+                "intitule": data["intitule"],
+                "description": data["description"],
+                "ville": data["ville"],
+                "date_debut": data["date_debut"],
+                "date_fin": data["date_fin"],
+                "nature": data["nature"],
+                "id_etudiant": id_etudiant,
+                "id_enseignant": data["id_enseignant"],
+            },
+            "allowedRolesRequester": ["responsable_stages"],
+        }
+    )
     return db_request(current_user, SQLRequest(**request))
 
 
@@ -523,15 +631,22 @@ def post_etudiant_stage(
 #
 ######################################################
 
-@router.patch("/etudiants/{id_etudiant:int}/stages/{id_stage:int}",
-             tags=["administratif", "student", "internship",],
-             summary="Students",
-             description="Return the list of students")
+
+@router.patch(
+    "/etudiants/{id_etudiant:int}/stages/{id_stage:int}",
+    tags=[
+        "administratif",
+        "student",
+        "internship",
+    ],
+    summary="Students",
+    description="Return the list of students",
+)
 def patch_etudiant_stage(
-        id_etudiant: int,
-        id_stage: int,
-        current_user: Annotated[User, Depends(get_current_active_user)],
-        data: Dict[str, Any],
+    id_etudiant: int,
+    id_stage: int,
+    current_user: Annotated[User, Depends(get_current_active_user)],
+    data: dict[str, Any],
 ):
     # ToDo il pourrait être intéressant de vérifier que le stage est bien à l'étudiant
     # ToDo convert parameters to be SQLAlchemy Core compatible when it will be up
@@ -542,7 +657,7 @@ def patch_etudiant_stage(
                     WHERE id_stage = %(id_stage)s
         """,
         "params": {
-            "id_enseignant": data['id_enseignant'],
+            "id_enseignant": data["id_enseignant"],
             "id_stage": id_stage,
         },
         "allowedRolesRequester": ["responsable_stages"],
@@ -556,14 +671,21 @@ def patch_etudiant_stage(
 #
 ######################################################
 
-@router.delete("/etudiants/{id_etudiant:int}/stages/{id_stage:int}",
-              tags=["administratif", "student", "internship",],
-              summary="Students",
-              description="Return the list of students")
+
+@router.delete(
+    "/etudiants/{id_etudiant:int}/stages/{id_stage:int}",
+    tags=[
+        "administratif",
+        "student",
+        "internship",
+    ],
+    summary="Students",
+    description="Return the list of students",
+)
 def delete_etudiant_stage(
-        id_etudiant: int,
-        id_stage: int,
-        current_user: Annotated[User, Depends(get_current_active_user)],
+    id_etudiant: int,
+    id_stage: int,
+    current_user: Annotated[User, Depends(get_current_active_user)],
 ):
     # ToDo il pourrait être intéressant de vérifier que le stage est bien à l'étudiant
     # ToDo convert parameters to be SQLAlchemy Core compatible when it will be up
@@ -577,6 +699,3 @@ def delete_etudiant_stage(
         "allowedRolesRequester": ["responsable_stages"],
     }
     return db_request(current_user, SQLRequest(**request))
-
-
-

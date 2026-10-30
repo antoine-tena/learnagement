@@ -1,17 +1,20 @@
-import logging
 from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException
+
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
+
 from api.dependencies import db_request, get_current_active_user
 from models.request import SQLRequest
 from models.user import User
 
 router = APIRouter()
 
+
 # Modèle pour l'insertion/mise à jour
 class CalendarUpdate(BaseModel):
     url: str
     url_name: str = "Planning des cours"
+
 
 ######################################################
 #
@@ -36,7 +39,7 @@ class CalendarUpdate(BaseModel):
 #     response = db_request(current_user, SQLRequest(**req))
 #
 #     if not isinstance(response, list) or len(response) == 0:
-#         raise HTTPException(status_code=404, detail="Utilisateur introuvable dans la vue des rôles.")
+# raise HTTPException(status_code=404, detail="Utilisateur introuvable dans la vue des rôles.")
 #
 #     user_data = response[0]
 #     user_type = user_data.get("role", "etudiant").lower()
@@ -58,16 +61,19 @@ class CalendarUpdate(BaseModel):
 #
 ######################################################
 
-@router.get("/user/{id:int}/calendars",
-            tags=["calendar"],
-            summary="Get User Calendar URLs",
-            description="Returns all ADE iCal URLs for the currently logged-in user")
+
+@router.get(
+    "/user/{id:int}/calendars",
+    tags=["calendar"],
+    summary="Get User Calendar URLs",
+    description="Returns all ADE iCal URLs for the currently logged-in user",
+)
 def get_user_calendar_urls(
     id: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
 ):
     # 1. On récupère le bon ID et la bonne colonne via notre Helper
-    #role_id, role_col, _ = get_user_role_and_id(current_user)
+    # role_id, role_col, _ = get_user_role_and_id(current_user)
     fields = f"id_{current_user.main_role}"
     # 2. On cherche le calendrier en utilisant spécifiquement cette colonne
     request = {
@@ -79,16 +85,16 @@ def get_user_calendar_urls(
         # """,
         "request": f"""
             SELECT *
-            FROM LNM_calendar 
-            WHERE {fields} = %(user_id)s 
+            FROM LNM_calendar
+            WHERE {fields} = %(user_id)s
             ORDER BY url_name ASC;
         """,
         "params": {
             "user_id": id,
         },
         "allowedRolesRequester": {
-            "roles":[],
-            "owner": {"role": current_user.main_role, "id": "user_id"}
+            "roles": [],
+            "owner": {"role": current_user.main_role, "id": "user_id"},
         },
     }
 
@@ -101,10 +107,13 @@ def get_user_calendar_urls(
 #
 ######################################################
 
-@router.post("/user/{id:int}/calendars",
-             tags=["calendar"],
-             summary="Update User Calendar URL",
-             description="Saves a specific iCal URL")
+
+@router.post(
+    "/user/{id:int}/calendars",
+    tags=["calendar"],
+    summary="Update User Calendar URL",
+    description="Saves a specific iCal URL",
+)
 def add_user_calendar_url(
     id: int,
     data: CalendarUpdate,
@@ -114,7 +123,7 @@ def add_user_calendar_url(
 
     request = {
         "request": f"""
-            INSERT INTO LNM_calendar (url_name, {fields}, url) 
+            INSERT INTO LNM_calendar (url_name, {fields}, url)
             VALUES (%(url_name)s, %(user_id)s, %(url)s)
             ON DUPLICATE KEY UPDATE url = %(url)s, url_name = %(url_name)s;
         """,
@@ -124,17 +133,20 @@ def add_user_calendar_url(
             "url": data.url,
         },
         "allowedRolesRequester": {
-            "roles":[],
-            "owner": {"role": current_user.main_role, "id": "user_id"}
+            "roles": [],
+            "owner": {"role": current_user.main_role, "id": "user_id"},
         },
     }
-    
+
     return db_request(current_user, SQLRequest(**request))
 
-@router.patch("/user/{id:int}/calendars/{id_calendar:int}",
-             tags=["calendar"],
-             summary="Update User Calendar URL",
-             description="Updates a specific iCal URL")
+
+@router.patch(
+    "/user/{id:int}/calendars/{id_calendar:int}",
+    tags=["calendar"],
+    summary="Update User Calendar URL",
+    description="Updates a specific iCal URL",
+)
 def update_user_calendar_url(
     id: int,
     id_calendar: int,
@@ -145,7 +157,7 @@ def update_user_calendar_url(
 
     request = {
         "request": f"""
-            UPDATE `LNM_calendar` 
+            UPDATE `LNM_calendar`
             SET `url_name` = %(url_name)s,
                 `url` = %(url)s
             WHERE id_calendar = %(id_calendar)s
@@ -155,11 +167,11 @@ def update_user_calendar_url(
             "url_name": data.url_name,
             "url": data.url,
             "id_calendar": id_calendar,
-            "user_id": id, # To check ownership
+            "user_id": id,  # To check ownership
         },
         "allowedRolesRequester": {
-            "roles":[],
-            "owner": {"role": current_user.main_role, "id": "user_id"}
+            "roles": [],
+            "owner": {"role": current_user.main_role, "id": "user_id"},
         },
     }
 

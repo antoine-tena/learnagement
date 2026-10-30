@@ -1,7 +1,7 @@
 import logging
+from typing import Annotated
 
 from fastapi import APIRouter, Depends
-from typing import Annotated
 
 from api.dependencies import db_request, get_current_active_user
 from models.request import SQLRequest
@@ -12,10 +12,12 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-@router.get("/apc/competences",
-            tags=["apc"],
-            summary="APC Compétences",
-            description="Retourne la liste des compétences APC")
+@router.get(
+    "/apc/competences",
+    tags=["apc"],
+    summary="APC Compétences",
+    description="Retourne la liste des compétences APC",
+)
 def get_competences(
     current_user: Annotated[User, Depends(get_current_active_user)],
 ):
@@ -29,10 +31,12 @@ def get_competences(
     return db_request(current_user, SQLRequest(**request))
 
 
-@router.get("/apc/niveaux",
-            tags=["apc"],
-            summary="APC Niveaux",
-            description="Retourne la liste des niveaux de compétences")
+@router.get(
+    "/apc/niveaux",
+    tags=["apc"],
+    summary="APC Niveaux",
+    description="Retourne la liste des niveaux de compétences",
+)
 def get_niveaux(
     current_user: Annotated[User, Depends(get_current_active_user)],
 ):
@@ -46,10 +50,12 @@ def get_niveaux(
     return db_request(current_user, SQLRequest(**request))
 
 
-@router.get("/apc/apprentissages",
-            tags=["apc"],
-            summary="APC Apprentissages critiques",
-            description="Retourne la liste des apprentissages critiques")
+@router.get(
+    "/apc/apprentissages",
+    tags=["apc"],
+    summary="APC Apprentissages critiques",
+    description="Retourne la liste des apprentissages critiques",
+)
 def get_apprentissages(
     current_user: Annotated[User, Depends(get_current_active_user)],
 ):
@@ -63,10 +69,12 @@ def get_apprentissages(
     return db_request(current_user, SQLRequest(**request))
 
 
-@router.get("/apc/ac_modules",
-            tags=["apc"],
-            summary="APC AC-Modules",
-            description="Retourne les associations apprentissages critiques / modules")
+@router.get(
+    "/apc/ac_modules",
+    tags=["apc"],
+    summary="APC AC-Modules",
+    description="Retourne les associations apprentissages critiques / modules",
+)
 def get_ac_modules(
     current_user: Annotated[User, Depends(get_current_active_user)],
 ):
@@ -80,10 +88,12 @@ def get_ac_modules(
     return db_request(current_user, SQLRequest(**request))
 
 
-@router.get("/apc/modules",
-            tags=["apc"],
-            summary="APC Modules",
-            description="Retourne la liste des modules de la maquette")
+@router.get(
+    "/apc/modules",
+    tags=["apc"],
+    summary="APC Modules",
+    description="Retourne la liste des modules de la maquette",
+)
 def get_apc_modules(
     current_user: Annotated[User, Depends(get_current_active_user)],
 ):
@@ -98,10 +108,12 @@ def get_apc_modules(
     return db_request(current_user, SQLRequest(**request))
 
 
-@router.get("/apc/composantes",
-            tags=["apc"],
-            summary="APC Composantes essentielles",
-            description="Retourne la liste des composantes essentielles")
+@router.get(
+    "/apc/composantes",
+    tags=["apc"],
+    summary="APC Composantes essentielles",
+    description="Retourne la liste des composantes essentielles",
+)
 def get_composantes(
     current_user: Annotated[User, Depends(get_current_active_user)],
 ):
@@ -115,10 +127,12 @@ def get_composantes(
     return db_request(current_user, SQLRequest(**request))
 
 
-@router.get("/apc/situations",
-            tags=["apc"],
-            summary="APC Situations professionnelles",
-            description="Retourne la liste des situations professionnelles / métiers")
+@router.get(
+    "/apc/situations",
+    tags=["apc"],
+    summary="APC Situations professionnelles",
+    description="Retourne la liste des situations professionnelles / métiers",
+)
 def get_situations(
     current_user: Annotated[User, Depends(get_current_active_user)],
 ):
