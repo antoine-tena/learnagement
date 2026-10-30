@@ -1,5 +1,5 @@
 # Utiliser l'image officielle de Node.js
-FROM node:18-alpine
+FROM node:24-alpine
 
 #RUN apk add --no-cache --upgrade bash
 
@@ -7,11 +7,14 @@ FROM node:18-alpine
 RUN mkdir /app
 WORKDIR /app
 
+# pnpm installe les dépendances du front (pnpm-lock.yaml)
+RUN npm install -g pnpm@12.8.1
+
 # Copier les fichiers nécessaires pour installer les dépendances
-#COPY package.json package-lock.json ./
+#COPY package.json pnpm-lock.yaml ./
 
 # Supprimer les dépendances existantes et les réinstaller
-#RUN npm install
+#RUN pnpm install --frozen-lockfile
 
 # Copy entrypoint
 COPY entrypoint.sh /entrypoint.sh

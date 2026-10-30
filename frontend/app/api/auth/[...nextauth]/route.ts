@@ -74,6 +74,8 @@ const handler = NextAuth({
                 return {
                     id: String(decoded.id),
                     email: decoded.email,
+                    firstname: decoded.firstname,
+                    lastname: decoded.lastname,
                     name: `${decoded.firstname} ${decoded.lastname}`,
                     roles: decoded.roles,
                     jwt_token: jwt,

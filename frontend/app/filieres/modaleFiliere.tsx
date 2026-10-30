@@ -22,12 +22,12 @@ import cross from "@/public/white-cross.png"
 /**
  * Composant de la modale des filières
  * Affiche les détails d'une filière sélectionnée
- * 
+ *
  * @param {string[]} nomFiliere - Nom de la filière sélectionnée
  * @param {Function} setNomFiliere - Fonction pour mettre à jour le nom de la filière
  * @returns {JSX.Element} Composant React
  */
-export default function ModaleFiliere({nomFiliere, setNomFiliere}: { nomFiliere: string[], setNomFiliere: any }) {
+export default function ModaleFiliere({nomFiliere, setNomFiliere}: { nomFiliere: string[], setNomFiliere: (nomFiliere: string[]) => void }) {
     const [infosCompetences, setInfosCompetences] = useState<infosCompetence[]>([])
     const [idCompetenceClicked, setIdCompetenceClicked] = useState<number>(-1)
     const [composantesEssentielles, setComposantesEssentielles] = useState<composanteEssentielle[]>([])
@@ -41,25 +41,18 @@ export default function ModaleFiliere({nomFiliere, setNomFiliere}: { nomFiliere:
     }, []);
 
     useEffect(() => {
-        let form_data = new FormData
-        form_data.append("nom_filiere", nomFiliere[0])
-        axios.get("/api/proxy/filiere/" + nomFiliere[0] + "/competences", form_data, {withCredentials: true})
+        axios.get("/api/proxy/filiere/" + nomFiliere[0] + "/competences", {withCredentials: true})
             .then(response => {
                 setInfosCompetences(response.data)
             })
-        setIdCompetenceClicked(-1)
     }, [nomFiliere]);
 
     useEffect(() => {
         if(idCompetenceClicked >= 0){
-            let form_data = new FormData
-            form_data.append("idCompetence", idCompetenceClicked.toString())
-            axios.get("/api/proxy/filiere/competence/" + idCompetenceClicked.toString() + "/composantes_essentielles", form_data, {withCredentials: true})
+            axios.get("/api/proxy/filiere/competence/" + idCompetenceClicked.toString() + "/composantes_essentielles", {withCredentials: true})
                 .then(response => {
                     setComposantesEssentielles(response.data)
                 })
-        }else{
-            setComposantesEssentielles([]);
         }
 
     }, [idCompetenceClicked]);
@@ -93,7 +86,7 @@ export default function ModaleFiliere({nomFiliere, setNomFiliere}: { nomFiliere:
                     <h1 className={"mt-0 mb-8"}>{nomFiliere[1] != null ? <>{nomFiliere[0]} - {nomFiliere[1]}</>  : nomFiliere[0]}</h1>
                     <ListCompetences infosCompetences={infosCompetences} setIdCompetenceClicked={setIdCompetenceClicked} />
                     <div className={"w-full flex flex-row justify-between"}>
-                        <ComposantesEssentielles composantesEssentielles={composantesEssentielles}/>
+                        <ComposantesEssentielles composantesEssentielles={idCompetenceClicked >= 0 ? composantesEssentielles : []}/>
                         {idCompetenceClicked >= 0 && <ListApprentissagesCritiques idCompetence={idCompetenceClicked}/>}
                     </div>
                 </div>

@@ -14,7 +14,7 @@ export default function Home() {
 
     useEffect(() => {
         if (session && !charged){
-            let form_data = new FormData
+            const form_data = new FormData
             form_data.append("userId", session.user.id)
             axios.post("/api/proxy/list/listResponsableModule", form_data, {withCredentials: true})
                 .then(response => {
@@ -27,7 +27,9 @@ export default function Home() {
     return (
         <>
             <main className={"h-screen grid grid-cols-4"}>
-                <SideMenu />
+                <Suspense>
+                    <SideMenu />
+                </Suspense>
                 <div className={"col-span-3 overflow-y-auto"}>
                     <Homepage />
                 </div>

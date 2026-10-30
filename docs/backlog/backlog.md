@@ -7,7 +7,7 @@ n'est ouvert.**
 
 North star: **Learnagement in service**.
 
-**Next free: T-18.**
+**Next free: T-21.**
 
 ---
 
@@ -15,19 +15,28 @@ North star: **Learnagement in service**.
 
 
 
-### T-14 · Next.js à jour : la faille du middleware corrigée
+## 🟠 Important
+
+### T-18 · Plus de données personnelles dans les logs du front
+- **Type**: bug
+- **Status**: todo
+- **Opened**: 2026-10-30
+- **Effort**: XS · **Owner**: — · **Due**: —
+- **Origin**: T-14, lecture de `route.ts`
+
+`app/api/auth/[...nextauth]/route.ts` écrit l'email, le prénom et le nom de l'utilisateur dans
+les logs à chaque connexion ([PERSONAL-DATA]) : ne garder que l'identifiant.
+
+### T-19 · Zod 4 et audit des dépendances du front
 - **Type**: bug
 - **Status**: todo
 - **Opened**: 2026-10-30
 - **Effort**: S · **Owner**: — · **Due**: —
-- **Origin**: `kiln set frontend=next` (pnpm signale next@15.1.2 obsolète)
+- **Origin**: `pnpm audit` après T-14
 
-`frontend/` est en Next 15.1.2, touché par CVE-2025-29927 : un en-tête
-`x-middleware-subrequest` contourne le middleware, donc l'authentification de `middleware.ts`
-(`withAuth`). Passer en Next 16 (la version de kiln), ESLint 9 et `eslint-config-next`
-installés, `middleware.ts` → `proxy.ts`.
-
-## 🟠 Important
+`pnpm audit` signale encore zod < 4.6.6 (élevée, dépendance directe en 3.x, version majeure à
+passer), postcss-selector-parser par `@tailwindcss/typography` (modérée) et deepmerge par
+`@svgr/webpack` (faible, sans correctif).
 
 
 ### T-05 · uv partout : `pyproject.toml` et `uv.lock`
@@ -54,6 +63,17 @@ Les `requirements*.txt` deviennent un `pyproject.toml` par composant Python avec
 Node 18 (fin de vie) → Node LTS.
 
 ## 🟡 Normal
+
+### T-20 · Le front passe ESLint
+- **Type**: improvement
+- **Status**: todo
+- **Opened**: 2026-10-30
+- **Effort**: M · **Owner**: — · **Due**: —
+- **Origin**: ESLint installé par T-14
+
+Le hook de commit vérifie chaque fichier touché, et `eslint .` trouve encore des erreurs
+anciennes dans tout `frontend/` (`any`, `set-state-in-effect`, `prefer-const`) : le premier qui
+modifie un de ces fichiers doit les corriger. À solder d'un coup.
 
 ### T-07 · Le lanceur fonctionne et se lit
 - **Type**: bug
