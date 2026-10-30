@@ -31,7 +31,8 @@ supprime un dossier, un domaine ou un point d'entrée.
 - `dashboards/` : les tableaux de bord Dash (`main.py`, une app `appNN_*` par vue et son
   `_tools.py`), `apc_dash/` (approche par compétences).
 - `frontend/` : le front Next.js en cours de refonte (`app/`, proxy vers l'API).
-- `scraping/` : scripts d'import (notes, agenda, stages, étudiants…).
+- `scraping/` : le paquet `learnagement_scraping` (commande `learnagement-scraping`) : `parsers.py`
+  (HTML vers données), `browser.py` (Selenium), `db.py` (écritures), `cli.py` ; `out/` est ignoré.
 - `db/` : `sql/` (schéma, migrations versionnées `VX.Y.Z__*.sql`), `freeData/` (jeux de données
   libres), `tools/` ; `db/data/` et `db/backup/` sont privés et ignorés.
 - `archive/` : le code mort gardé pour mémoire (ancien backend PHP…), hors des règles ; son
