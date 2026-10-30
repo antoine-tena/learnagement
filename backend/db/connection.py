@@ -1,12 +1,10 @@
 import os
-from warnings import deprecated
-from core.logging import logger
-
 from contextlib import contextmanager
 
-from sqlalchemy import create_engine, URL
+from sqlalchemy import URL, create_engine
 
 _engine = None
+
 
 def get_engine():
     global _engine
@@ -24,10 +22,11 @@ def get_engine():
             pool_size=int(os.getenv("DB_POOL_SIZE", "10")),
             max_overflow=int(os.getenv("DB_MAX_OVERFLOW", "10")),
             pool_timeout=10,
-            pool_pre_ping=True,   # teste la connexion avant usage
-            pool_recycle=1800,    # évite les "MySQL server has gone away"
+            pool_pre_ping=True,  # teste la connexion avant usage
+            pool_recycle=1800,  # évite les "MySQL server has gone away"
         )
     return _engine
+
 
 @contextmanager
 def get_connection():
@@ -35,10 +34,12 @@ def get_connection():
     with get_engine().begin() as conn:
         yield conn
 
+
 @contextmanager
 def get_read_connection():
     with get_engine().connect() as conn:
         yield conn  # fermeture = rollback implicite, retour au pool
+
 
 # @deprecated("Migration to sqlalchemy, use get_connection() instead")
 # def db_connexion():
