@@ -10,3 +10,12 @@ by = "antoine-tena"
 since = 2026-10-30
 until = 2026-11-06
 renewals = 0
+
+[[waiver]]
+rule = "LOGGING"
+paths = ["backend/**"]
+reason = "Dette d'avant kiln : logging et print remplacés par structlog (T-13)"
+by = "antoine-tena"
+since = 2026-10-30
+until = 2026-11-06
+renewals = 0
