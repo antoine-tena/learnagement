@@ -9,17 +9,17 @@ import init
 from auth import authenticate
 from system import access_auth, check
 from user import (
-    APC_data,
-    LNM_calendar,
-    LNM_enseignant,
-    LNM_etudiant,
-    LNM_evaluation,
-    LNM_filiere,
-    LNM_mobility_assignment,
-    LNM_university,
-    MAQUETTE_module,
     apc_competence,
-    apc_KPI_competence,
+    apc_data,
+    apc_kpi_competence,
+    lnm_calendar,
+    lnm_enseignant,
+    lnm_etudiant,
+    lnm_evaluation,
+    lnm_filiere,
+    lnm_mobility_assignment,
+    lnm_university,
+    maquette_module,
 )
 
 
@@ -66,17 +66,17 @@ app.add_middleware(
 app.include_router(authenticate.router)
 app.include_router(check.router)
 app.include_router(access_auth.router)
-app.include_router(LNM_enseignant.router)
-app.include_router(LNM_etudiant.router)
-app.include_router(LNM_university.router)
-app.include_router(LNM_filiere.router)
-app.include_router(MAQUETTE_module.router)
-app.include_router(LNM_evaluation.router)
-app.include_router(APC_data.router)
-app.include_router(apc_KPI_competence.router)
+app.include_router(lnm_enseignant.router)
+app.include_router(lnm_etudiant.router)
+app.include_router(lnm_university.router)
+app.include_router(lnm_filiere.router)
+app.include_router(maquette_module.router)
+app.include_router(lnm_evaluation.router)
+app.include_router(apc_data.router)
+app.include_router(apc_kpi_competence.router)
 app.include_router(apc_competence.router)
-app.include_router(LNM_calendar.router)
-app.include_router(LNM_mobility_assignment.router)
+app.include_router(lnm_calendar.router)
+app.include_router(lnm_mobility_assignment.router)
 
 
 # Classical health

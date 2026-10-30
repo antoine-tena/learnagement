@@ -62,7 +62,7 @@ def tree_competence(
     description="Return the list of partner universities",
     response_model=None,
 )
-def tree_competence(
+def tree_competence_big(
     current_user: Annotated[User, Depends(get_current_active_user)],
 ) -> Rows:
     request = {
@@ -266,7 +266,7 @@ def get_classical_module_evaluation_average(
     description="Return the list of partner universities",
     response_model=None,
 )
-def tree_competence(
+def get_classical_evaluations_enseignant(
     id_enseignant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
 ) -> Rows:

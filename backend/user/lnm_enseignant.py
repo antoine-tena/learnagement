@@ -117,7 +117,7 @@ def enseignants_load(
     description="Return the list of teachers load",
     response_model=None,
 )
-def enseignants_load(
+def enseignant_load(
     id_enseignant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
 ) -> Rows:

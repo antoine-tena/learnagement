@@ -7,7 +7,7 @@ from api.dependencies import Rows, db_request, get_current_active_user
 from api.route_factory import register_auto_routes
 from models.request import SQLRequest
 from models.user import User
-from repositories.LNM_filiere_requests import __requests, requests
+from repositories.lnm_filiere_requests import __requests, requests
 
 logger = logging.getLogger(__name__)
 

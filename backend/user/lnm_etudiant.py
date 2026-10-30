@@ -189,7 +189,7 @@ def get_etudiants_stages(
     description="Return the list of students",
     response_model=None,
 )
-def get_etudiants_stages(
+def get_etudiants_without_stage(
     current_user: Annotated[User, Depends(get_current_active_user)],
 ) -> Rows:
     request = {
@@ -457,7 +457,7 @@ def get_etudiant_pastedt(
     description="Return the list of students",
     response_model=None,
 )
-def get_etudiant_pastedt(
+def get_etudiant_polypoints(
     id_etudiant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
 ) -> Rows:
@@ -490,7 +490,7 @@ def get_etudiant_pastedt(
     description="Return the list of students",
     response_model=None,
 )
-def get_etudiant_pastedt(
+def get_etudiant_rendus(
     id_etudiant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
 ) -> Rows:
@@ -535,7 +535,7 @@ def get_etudiant_pastedt(
     description="Return the list of students",
     response_model=None,
 )
-def get_etudiants_stages(
+def get_etudiant_stages(
     id_etudiant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
 ) -> Rows:

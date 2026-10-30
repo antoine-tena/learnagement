@@ -7,8 +7,8 @@ from access_control.rules import evaluate_rule
 from api.dependencies import Rows, get_current_active_user
 from models.request import SQLRequest
 from models.user import User
-from user import LNM_university
-from user.LNM_university import StudentDecisionPayload
+from user import lnm_university
+from user.lnm_university import StudentDecisionPayload
 
 # ─────────────────────────────────────────────
 # Helpers
@@ -43,25 +43,25 @@ def recorded(monkeypatch: pytest.MonkeyPatch) -> list[SQLRequest]:
             return [{"wishes_count": 0, "max_priority": 0, "already_exists": 0, "is_submitted": 0}]
         return [{"id_assignment": 1, "status": "pending"}]
 
-    monkeypatch.setattr(LNM_university, "db_request", fake_db_request)
+    monkeypatch.setattr(lnm_university, "db_request", fake_db_request)
     return calls
 
 
 # Un appel par endpoint concerné, avec l'utilisateur courant en paramètre
 ENDPOINT_CALLS = {
-    "get_campaign_status": lambda user: LNM_university.get_campaign_status(
+    "get_campaign_status": lambda user: lnm_university.get_campaign_status(
         id_etudiant=ID_ETUDIANT, current_user=user
     ),
-    "add_university_to_wishes": lambda user: LNM_university.add_university_to_wishes(
+    "add_university_to_wishes": lambda user: lnm_university.add_university_to_wishes(
         id_etudiant=ID_ETUDIANT,
         id_partner_university=7,
         current_user=user,
         payload={"id_semestre": 8},
     ),
-    "get_student_assignment": lambda user: LNM_university.get_student_assignment(
+    "get_student_assignment": lambda user: lnm_university.get_student_assignment(
         id_etudiant=ID_ETUDIANT, current_user=user
     ),
-    "submit_student_decision": lambda user: LNM_university.submit_student_decision(
+    "submit_student_decision": lambda user: lnm_university.submit_student_decision(
         id_etudiant=ID_ETUDIANT,
         payload=StudentDecisionPayload(decision="accepted"),
         current_user=user,
@@ -167,7 +167,7 @@ class TestHttpLevel:
     @pytest.fixture
     def client(self, recorded: list[SQLRequest]) -> TestClient:
         app = FastAPI()
-        app.include_router(LNM_university.router)
+        app.include_router(lnm_university.router)
         app.dependency_overrides[get_current_active_user] = lambda: make_student(ID_ETUDIANT)
         # raise_server_exceptions=False : on veut le code HTTP, pas l'exception
         return TestClient(app, raise_server_exceptions=False)

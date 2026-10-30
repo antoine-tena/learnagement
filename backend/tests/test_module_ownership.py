@@ -11,7 +11,7 @@ from access_control.checker import check_access
 from api.dependencies import Rows, get_current_active_user
 from models.request import SQLRequest
 from models.user import User
-from user import MAQUETTE_module
+from user import maquette_module
 
 # ─────────────────────────────────────────────
 # Jeu de données : 2 modules, 2 responsables
@@ -76,7 +76,7 @@ def db(monkeypatch: pytest.MonkeyPatch) -> Iterator[sqlite3.Connection]:
         conn.commit()
         return rows
 
-    monkeypatch.setattr(MAQUETTE_module, "db_request", fake_db_request)
+    monkeypatch.setattr(maquette_module, "db_request", fake_db_request)
     monkeypatch.setattr("api.dependencies.db_request", fake_db_request)  # pour les prédicats
     yield conn
     conn.close()
@@ -85,7 +85,7 @@ def db(monkeypatch: pytest.MonkeyPatch) -> Iterator[sqlite3.Connection]:
 @pytest.fixture
 def call_as(db: sqlite3.Connection) -> CallAs:
     app = FastAPI()
-    app.include_router(MAQUETTE_module.router)
+    app.include_router(maquette_module.router)
     client = TestClient(app, raise_server_exceptions=False)
 
     def _call(user: User, method: str, url: str, **kwargs: object) -> Response:
