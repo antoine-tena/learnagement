@@ -2,7 +2,7 @@
 Project rules go in CLAUDE.md or in .claude/rules/ outside kiln/. -->
 # Learnagement: working here
 
-Learnagement.
+Outil d'intégration des données de l'enseignement : le pont entre étudiants, enseignants et administratifs de l'USMB.
 
 Size: **Medium**, an app in production, real users, several contributors (`kiln set size=…` changes it).
 No stack of kiln here: its common part only (CI, hooks, rules, charter).
@@ -15,8 +15,8 @@ The repo is generated and kept current by [kiln](https://github.com/antoine-tena
   included; `kiln set key=value` changes a setting of the project (stack, team, podman…).
 
 ## Language
-- Talk with the user in English. Docs (README, `docs/`), commit messages, code
-  comments, tickets and the texts users read are in English too.
+- Talk with the user in French. Docs (README, `docs/`), commit messages, code
+  comments, tickets and the texts users read are in French too.
 - Code identifiers are always English. The keywords of `docs/backlog/` (`Type`, `Status`,
   `todo`, section titles) stay English whatever the language.
 

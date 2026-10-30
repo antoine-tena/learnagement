@@ -1,18 +1,18 @@
-## What
+## Quoi
 
-<!-- What this pull request changes, in one or two sentences. -->
+<!-- Ce que change cette PR, en une ou deux phrases. -->
 
-## Why
+## Pourquoi
 
-<!-- The need or the bug behind it (link to the issue: Closes #…). -->
+<!-- Le besoin ou le bug d'origine (lien vers l'issue : Closes #…). -->
 
-## How to test
+## Comment tester
 
 1.
 
-## Checks
+## Vérifications
 
-- [ ] The code follows the rules of `.claude/rules/kiln/` and `CLAUDE.md` ([FILE-SIZE], [GENERIC-NAMES], [NO-MAGIC-VALUES])
-- [ ] Commits of 10 files at most, prefixed titles of 50 characters at most ([COMMITS])
-- [ ] A bug fix comes with the test that would have caught it ([REGRESSION-TEST])
-- [ ] No secret nor real personal data in the diff ([SECRETS], [PERSONAL-DATA])
+- [ ] Le code respecte les règles de `.claude/rules/kiln/` et du `CLAUDE.md` ([FILE-SIZE], [GENERIC-NAMES], [NO-MAGIC-VALUES])
+- [ ] Commits de 10 fichiers au plus, titres préfixés de 50 caractères au plus ([COMMITS])
+- [ ] Un bug corrigé arrive avec le test qui l'aurait détecté ([REGRESSION-TEST])
+- [ ] Aucun secret ni donnée personnelle réelle dans le diff ([SECRETS], [PERSONAL-DATA])

@@ -5,12 +5,13 @@ backend: none
 ci_runner: github
 compact_window: 400000
 created: '2026-10-30'
-description: Learnagement.
+description: 'Outil d''intégration des données de l''enseignement : le pont entre
+    étudiants, enseignants et administratifs de l''USMB.'
 frontend: none
 kept:
 - .gitignore
 - README.md
-language: en
+language: fr
 language_custom: false
 name: learnagement
 north_star: Learnagement in service
@@ -23,5 +24,6 @@ size: medium
 statusline_ci: true
 team:
 - FlavienVernier
+- antoine-tena
 timezone: Europe/Paris
 title: Learnagement
