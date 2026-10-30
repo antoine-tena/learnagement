@@ -7,34 +7,13 @@ n'est ouvert.**
 
 North star: **Learnagement in service**.
 
-**Next free: T-17.**
+**Next free: T-18.**
 
 ---
 
 ## 🔴 Critical
 
-### T-01 · Requêtes SQL de l'API construites avec des paramètres
-- **Type**: bug
-- **Status**: todo
-- **Opened**: 2026-10-30
-- **Effort**: S · **Owner**: — · **Due**: —
-- **Origin**: `kiln score`, règle SQL-PARAMETERS
 
-`backend/api/dependencies.py` (l. 40 à 110) insère des valeurs dans le texte SQL :
-injection possible. Passer par les paramètres liés de SQLAlchemy (`text(...)` + `:nom`), un
-test par requête.
-
-### T-02 · Le front PHP passe par l'API, plus par la base
-- **Type**: bug
-- **Status**: todo
-- **Opened**: 2026-10-30
-- **Effort**: S · **Owner**: — · **Due**: —
-- **Origin**: lecture du code
-
-`web/utils/connectDB.php`, `views/base/@post/inscription.php`,
-`views/dashboard/@post/dependance_module.php`, `views/dashboard/create_stage.php` parlent à
-MySQL en direct : deux chemins vers les données, deux contrôles d'accès. Les faire passer par
-`utils/apiProxy.php` et une route de l'API.
 
 ### T-14 · Next.js à jour : la faille du middleware corrigée
 - **Type**: bug
@@ -49,6 +28,17 @@ MySQL en direct : deux chemins vers les données, deux contrôles d'accès. Les 
 installés, `middleware.ts` → `proxy.ts`.
 
 ## 🟠 Important
+
+### T-17 · L'API passe ruff : format, imports, annotations
+- **Type**: improvement
+- **Status**: todo
+- **Opened**: 2026-10-30
+- **Effort**: M · **Owner**: — · **Due**: —
+- **Origin**: hook `ruff-check-backend` de kiln, 1 468 erreurs sur `backend/`
+
+Tant que la dette ruff reste, toute retouche d'un fichier de `backend/` est refusée au commit.
+`ruff format` et les corrections sûres d'abord (style), puis les annotations (ANN, 400), les
+noms de modules (`LNM_*.py`, N999) et le reste à la main, tests verts à chaque étape.
 
 
 
