@@ -1,0 +1,29 @@
+# kiln's answers for this project: never edit by hand, `kiln set` changes them.
+_commit: v0.4.9-279-gbad9cd3
+_src_path: https://github.com/antoine-tena/kiln.git
+backend: none
+ci_runner: github
+compact_window: 400000
+created: '2026-10-30'
+description: 'Outil d''intégration des données de l''enseignement : le pont entre
+    étudiants, enseignants et administratifs de l''USMB.'
+frontend: none
+kept:
+- .gitignore
+- README.md
+language: fr
+language_custom: false
+name: learnagement
+north_star: Learnagement in service
+owner: FlavienVernier
+podman: false
+prod_health_url: ''
+project_type: app
+serena: false
+size: medium
+statusline_ci: true
+team:
+- FlavienVernier
+- antoine-tena
+timezone: Europe/Paris
+title: Learnagement

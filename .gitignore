@@ -6,16 +6,14 @@
 **/tmp/*
 *.lock
 
-# data and backup directories store private data, NEVER PUT IN ON GIT 
+# data and backup directories store private data, NEVER PUT IN ON GIT
 **/data
 **/backup
 db/docker-entrypoint-initdb.d
 
 __pycache__
-.*
 #*
 *#
-!.htaccess
 
 # private files that contain password, NEVER PUT IN ON GIT (must be replaced by .env)
 docker/docker-compose.yml
@@ -29,3 +27,24 @@ front_NextJS/node_modules/
 mobility_map/node_modules/
 
 Doc_Private
+
+# kiln
+.env
+.env.*
+!.env.example
+*.p12
+.claude/settings.local.json
+.claude/worktrees/
+.claude/memory/
+.claude/sessions/
+.claude/kiln
+.serena/
+CLAUDE.local.md
+logs/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+*:Zone.Identifier
+.env_*
+.next/
