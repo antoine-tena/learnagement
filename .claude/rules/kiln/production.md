@@ -12,6 +12,8 @@ paths:
 
 - **[FAST-CI]** The full CI runs in under 10 minutes; a flaky test is quarantined and fixed within
   the week, never re-run until it passes.
+- **[HEALTH-PROBES]** Each service exposes a liveness probe and a readiness probe; the second one
+  really checks its dependencies (database, cache).
 - **[TESTED-BACKUPS]** A backup never restored does not exist: the restore is repeated at regular
   intervals and timed.
 - **[REVERSIBLE-DEPLOYMENT]** Every deployment can be undone in one command, without data loss: a
