@@ -7,7 +7,7 @@ n'est ouvert.**
 
 North star: **Learnagement in service**.
 
-**Next free: T-29.**
+**Next free: T-33.**
 
 ---
 
@@ -150,6 +150,46 @@ hash devient le secret, et le serveur ne contrôle ni le coût ni le sel. Envoye
 en HTTPS, hacher dans l'API (`pwdlib`).
 
 ## ⚪ Background — long-running work, debt and ideas
+
+### T-29 · Le backend découpé par domaine
+- **Type**: improvement
+- **Status**: todo
+- **Opened**: 2026-10-30
+- **Effort**: L · **Owner**: — · **Due**: —
+- **Origin**: revue de l'arborescence
+
+Regrouper routes, requêtes et modèles d'un même domaine (mobilité, maquette, auth…) au lieu de
+couches séparées (`api/`, `domains/`, `models/`, `repositories/`). À mener avec T-11.
+
+### T-30 · `scraping/` en vrai paquet testé
+- **Type**: improvement
+- **Status**: todo
+- **Opened**: 2026-10-30
+- **Effort**: M · **Owner**: — · **Due**: —
+- **Origin**: revue de l'arborescence
+
+Les scripts font `import lien_db` et dépendent du dossier d'où on les lance : un paquet, une
+commande par import, des tests sans réseau.
+
+### T-31 · Des noms parlants pour les tableaux de bord
+- **Type**: improvement
+- **Status**: todo
+- **Opened**: 2026-10-30
+- **Effort**: M · **Owner**: — · **Due**: —
+- **Origin**: revue de l'arborescence
+
+Les préfixes `appNN_` ne disent rien, et `app11_dag_dependance_new.py` côtoie son ancienne
+version. À décider après T-12, qui peut faire disparaître ces apps.
+
+### T-32 · Des tests pour le front et les tableaux de bord
+- **Type**: improvement
+- **Status**: todo
+- **Opened**: 2026-10-30
+- **Effort**: L · **Owner**: — · **Due**: —
+- **Origin**: revue de l'arborescence
+
+Seul `backend/` a une vraie suite de tests : couvrir au moins les parcours critiques du front
+retenu par T-12.
 
 ### T-21 · Code, commentaires et doc en anglais
 - **Type**: idea
