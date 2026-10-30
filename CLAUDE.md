@@ -37,17 +37,18 @@ supprime un dossier, un domaine ou un point d'entrée.
   libres), `tools/`, `update/` ; `db/data/` et `db/backup/` sont privés et ignorés.
 - `archive/` : le code mort gardé pour mémoire (ancien backend PHP…), hors des règles ; son
   `README.md` dit ce que chaque chose était.
-- `Doc/`, `ToDo/` : documentation et listes de tâches historiques.
+- `docs/` : la documentation (`README.md` en est l'index), `docs/mobility/` pour le module de
+  mobilité.
 - `docs/backlog/` : le travail à faire ; `charter.toml` : les règles vérifiées ;
   `.claude/rules/kiln/` : les règles de kiln pour Claude.
 
 ## Notes
 
 - Les branches de Flavien : `main` (production), `prerelease`, `dev` (intégration), puis
-  `feature/`, `bugfix/`, `refactor/`… (`GIT.md`). Le fork `antoine-tena/learnagement` intègre
+  `feature/`, `bugfix/`, `refactor/`… (`docs/git.md`). Le fork `antoine-tena/learnagement` intègre
   sur `antoine-tena`, puis propose ses changements à `dev` en pull request.
-- Les `.env` sont générés par le lanceur à partir de `__env_skeleton.env` et
-  `__env_default_<env>.env`, puis recopiés dans chaque conteneur : on ne les édite jamais à la
+- Les `.env` sont générés par le lanceur à partir de `config/env.skeleton` et
+  `config/env.<env>`, puis recopiés dans chaque conteneur : on ne les édite jamais à la
   main dans les sous-dossiers.
 - Des étudiants travaillent sur le repo par promotion : on ne casse pas une interface (route de
   l'API, variable d'environnement, commande du lanceur) sans le signaler dans le README.

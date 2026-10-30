@@ -41,7 +41,7 @@ Le système est conçu comme une machine à états stricte, divisée en 4 phases
 L'administration déclenche l'ouverture (`POST /university/admin/campaign/launch`). Le système calcule automatiquement le `mobility_z_score` (Moyenne Centrée Réduite) de chaque étudiant éligible. Ce score servira au tri pour l'algorithme, assurant une équité inter-filières.
 
 ### Phase 2 : Soumission des Vœux (Espace Étudiant)
-Les étudiants parcourent le catalogue, ajoutent des universités à leur panier (jusqu'à 6 vœux), et valident définitivement leur liste. 
+Les étudiants parcourent le catalogue, ajoutent des universités à leur panier (jusqu'à 6 vœux), et valident définitivement leur liste.
 
 ### Phase 3 : Diagnostic et Suivi (Administration)
 L'administration dispose d'un tableau de bord en temps réel pour suivre les soumissions et générer des exports. À la fin de cette phase, l'administration clique sur "Clôturer l'étape 1", ce qui force automatiquement la soumission des paniers des retardataires.

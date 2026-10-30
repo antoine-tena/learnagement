@@ -59,7 +59,7 @@ Si l'université est déjà présente dans le tableau mais que vous souhaitez aj
     \item Le bloc d'édition de l'université s'ouvre directement dans la ligne du tableau.
     \item Vous pouvez modifier le chiffre des \textbf{« Places globales S8/S9 »} directement dans la case.
     \item \textbf{Pour ajouter une nouvelle filière :} Sélectionnez la filière dans le menu déroulant, puis cliquez sur le petit bouton gris \textbf{« Ajouter »} pour créer la ligne, puis saisissez le nombre de places.
-    \item \textbf{Pour supprimer l'accès d'une filière :} Cliquez sur le texte rouge \textbf{« Supprimer »} situé sur la ligne de la filière concernée. 
+    \item \textbf{Pour supprimer l'accès d'une filière :} Cliquez sur le texte rouge \textbf{« Supprimer »} situé sur la ligne de la filière concernée.
     \newline \textit{(Astuce : C'est la méthode recommandée pour "cacher" une université aux étudiants d'une filière spécifique sans avoir à supprimer l'université entière du système).}
     \item \textbf{Pour modifier une filière existante :} Changez simplement le chiffre dans la case de sa ligne.
     \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=⚠️ ENREGISTREMENT FINAL OBLIGATOIRE ET RISQUE D'EXPIRATION]
@@ -88,18 +88,18 @@ Avant de commencer, il est impératif de vérifier rigoureusement le \textbf{nom
     \newline Si tous les étudiants d'une filière sont autorisés à partir en mobilité sans restriction de quota, vous \textbf{devez obligatoirement saisir un nombre grand} (au moins égal ou supérieur au nombre total d'étudiants de cette filière). L'essentiel est de ne pas mettre un chiffre inférieur au nombre d'étudiants concernés, afin de garantir que l'algorithme ne bloquera personne.
     \end{tcolorbox}
     \textbf{Remarque :} Tant que vous n'avez pas exécuté l'algorithme d'affectation (Étape 2), vous gardez toujours la possibilité de modifier ces valeurs.
-    
+
     \item Cliquez sur \textbf{« Lancement de la campagne \& Redoublants »}.
-    
+
     \item \textbf{Gestion des étudiants doublants :}
     \newline Le système ne sait pas par défaut qui sont les étudiants doublants. Il ne conserve aucune information stipulant qu'un étudiant est redoublant. C'est donc à vous de les indiquer manuellement.
     \newline Afin d'éviter que les notes de ces redoublants ne faussent le calcul de la Moyenne Centrée Réduite (Z-score) de la nouvelle cohorte, vous devez saisir l'\textbf{ID Étudiant} de chaque doublant ainsi que sa \textbf{Moyenne C. Réduite} (\textbf{Attention : vous devez avoir calculé ces valeurs vous-même au préalable}). Cliquez ensuite sur \textbf{« Ajouter à la liste »}.
     \newline \textit{Que fait le système ?} En lui fournissant cette liste, le système va chercher ces étudiants, mettre à jour leur score avec vos valeurs, et les exclure du calcul mathématique du Z-score des autres étudiants. Il fera tout cela sans jamais enregistrer en base de données qu'il s'agit d'étudiants "doublants".
-    
+
     \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=⚠️ RISQUE DE PERTE DE DONNÉES (EXPIRATION DE SESSION)]
     La liste des doublants que vous construisez à l'écran est temporaire et n'est envoyée au serveur \textbf{qu'au moment où vous cliquez sur le bouton final} de lancement de la campagne.
     \newline Si vous prenez trop de temps pour chercher et saisir tous les étudiants un par un, votre session de sécurité de l'application risque d'expirer. Si cela arrive, lorsque vous tenterez de lancer la campagne, l'action échouera et \textbf{vous perdrez toute la liste que vous venez de taper}.
-    \newline \textbf{Bonne pratique pour éviter cela :} 
+    \newline \textbf{Bonne pratique pour éviter cela :}
     \begin{itemize}[leftmargin=*]
         \item Préparez impérativement toute votre liste d'ID et de moyennes à l'avance sur un document séparé.
         \item Saisissez-les rapidement l'un après l'autre.
@@ -107,7 +107,7 @@ Avant de commencer, il est impératif de vérifier rigoureusement le \textbf{nom
         \item Lancez l'algorithme immédiatement après !
     \end{itemize}
     \end{tcolorbox}
-    
+
     \item Cliquez sur le bouton vert \textbf{« Ouvrir la campagne \& Calculer les scores »} pour ouvrir les accès et générer les scores de mérite.
     \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=⚠️ ACTION CRITIQUE UNIQUE]
     Le lancement de la campagne est une opération qui ne s'exécute \textbf{qu'une seule fois}. Assurez-vous que le moment est opportun et que tous les quotas sont corrects avant de cliquer.
@@ -171,7 +171,7 @@ Cliquez sur le bouton blanc \textbf{« Liste des Vœux Étudiants »}. Ce tablea
         \item \textbf{Pendant l'Étape 3 :} Utilisez le filtre \textbf{« Phase 3: Acceptation »} (\textit{En attente}) pour identifier qui n'a pas encore validé son départ.
         \item Utilisez la barre \textbf{« Rechercher un étudiant, email ou université... »} pour cibler un cas spécifique, ou \textbf{« Réinitialiser »} pour tout effacer.
     \end{itemize}
-    
+
     \item \textbf{Intervention manuelle (Modification des statuts) :}
     Depuis cette liste, l'administrateur a tous les droits pour forcer l'état d'un dossier :
     \begin{itemize}[leftmargin=*]

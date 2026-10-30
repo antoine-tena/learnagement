@@ -1,8 +1,8 @@
 # General Documentation
 
 ## directory architecture and contents
-- Doc directory architecture the same as app directory
-- Doc directory architecture contains at least one doc.md files
+- docs directory architecture follows the app directory
+- each docs sub-directory contains at least one README.md
 
 ## Useful tools
 - Existing backend endpoints: 127.0.0.1:```i```4000/docs#/
@@ -11,10 +11,8 @@
 
 ## [Dev/Prod environnement](prod.md)
 
-## [Docker](./docker/doc.md)
+## [DB](db/README.md)
 
-## [DB](db/doc.md)
-
-## [Front NextJS](frontend/doc.md)
+## [Front NextJS](frontend/README.md)
 
 [Back](../README.md)

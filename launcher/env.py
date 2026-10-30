@@ -103,7 +103,7 @@ def __set_env(env_vars: dict, filepath: str) -> dict:
 
 
 def __generate_base_env():
-    default_env_vars = __load_env_file("__env_skeleton.env")
+    default_env_vars = __load_env_file("config/env.skeleton")
 
     # Instance
 

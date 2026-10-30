@@ -1,4 +1,4 @@
-# [General Normalization and spécific Normalisations](../doc.md)
+# [General Normalization and spécific Normalisations](../README.md)
 
 ## DB Normalization
 
@@ -21,7 +21,7 @@ Cet ensemble doit être déclaré comme unique avec pour nom d'indexe "SECONDARY
 Si la clé secondaire contient une clé étrangaire, la table concernée sera califiée d'intermédiaire.
 La clé primaire est toujours constitué des premiers attributs, le premier dans le cas d'une table de base ou intermédiaire, les 2 premiers dans le cas d'une table de liaison.
 Nous avons donc 3 types de table:
-* les tables de base avec un seul attribut numérique clé primaire et une clé secondaire composée d'un ensemble d'attributs ne contemnant pas de clé étrangère 
+* les tables de base avec un seul attribut numérique clé primaire et une clé secondaire composée d'un ensemble d'attributs ne contemnant pas de clé étrangère
 * les tables intermédiaires avec un seul attribut numérique clé primaire et une clé secondaire composée d'un ensemble d'attributs contemnant au moins une clé étrangère  
 * les tables de liaison avec 2 attributs formant la clé primaire et ne contenant pas de clé secondaire
 
@@ -45,6 +45,6 @@ La description débute par :
 * trigger_ : pour les triggers
 * trim_ : pour supprimer, nettoyer et déprécier définitivement
 
-**ATTENTION** : un fichier ```.sql``` ne doit **jamais** être modifié, toute modification de la BD implique un nouveau fichier ```.sql``` 
+**ATTENTION** : un fichier ```.sql``` ne doit **jamais** être modifié, toute modification de la BD implique un nouveau fichier ```.sql```
 
-[Back](../doc.md)
+[Back](../README.md)

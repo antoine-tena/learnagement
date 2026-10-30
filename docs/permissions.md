@@ -10,7 +10,7 @@ Un utilisateur est forcément dans l'un, et un seul, de ces rôles.
 
 ## Institutional role
 
-La définition des rôles institutionnels est libre. Chaque rôle institutionnel peut être associé à 1 ou plusieurs utilisateurs, quelque soit son rôle structurel. 
+La définition des rôles institutionnels est libre. Chaque rôle institutionnel peut être associé à 1 ou plusieurs utilisateurs, quelque soit son rôle structurel.
 
 ## Advanced permission system
 

@@ -1,6 +1,6 @@
 # Certificats
 
-## auto-signé 
+## auto-signé
 
 Création d'un certificat autosigné.
 
@@ -63,5 +63,3 @@ sudo certbot certonly --standalone -d mondomaine.com
 ```
 
 Ou via **Caddy** qui gère Let's Encrypt automatiquement sans rien faire.
-
-

@@ -5,7 +5,7 @@ Ce fichier recense les pistes d'amélioration techniques et fonctionnelles pour 
 ---
 
 ## 1. Amélioration de la Gestion des Retardataires
-Bien que la clôture de la Phase 1 soumette de force les paniers en attente, le système pourrait être durci. 
+Bien que la clôture de la Phase 1 soumette de force les paniers en attente, le système pourrait être durci.
 * **Évolution :** Implémenter un verrouillage total (backend et frontend) pour empêcher techniquement un étudiant de continuer à formuler ou modifier des vœux après le clic de clôture de la Phase 1 par l'administrateur. Actuellement, si l'interface n'est pas rafraîchie, un étudiant pourrait tenter des manipulations tardives.
 
 ## 2. Interface Dédiée pour les Étudiants Non Affectés

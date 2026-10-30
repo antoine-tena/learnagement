@@ -27,20 +27,20 @@ python.exe .\Learnagement.py
 
 ### **Configuration de la base de données**
 
-![image](.\ImagesMarkdown\EtapeLancement1.png)
+![image](images/EtapeLancement1.png)
 Lors du lancement de l'application veillez à :
 
 - Nommer votre instance ( ici dev )
 - Entrer un mot de passe Root pour la BDD ( ici toto )
 - Entrer un mot de passe pour le User de la BDD ( ici toto )
 - Lorsque le ligne Then press enter apparait, copier et coller le fichier ```.\db\freeData\V0.0.5__data_small.```sql  dans le dossier ```.\db\data\``` puis appuyer sur "Enter" pour continuer le lancement de l'application.
-  ![image](.\ImagesMarkdown\EtapeLancement2.png)
+  ![image](images/EtapeLancement2.png)
 
 - Docker :
-  ![image](.\ImagesMarkdown\EtapeLancement3.png)
+  ![image](images/EtapeLancement3.png)
   - Cliquer sur le Port utilisé par la phpmyadmin pour vérifier sont foncitonnement
   - Dans le cas d'une erreure tels que :
-    ![image](.\ImagesMarkdown\EtapeLancement4.png)
+    ![image](images/EtapeLancement4.png)
     Aller dans le terminal ( Exec ) du container et tapper la commande :
 
     ```bash
@@ -56,7 +56,7 @@ Lors du lancement de l'application veillez à :
      Username : learnagement
      Password : ( ici toto )
   - Verifier que le container suivant et bien lancé sinon le démarrer :
-    ![image](.\ImagesMarkdown\EtapeLancement5.png)
+    ![image](images/EtapeLancement5.png)
 
-  - Si necessaire apres connection à l'application web, relancer l'ensemble de container puis lancer la commande ```docker compose up -d``` 
+  - Si necessaire apres connection à l'application web, relancer l'ensemble de container puis lancer la commande ```docker compose up -d```
   - Relancer le container learnagment_php_dev
