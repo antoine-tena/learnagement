@@ -1,9 +1,8 @@
 import os
-import dotenv
+from datetime import UTC, datetime, timedelta
 
-from datetime import datetime, timedelta, timezone
+import dotenv
 import jwt
-from typing import Annotated
 from fastapi import HTTPException, status
 
 dotenv.load_dotenv(".env")
@@ -11,7 +10,6 @@ dotenv.load_dotenv(".env")
 JWT_SIGNING_KEY = os.getenv("JWT_SIGNING_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_SECONDS = int(os.getenv("SESSION_TIMEOUT"))
-
 
 
 # def authenticate_user(user_login: str, password: str, method: str = "byMail"):
@@ -32,11 +30,12 @@ ACCESS_TOKEN_EXPIRE_SECONDS = int(os.getenv("SESSION_TIMEOUT"))
 #         user = get_user_from_ldap(user_login)
 #     return user
 
+
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
     if not expires_delta:
         expires_delta = timedelta(seconds=ACCESS_TOKEN_EXPIRE_SECONDS)
-    expire = datetime.now(timezone.utc) + expires_delta
+    expire = datetime.now(UTC) + expires_delta
 
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, JWT_SIGNING_KEY, algorithm=ALGORITHM)

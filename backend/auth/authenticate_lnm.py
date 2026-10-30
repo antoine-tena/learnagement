@@ -1,18 +1,16 @@
+from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-
-from typing import Annotated
-
 from pwdlib import PasswordHash
 from pwdlib.hashers.bcrypt import BcryptHasher
 
-from api.dependencies import logger, get_user
-from models.token import Token
+from api.dependencies import get_user, logger
 from auth.authenticate_tools import create_access_token
-
+from models.token import Token
 
 password_hash = PasswordHash((BcryptHasher(),))
+
 
 def verify_password(plain_password, hashed_password):
     return password_hash.verify(plain_password, hashed_password)
@@ -29,6 +27,7 @@ def __authenticate_user_lnm(user_login: str, password: str):
         return None
     return user
 
+
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> Token:
@@ -40,14 +39,15 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token = create_access_token(
-        data={"id": user.id,
-              "login": user.mail,
-              "email": user.mail,
-              "firstname": user.prenom,
-              "lastname": user.nom,
-              "roles" : user.roles,
-              "password2update" : user.password2update
-              },
+        data={
+            "id": user.id,
+            "login": user.mail,
+            "email": user.mail,
+            "firstname": user.prenom,
+            "lastname": user.nom,
+            "roles": user.roles,
+            "password2update": user.password2update,
+        },
     )
     logger.info(f"LNM user {user.mail} connected with roles {user.roles}")
     return Token(access_token=access_token, token_type="bearer")

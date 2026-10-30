@@ -1,31 +1,31 @@
-import os
-import json
 import hmac
+import json
+import os
+from typing import Annotated
 
-
-from fastapi import HTTPException, status, Header
-from typing import Annotated, Optional
+from fastapi import Header, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 
+from api.dependencies import get_user, logger
+from auth.authenticate_tools import create_access_token
+from db.connection import get_connection
 from models.token import Token
 from models.user import UserInDB
-from api.dependencies import logger, get_user
-from db.connection import get_connection
-from auth.authenticate_tools import create_access_token
 
 
 # --- Schéma pour le provisionnement CAS ---
 class CasUserProvision(BaseModel):
-    login:  str
-    email:  str
-    nom:    str
+    login: str
+    email: str
+    nom: str
     prenom: str
     members: list[str] = []
 
+
 # --- Vérification du token de service CAS ---
-def verify_cas_service_token(x_cas_token: Annotated[Optional[str], Header()] = None):
+def verify_cas_service_token(x_cas_token: Annotated[str | None, Header()] = None):
     expected = os.getenv("CAS_SERVICE_TOKEN")
 
     if not expected:
@@ -55,6 +55,7 @@ def verify_cas_service_token(x_cas_token: Annotated[Optional[str], Header()] = N
             detail="Invalid CAS service token",
         )
 
+
 async def authenticate_cas(data: CasUserProvision) -> Token:
     """
     Point d'entrée unique pour l'auth CAS.
@@ -63,7 +64,6 @@ async def authenticate_cas(data: CasUserProvision) -> Token:
     user = get_user(data.login)
     main_role = ""
     if not user:
-
         logger.info(f"Premier login CAS pour '{data.login}', provisionnement...")
 
         # Détermination du rôle depuis les groupes CAS
@@ -73,27 +73,29 @@ async def authenticate_cas(data: CasUserProvision) -> Token:
             logger.error(f"Aucun groupe autorisé pour '{data.login}' : {data.members}")
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Vous n'avez pas accès à cette application"
+                detail="Vous n'avez pas accès à cette application",
             )
 
         user = _create_cas_user(data, main_role=main_role)
 
     if not user:
-        logger.error(f"Échec provisionnement CAS pour '{data.login}' avec le rôle principal '{main_role}'")
+        logger.error(
+            f"Échec provisionnement CAS pour '{data.login}' avec le rôle principal '{main_role}'"
+        )
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="CAS authentication failed"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="CAS authentication failed"
         )
 
     access_token = create_access_token(
-        data={"id": user.id,
-              "login": user.login,
-              "email": user.mail,
-              "firstname": user.prenom,
-              "lastname": user.nom,
-              "roles": user.roles,
-              "password2update": False
-              },
+        data={
+            "id": user.id,
+            "login": user.login,
+            "email": user.mail,
+            "firstname": user.prenom,
+            "lastname": user.nom,
+            "roles": user.roles,
+            "password2update": False,
+        },
     )
 
     logger.info(f"CAS user {user.mail} connected with roles {user.roles}")
@@ -231,6 +233,7 @@ def _create_cas_user(data: CasUserProvision, main_role: str) -> UserInDB | None:
     # on évite donc tout emprunt imbriqué dans le pool.
     return get_user(data.login)
 
+
 # def _determine_promo_from_cas_groups(members: list[str]) -> int | None:
 #     """
 #     Détermine l'id_promo d'un étudiant depuis ses groupes CAS
@@ -318,13 +321,16 @@ def _determine_promo_from_cas_groups(members: list[str]) -> int | None:
 
     try:
         with get_connection() as conn:
-            return conn.execute(text("""
+            return conn.execute(
+                text("""
                 SELECT LNM_promo.id_promo
                 FROM LNM_promo
                 JOIN ExplicitSecondaryKs_LNM_promo
                   ON ExplicitSecondaryKs_LNM_promo.id_promo = LNM_promo.id_promo
                 WHERE ExplicitSecondaryKs_LNM_promo.ExplicitSecondaryK = :promo_name
-            """), {"promo_name": promo_name}).scalar()  # 1re colonne de la 1re ligne, ou None
+            """),
+                {"promo_name": promo_name},
+            ).scalar()  # 1re colonne de la 1re ligne, ou None
     except Exception as e:
         logger.error(f"DB error lors de la résolution de promo '{promo_name}': {e}")
         return None

@@ -1,11 +1,11 @@
-from access_control.types import AccessRule
 from access_control.responsibilities import (
-    has_any_of_responsibilities,
     has_all_responsibilities,
+    has_any_of_responsibilities,
     has_hierarchy_responsibilities,
     parse_responsibility,
 )
-from core.logging import logger
+from access_control.types import AccessRule
+
 
 def evaluate_rule(rule: AccessRule, user, params: dict | None) -> bool:
     """
@@ -15,7 +15,7 @@ def evaluate_rule(rule: AccessRule, user, params: dict | None) -> bool:
     # Résolution du lambda → valeur concrète
     if callable(rule):
         rule = rule(params, user)
-    
+
     if isinstance(rule, str):
         return _evaluate_string(rule, user)
 
@@ -29,6 +29,7 @@ def evaluate_rule(rule: AccessRule, user, params: dict | None) -> bool:
 
 
 # --- Évaluateurs par type ---
+
 
 def _evaluate_string(rule: str, user) -> bool:
     """
@@ -49,9 +50,11 @@ def _evaluate_role_list(roles: list[str], user) -> bool:
     L'utilisateur doit avoir AU MOINS UN des rôles listés.
     """
     if not roles:
-        #raise ValueError("La liste de rôles ne peut pas être vide")
-        # Si la liste des rôles est vide, ceci ne signifie pas qu'il ne faut pas de rôle (cf. anonymous)
-        # L'utilisateur ne peut avoir de rôles explicitement définis, la liste étant vide, False est donc retourné
+        # raise ValueError("La liste de rôles ne peut pas être vide")
+        # Si la liste des rôles est vide, ceci ne signifie pas qu'il ne faut pas de rôle
+        # (cf. anonymous)
+        # L'utilisateur ne peut avoir de rôles explicitement définis, la liste étant vide,
+        # False est donc retourné
         return False
 
     if user is None:
@@ -76,22 +79,13 @@ def _evaluate_dict(rule: dict, user, params: dict) -> bool:
         return False
 
     evaluators = {
-        "roles":     lambda v: _evaluate_role_list(v, user),
-        "any":       lambda v: has_any_of_responsibilities(
-                                   user,
-                                   [parse_responsibility(r) for r in v]
-                               ),
-        "all":       lambda v: has_all_responsibilities(
-                                   user,
-                                   [parse_responsibility(r) for r in v]
-                               ),
+        "roles": lambda v: _evaluate_role_list(v, user),
+        "any": lambda v: has_any_of_responsibilities(user, [parse_responsibility(r) for r in v]),
+        "all": lambda v: has_all_responsibilities(user, [parse_responsibility(r) for r in v]),
         "hierarchy": lambda v: has_hierarchy_responsibilities(
-                                   user,
-                                   [parse_responsibility(r) for r in v]
-                               ),
-        "owner": lambda v: user.main_role == v["role"]
-                           and user.id == (params or {}).get(v["id"]),
-
+            user, [parse_responsibility(r) for r in v]
+        ),
+        "owner": lambda v: user.main_role == v["role"] and user.id == (params or {}).get(v["id"]),
         "predicate": lambda fn: bool(fn(user, params)),
     }
 
