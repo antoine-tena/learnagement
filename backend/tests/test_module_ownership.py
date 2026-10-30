@@ -1,14 +1,17 @@
 import re
 import sqlite3
+from collections.abc import Callable, Iterator
 
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+from httpx import Response
 
 from access_control.checker import check_access
-from api.dependencies import get_current_active_user
+from api.dependencies import Rows, get_current_active_user
+from models.request import SQLRequest
 from models.user import User
-from user import MAQUETTE_module
+from user import maquette_module
 
 # ─────────────────────────────────────────────
 # Jeu de données : 2 modules, 2 responsables
@@ -35,56 +38,64 @@ INSERT INTO MAQUETTE_module_sequence   VALUES (100, 10, NULL), (200, 20, NULL);
 INSERT INTO CLASS_session              VALUES (1000, 100, NULL), (2000, 200, 2);
 """
 
+# Calls a route as a user: call_as(user, method, url, **request options).
+type CallAs = Callable[..., Response]
+
 
 def make_user(id_: int, role: str, name: str) -> User:
     return User(
-        id=id_, prenom=name, nom=name, ExplicitSecondaryK=name,
-        main_role=role, roles=["connected_user", role, name],
+        id=id_,
+        prenom=name,
+        nom=name,
+        ExplicitSecondaryK=name,
+        main_role=role,
+        roles=["connected_user", role, name],
     )
 
 
-TEACHER_1 = make_user(1, "enseignant", "Alice Responsable1")   # responsable du module 1
-STUDENT_1 = make_user(1, "etudiant", "Etienne Etudiant")       # même id que TEACHER_1, autre table
+TEACHER_1 = make_user(1, "enseignant", "Alice Responsable1")  # responsable du module 1
+STUDENT_1 = make_user(1, "etudiant", "Etienne Etudiant")  # même id que TEACHER_1, autre table
 
 
 # ─────────────────────────────────────────────
 # Fixtures
 # ─────────────────────────────────────────────
 
+
 @pytest.fixture
-def db(monkeypatch):
+def db(monkeypatch: pytest.MonkeyPatch) -> Iterator[sqlite3.Connection]:
     conn = sqlite3.connect(":memory:", check_same_thread=False)  # TestClient = autre thread
     conn.row_factory = sqlite3.Row
     conn.executescript(SCHEMA)
 
-    def fake_db_request(requester, request):
-        check_access(request=request, user=requester)             # vraie règle d'accès
-        sql = re.sub(r"%\((\w+)\)s", r":\1", request.request)     # style pyformat → nommé
+    def fake_db_request(requester: User, request: SQLRequest) -> Rows:
+        check_access(request=request, user=requester)  # vraie règle d'accès
+        sql = re.sub(r"%\((\w+)\)s", r":\1", request.request)  # style pyformat → nommé
         cur = conn.execute(sql, request.params or {})
         rows = [dict(r) for r in cur.fetchall()] if cur.description else []
         conn.commit()
         return rows
 
-    monkeypatch.setattr(MAQUETTE_module, "db_request", fake_db_request)
+    monkeypatch.setattr(maquette_module, "db_request", fake_db_request)
     monkeypatch.setattr("api.dependencies.db_request", fake_db_request)  # pour les prédicats
     yield conn
     conn.close()
 
 
 @pytest.fixture
-def call_as(db):
+def call_as(db: sqlite3.Connection) -> CallAs:
     app = FastAPI()
-    app.include_router(MAQUETTE_module.router)
+    app.include_router(maquette_module.router)
     client = TestClient(app, raise_server_exceptions=False)
 
-    def _call(user, method, url, **kwargs):
+    def _call(user: User, method: str, url: str, **kwargs: object) -> Response:
         app.dependency_overrides[get_current_active_user] = lambda: user
         return client.request(method, url, **kwargs)
 
     return _call
 
 
-def scalar(db, sql):
+def scalar(db: sqlite3.Connection, sql: str) -> int | None:
     row = db.execute(sql).fetchone()
     return None if row is None else row[0]
 
@@ -92,17 +103,35 @@ def scalar(db, sql):
 # (url, body, requête de contrôle, id du module 1, id du module 2)
 PATCH_CASES = [
     pytest.param(
-        "/modules/{m}/sequencages/{r}", {"id_intervenant_principal": 99},
-        "SELECT id_intervenant_principal FROM MAQUETTE_module_sequencage WHERE id_module_sequencage={r}",
-        10, 20, id="sequencage"),
+        "/modules/{m}/sequencages/{r}",
+        {"id_intervenant_principal": 99},
+        (
+            "SELECT id_intervenant_principal FROM MAQUETTE_module_sequencage WHERE "
+            "id_module_sequencage={r}"
+        ),
+        10,
+        20,
+        id="sequencage",
+    ),
     pytest.param(
-        "/modules/{m}/sequences/{r}", {"id_intervenant_principal": 99},
-        "SELECT id_intervenant_principal FROM MAQUETTE_module_sequence WHERE id_module_sequence={r}",
-        100, 200, id="sequence"),
+        "/modules/{m}/sequences/{r}",
+        {"id_intervenant_principal": 99},
+        (
+            "SELECT id_intervenant_principal FROM MAQUETTE_module_sequence WHERE "
+            "id_module_sequence={r}"
+        ),
+        100,
+        200,
+        id="sequence",
+    ),
     pytest.param(
-        "/modules/{m}/sessions/{r}", {"id_enseignant": 99},
+        "/modules/{m}/sessions/{r}",
+        {"id_enseignant": 99},
         "SELECT id_enseignant FROM CLASS_session WHERE id_session={r}",
-        1000, 2000, id="session"),
+        1000,
+        2000,
+        id="session",
+    ),
 ]
 
 
@@ -110,8 +139,17 @@ PATCH_CASES = [
 # Témoin : le cas légitime doit continuer à marcher
 # ─────────────────────────────────────────────
 
+
 @pytest.mark.parametrize("url, body, check, own, foreign", PATCH_CASES)
-def test_responsable_can_patch_resource_of_own_module(call_as, db, url, body, check, own, foreign):
+def test_responsable_can_patch_resource_of_own_module(
+    call_as: CallAs,
+    db: sqlite3.Connection,
+    url: str,
+    body: dict[str, int],
+    check: str,
+    own: int,
+    foreign: int,
+) -> None:
     r = call_as(TEACHER_1, "PATCH", url.format(m=1, r=own), json=body)
     assert r.status_code == 200
     assert scalar(db, check.format(r=own)) == 99
@@ -121,46 +159,77 @@ def test_responsable_can_patch_resource_of_own_module(call_as, db, url, body, ch
 # Faille : ressource d'un autre module via son propre id_module
 # ─────────────────────────────────────────────
 
+
 @pytest.mark.parametrize("url, body, check, own, foreign", PATCH_CASES)
-def test_responsable_cannot_patch_resource_of_other_module(call_as, db, url, body, check, own, foreign):
+def test_responsable_cannot_patch_resource_of_other_module(
+    call_as: CallAs,
+    db: sqlite3.Connection,
+    url: str,
+    body: dict[str, int],
+    check: str,
+    own: int,
+    foreign: int,
+) -> None:
     before = scalar(db, check.format(r=foreign))
 
     # TEACHER_1 est responsable du module 1 mais cible une ressource du module 2
     call_as(TEACHER_1, "PATCH", url.format(m=1, r=foreign), json=body)
 
-    assert scalar(db, check.format(r=foreign)) == before, \
+    assert scalar(db, check.format(r=foreign)) == before, (
         "La ressource du module 2 a été modifiée par le responsable du module 1"
+    )
 
 
-def test_responsable_cannot_delete_sequencage_of_other_module(call_as, db):
+def test_responsable_cannot_delete_sequencage_of_other_module(
+    call_as: CallAs, db: sqlite3.Connection
+) -> None:
     call_as(TEACHER_1, "DELETE", "/modules/1/sequencages/20")
 
-    assert scalar(db, "SELECT COUNT(*) FROM MAQUETTE_module_sequencage WHERE id_module_sequencage=20") == 1, \
-        "Le séquençage du module 2 a été supprimé par le responsable du module 1"
+    assert (
+        scalar(db, "SELECT COUNT(*) FROM MAQUETTE_module_sequencage WHERE id_module_sequencage=20")
+        == 1
+    ), "Le séquençage du module 2 a été supprimé par le responsable du module 1"
 
 
 # ─────────────────────────────────────────────
 # Collision d'ids entre tables (autre défaut du même contrôle)
 # ─────────────────────────────────────────────
 
-def test_student_with_same_id_as_responsable_is_denied(call_as, db):
-    r = call_as(STUDENT_1, "PATCH", "/modules/1/sequences/100", json={"id_intervenant_principal": 99})
+
+def test_student_with_same_id_as_responsable_is_denied(
+    call_as: CallAs, db: sqlite3.Connection
+) -> None:
+    r = call_as(
+        STUDENT_1, "PATCH", "/modules/1/sequences/100", json={"id_intervenant_principal": 99}
+    )
 
     assert r.status_code == 403
-    assert scalar(db, "SELECT id_intervenant_principal FROM MAQUETTE_module_sequence WHERE id_module_sequence=100") is None
+    assert (
+        scalar(
+            db,
+            (
+                "SELECT id_intervenant_principal FROM MAQUETTE_module_sequence WHERE "
+                "id_module_sequence=100"
+            ),
+        )
+        is None
+    )
 
 
 # ─────────────────────────────────────────────
 # Robustesse : module inexistant
 # ─────────────────────────────────────────────
 
-def test_unknown_module_is_denied_not_500(call_as, db):
-    r = call_as(TEACHER_1, "PATCH", "/modules/999/sequences/100", json={"id_intervenant_principal": 99})
 
-    assert r.status_code in (403, 404)   # aujourd'hui : IndexError → 500
+def test_unknown_module_is_denied_not_500(call_as: CallAs, db: sqlite3.Connection) -> None:
+    r = call_as(
+        TEACHER_1, "PATCH", "/modules/999/sequences/100", json={"id_intervenant_principal": 99}
+    )
+
+    assert r.status_code in (403, 404)  # aujourd'hui : IndexError → 500
 
 
-#─────────────────────────────────────────────
+# ─────────────────────────────────────────────
 # Interaction entre 2 enseignants
 # ─────────────────────────────────────────────
 
@@ -168,8 +237,8 @@ TEACHER_2 = make_user(2, "enseignant", "Bernard Responsable2")  # responsable du
 
 # (utilisateur, module dans l'URL, module propriétaire de la ressource, attendu)
 OWNERSHIP_MATRIX = [
-    pytest.param(TEACHER_1, 1, 1, True,  id="T1-url1-res1-legitime"),
-    pytest.param(TEACHER_2, 2, 2, True,  id="T2-url2-res2-legitime"),
+    pytest.param(TEACHER_1, 1, 1, True, id="T1-url1-res1-legitime"),
+    pytest.param(TEACHER_2, 2, 2, True, id="T2-url2-res2-legitime"),
     # URL de son module, ressource de l'autre : la faille
     pytest.param(TEACHER_1, 1, 2, False, id="T1-url1-res2-ressource-etrangere"),
     pytest.param(TEACHER_2, 2, 1, False, id="T2-url2-res1-ressource-etrangere"),
@@ -185,9 +254,18 @@ OWNERSHIP_MATRIX = [
 @pytest.mark.parametrize("url, body, check, res_m1, res_m2", PATCH_CASES)
 @pytest.mark.parametrize("user, url_module, res_module, allowed", OWNERSHIP_MATRIX)
 def test_two_teachers_ownership_matrix(
-    call_as, db, url, body, check, res_m1, res_m2,
-    user, url_module, res_module, allowed,
-):
+    call_as: CallAs,
+    db: sqlite3.Connection,
+    url: str,
+    body: dict[str, int],
+    check: str,
+    res_m1: int,
+    res_m2: int,
+    user: User,
+    url_module: int,
+    res_module: int,
+    allowed: bool,
+) -> None:
     resource = res_m1 if res_module == 1 else res_m2
     before = scalar(db, check.format(r=resource))
 
@@ -203,18 +281,30 @@ def test_two_teachers_ownership_matrix(
         )
 
 
-@pytest.mark.parametrize("user, url_module, res_module, allowed", [
-    pytest.param(TEACHER_1, 1, 1, True,  id="T1-legitime"),
-    pytest.param(TEACHER_1, 1, 2, False, id="T1-url1-res2"),
-    pytest.param(TEACHER_2, 2, 1, False, id="T2-url2-res1"),
-    pytest.param(TEACHER_2, 1, 1, False, id="T2-url1-res1"),
-])
-def test_two_teachers_delete_sequencage(call_as, db, user, url_module, res_module, allowed):
+@pytest.mark.parametrize(
+    "user, url_module, res_module, allowed",
+    [
+        pytest.param(TEACHER_1, 1, 1, True, id="T1-legitime"),
+        pytest.param(TEACHER_1, 1, 2, False, id="T1-url1-res2"),
+        pytest.param(TEACHER_2, 2, 1, False, id="T2-url2-res1"),
+        pytest.param(TEACHER_2, 1, 1, False, id="T2-url1-res1"),
+    ],
+)
+def test_two_teachers_delete_sequencage(
+    call_as: CallAs,
+    db: sqlite3.Connection,
+    user: User,
+    url_module: int,
+    res_module: int,
+    allowed: bool,
+) -> None:
     resource = 10 if res_module == 1 else 20
 
     call_as(user, "DELETE", f"/modules/{url_module}/sequencages/{resource}")
 
-    remaining = scalar(db, f"SELECT COUNT(*) FROM MAQUETTE_module_sequencage WHERE id_module_sequencage={resource}")
+    remaining = scalar(
+        db, f"SELECT COUNT(*) FROM MAQUETTE_module_sequencage WHERE id_module_sequencage={resource}"
+    )
     assert remaining == (0 if allowed else 1)
 
 
@@ -239,12 +329,14 @@ INSERT INTO MAQUETTE_dependance_sequence VALUES (100, 101), (200, 201), (101, 20
 
 
 @pytest.fixture
-def db_deps(db):
+def db_deps(db: sqlite3.Connection) -> sqlite3.Connection:
     db.executescript(DEPS_SCHEMA)
     return db
 
 
-def dep_count(db, prev=None, nxt=None):
+def dep_count(
+    db: sqlite3.Connection, prev: int | None = None, nxt: int | None = None
+) -> int | None:
     sql = "SELECT COUNT(*) FROM MAQUETTE_dependance_sequence"
     if prev is not None:
         sql += f" WHERE id_sequence_prev={prev} AND id_sequence_next={nxt}"
@@ -260,9 +352,9 @@ def dep_count(db, prev=None, nxt=None):
 # (101, 100) est l'inverse de (100, 101) : l'API ne détecte pas les cycles,
 # on s'en sert ici uniquement pour obtenir une paire interne libre.
 ADD_MATRIX = [
-    pytest.param(TEACHER_1, 1, (101, 100), True,  id="T1-url1-interne-legitime"),
-    pytest.param(TEACHER_2, 2, (201, 200), True,  id="T2-url2-interne-legitime"),
-    pytest.param(TEACHER_1, 1, (100, 200), True,  id="T1-url1-croise-une-extremite-a-lui"),
+    pytest.param(TEACHER_1, 1, (101, 100), True, id="T1-url1-interne-legitime"),
+    pytest.param(TEACHER_2, 2, (201, 200), True, id="T2-url2-interne-legitime"),
+    pytest.param(TEACHER_1, 1, (100, 200), True, id="T1-url1-croise-une-extremite-a-lui"),
     # URL de son module, mais aucune des deux séquences ne lui appartient : la faille
     pytest.param(TEACHER_1, 1, (201, 200), False, id="T1-url1-sequences-etrangeres"),
     pytest.param(TEACHER_2, 2, (101, 100), False, id="T2-url2-sequences-etrangeres"),
@@ -273,15 +365,28 @@ ADD_MATRIX = [
 
 
 @pytest.mark.parametrize("user, url_module, pair, allowed", ADD_MATRIX)
-def test_add_dependency_ownership(call_as, db_deps, user, url_module, pair, allowed):
+def test_add_dependency_ownership(
+    call_as: CallAs,
+    db_deps: sqlite3.Connection,
+    user: User,
+    url_module: int,
+    pair: tuple[int, int],
+    allowed: bool,
+) -> None:
     prev, nxt = pair
     total_before = dep_count(db_deps)
 
-    call_as(user, "POST", f"/modules/{url_module}/dependencies",
-            json={"id_sequence_prev": prev, "id_sequence_next": nxt})
+    call_as(
+        user,
+        "POST",
+        f"/modules/{url_module}/dependencies",
+        json={"id_sequence_prev": prev, "id_sequence_next": nxt},
+    )
 
     if allowed:
-        assert dep_count(db_deps, prev, nxt) == 1, "Le responsable légitime n'a pas pu créer la dépendance"
+        assert dep_count(db_deps, prev, nxt) == 1, (
+            "Le responsable légitime n'a pas pu créer la dépendance"
+        )
     else:
         assert dep_count(db_deps, prev, nxt) == 0, (
             f"{user.prenom} (module {url_module} dans l'URL) a créé la dépendance {pair} "
@@ -295,11 +400,11 @@ def test_add_dependency_ownership(call_as, db_deps, user, url_module, pair, allo
 # ─────────────────────────────────────────────
 
 DELETE_MATRIX = [
-    pytest.param(TEACHER_1, 1, (100, 101), True,  id="T1-url1-interne-legitime"),
-    pytest.param(TEACHER_2, 2, (200, 201), True,  id="T2-url2-interne-legitime"),
+    pytest.param(TEACHER_1, 1, (100, 101), True, id="T1-url1-interne-legitime"),
+    pytest.param(TEACHER_2, 2, (200, 201), True, id="T2-url2-interne-legitime"),
     # dépendance inter-modules : chaque responsable peut la supprimer
-    pytest.param(TEACHER_1, 1, (101, 200), True,  id="T1-url1-croise"),
-    pytest.param(TEACHER_2, 2, (101, 200), True,  id="T2-url2-croise"),
+    pytest.param(TEACHER_1, 1, (101, 200), True, id="T1-url1-croise"),
+    pytest.param(TEACHER_2, 2, (101, 200), True, id="T2-url2-croise"),
     # URL de son module, dépendance qui ne le concerne pas : la faille
     pytest.param(TEACHER_1, 1, (200, 201), False, id="T1-url1-dependance-etrangere"),
     pytest.param(TEACHER_2, 2, (100, 101), False, id="T2-url2-dependance-etrangere"),
@@ -311,14 +416,22 @@ DELETE_MATRIX = [
 
 
 @pytest.mark.parametrize("user, url_module, pair, allowed", DELETE_MATRIX)
-def test_delete_dependency_ownership(call_as, db_deps, user, url_module, pair, allowed):
+def test_delete_dependency_ownership(
+    call_as: CallAs,
+    db_deps: sqlite3.Connection,
+    user: User,
+    url_module: int,
+    pair: tuple[int, int],
+    allowed: bool,
+) -> None:
     prev, nxt = pair
     assert dep_count(db_deps, prev, nxt) == 1  # garde-fou sur le jeu de données
 
     call_as(user, "DELETE", f"/modules/{url_module}/dependencies/{prev}/{nxt}")
 
     assert dep_count(db_deps, prev, nxt) == (0 if allowed else 1), (
-        f"{user.prenom} (module {url_module} dans l'URL) : résultat inattendu sur la dépendance {pair}"
+        f"{user.prenom} (module {url_module} dans l'URL) : résultat inattendu sur la dépendance "
+        f"{pair}"
     )
     # Détecte un DELETE au WHERE trop large : seule la ligne visée peut disparaître
     assert dep_count(db_deps) == (2 if allowed else 3)
@@ -328,23 +441,38 @@ def test_delete_dependency_ownership(call_as, db_deps, user, url_module, pair, a
 # Collision d'ids entre tables et module inexistant
 # ─────────────────────────────────────────────
 
-def test_student_with_same_id_as_responsable_cannot_add_dependency(call_as, db_deps):
-    r = call_as(STUDENT_1, "POST", "/modules/1/dependencies",
-                json={"id_sequence_prev": 101, "id_sequence_next": 100})
+
+def test_student_with_same_id_as_responsable_cannot_add_dependency(
+    call_as: CallAs, db_deps: sqlite3.Connection
+) -> None:
+    r = call_as(
+        STUDENT_1,
+        "POST",
+        "/modules/1/dependencies",
+        json={"id_sequence_prev": 101, "id_sequence_next": 100},
+    )
 
     assert r.status_code == 403
     assert dep_count(db_deps, 101, 100) == 0
 
 
-def test_student_with_same_id_as_responsable_cannot_delete_dependency(call_as, db_deps):
+def test_student_with_same_id_as_responsable_cannot_delete_dependency(
+    call_as: CallAs, db_deps: sqlite3.Connection
+) -> None:
     call_as(STUDENT_1, "DELETE", "/modules/1/dependencies/100/101")
 
     assert dep_count(db_deps, 100, 101) == 1
 
 
-def test_add_dependency_unknown_module_is_denied_not_500(call_as, db_deps):
-    r = call_as(TEACHER_1, "POST", "/modules/999/dependencies",
-                json={"id_sequence_prev": 101, "id_sequence_next": 100})
+def test_add_dependency_unknown_module_is_denied_not_500(
+    call_as: CallAs, db_deps: sqlite3.Connection
+) -> None:
+    r = call_as(
+        TEACHER_1,
+        "POST",
+        "/modules/999/dependencies",
+        json={"id_sequence_prev": 101, "id_sequence_next": 100},
+    )
 
-    assert r.status_code in (403, 404)   # aujourd'hui : IndexError → 500
+    assert r.status_code in (403, 404)  # aujourd'hui : IndexError → 500
     assert dep_count(db_deps, 101, 100) == 0

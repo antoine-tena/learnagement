@@ -1,4 +1,7 @@
-def is_current_user_module_participant(user, params) -> bool:
+from models.user import User
+
+
+def is_current_user_module_participant(user: User, params: dict) -> bool:
     """L'étudiant connecté suit-il ce module ?"""
     if user.main_role != "etudiant":
         return False
@@ -8,8 +11,10 @@ def is_current_user_module_participant(user, params) -> bool:
     from api.dependencies import db_request
     from models.request import SQLRequest
 
-    rows = db_request(user, SQLRequest(
-        request="""
+    rows = db_request(
+        user,
+        SQLRequest(
+            request="""
             SELECT 1
             FROM MAQUETTE_module_as_learning_unit malu
             JOIN MAQUETTE_learning_unit lu ON lu.id_learning_unit = malu.id_learning_unit
@@ -18,12 +23,14 @@ def is_current_user_module_participant(user, params) -> bool:
               AND e.id_etudiant  = %(id_etudiant)s
             LIMIT 1
         """,
-        params={"id_module": params["id_module"], "id_etudiant": user.id},
-        allowedRolesRequester="connected_user",   # règle string : pas de récursion
-    ))
+            params={"id_module": params["id_module"], "id_etudiant": user.id},
+            allowedRolesRequester="connected_user",  # règle string : pas de récursion
+        ),
+    )
     return bool(rows)
 
-def is_current_user_module_responsible(user, params) -> bool:
+
+def is_current_user_module_responsible(user: User | None, params: dict | None) -> bool:
     """L'enseignant connecté est-il responsable de ce module ?"""
     if user is None or user.main_role != "enseignant":
         return False
@@ -36,15 +43,18 @@ def is_current_user_module_responsible(user, params) -> bool:
     from api.dependencies import db_request
     from models.request import SQLRequest
 
-    rows = db_request(user, SQLRequest(
-        request="""
+    rows = db_request(
+        user,
+        SQLRequest(
+            request="""
             SELECT 1
             FROM MAQUETTE_module
             WHERE id_module = %(id_module)s
               AND id_responsable = %(id_user)s
             LIMIT 1
         """,
-        params={"id_module": id_module, "id_user": user.id},
-        allowedRolesRequester="connected_user",   # règle string : pas de récursion
-    ))
+            params={"id_module": id_module, "id_user": user.id},
+            allowedRolesRequester="connected_user",  # règle string : pas de récursion
+        ),
+    )
     return bool(rows)

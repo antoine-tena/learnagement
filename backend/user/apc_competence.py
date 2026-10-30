@@ -1,9 +1,9 @@
 import logging
-
-from fastapi import APIRouter, Depends
 from typing import Annotated
 
-from api.dependencies import db_request, get_current_active_user
+from fastapi import APIRouter, Depends
+
+from api.dependencies import Rows, db_request, get_current_active_user
 from models.request import SQLRequest
 from models.user import User
 
@@ -11,33 +11,42 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-@router.get("/competence_ac",
-            tags=["apc"],
-            summary="Students",
-            description="Return the list of competences and apprentissages for the students",)
+
+@router.get(
+    "/competence_ac",
+    tags=["apc"],
+    summary="Students",
+    description="Return the list of competences and apprentissages for the students",
+    response_model=None,
+)
 def get_competence_ac(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
-        "request" : """
-                    SELECT 
-                    C.id_competence,C.libelle_competence , C.code_competence ,AC.id_apprentissage_critique, AC.libelle_apprentissage 
-                    FROM APC_competence C join APC_niveau N ON C.id_competence=N.id_competence JOIN APC_apprentissage_critique AC ON AC.id_niveau=N.id_niveau;
+        "request": """
+                    SELECT
+                    C.id_competence,C.libelle_competence ,
+                        C.code_competence ,AC.id_apprentissage_critique, AC.libelle_apprentissage
+                    FROM APC_competence C join APC_niveau N ON C.id_competence=N.id_competence
+                        JOIN APC_apprentissage_critique AC ON AC.id_niveau=N.id_niveau;
                     """,
-        "allowedRolesRequester" : ["connected_user"],
+        "allowedRolesRequester": ["connected_user"],
     }
     return db_request(current_user, SQLRequest(**request))
 
 
-@router.get("/competence_ce",
-            tags=["apc"],
-            summary="Students",
-            description="Return the list of competences and essentiel composant",)
+@router.get(
+    "/competence_ce",
+    tags=["apc"],
+    summary="Students",
+    description="Return the list of competences and essentiel composant",
+    response_model=None,
+)
 def get_competence_ce(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
-        "request" : """
+        "request": """
                      SELECT
                         C.id_competence,
                         C.code_competence,
@@ -48,6 +57,6 @@ def get_competence_ce(
                     JOIN APC_composante_essentielle CE
                         ON C.id_competence = CE.id_competence;
                     """,
-        "allowedRolesRequester" : ["connected_user"],
+        "allowedRolesRequester": ["connected_user"],
     }
     return db_request(current_user, SQLRequest(**request))

@@ -1,13 +1,15 @@
-import json
 import re
+
 import pytest
 import sqlglot
+
 from system.tools import get_all_requests
 
 _PYFORMAT = re.compile(r"%\((\w+)\)s")
 
+
 class TestRequestStructures:
-    def test_requests_portable_to_postgres(self):
+    def test_requests_portable_to_postgres(self) -> None:
         errors = []
         for module, reqs in get_all_requests("repositories").items():
             for name, r in reqs.items():
@@ -18,7 +20,7 @@ class TestRequestStructures:
                     errors.append(f"{module}.{name}: {e}")
         assert not errors, "\n".join(errors)
 
-    def test_user_request_structures(self):
+    def test_user_request_structures(self) -> None:
         all_requests = get_all_requests(package_name="repositories")
         errors = []
 
@@ -30,7 +32,9 @@ class TestRequestStructures:
                 if request is None:
                     errors.append(f"{module_name}.{sql_request_name} : 'request' manquant")
                 if rule is None:
-                    errors.append(f"{module_name}.{sql_request_name} : 'allowedRolesRequester' manquant")
+                    errors.append(
+                        f"{module_name}.{sql_request_name} : 'allowedRolesRequester' manquant"
+                    )
 
         if errors:
             pytest.fail("Requêtes invalides :\n" + "\n".join(errors))

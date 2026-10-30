@@ -1,28 +1,31 @@
+import inspect
 import logging
 import re
-import inspect
+from typing import Annotated
 
 import sqlglot
 import sqlglot.expressions as exp
-
 from fastapi import APIRouter, Depends
-from system.tools import get_all_requests, get_all_local_requests
-from typing import Annotated
+
 from api.dependencies import get_current_active_user
 from models.user import User
+from system.tools import get_all_local_requests, get_all_requests
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
 
-@router.get("/access_auth",
-            tags=["check", "table"],
-            summary="Teacher without session",
-            description="Check teacher without session.")
+@router.get(
+    "/access_auth",
+    tags=["check", "table"],
+    summary="Teacher without session",
+    description="Check teacher without session.",
+    response_model=None,
+)
 def get_access_auth(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> object:
 
     if "administratif" in current_user.roles:
         all_requests = get_all_requests(package_name="user") | get_all_local_requests()
@@ -30,16 +33,16 @@ def get_access_auth(
         result = []
         for fichier, module_requests in all_requests.items():
             for endpoint_name, req in module_requests.items():
-
                 # Extraire les champs SELECT de la requête SQL
                 sql = req.get("request", "")
-                select_match = re.search(r'SELECT\s+(.*?)\s+FROM', sql, re.IGNORECASE | re.DOTALL)
+                select_match = re.search(r"SELECT\s+(.*?)\s+FROM", sql, re.IGNORECASE | re.DOTALL)
                 if select_match:
                     # fields = [f.strip().split(".")[-1].split(" AS ")[-1].strip()
                     #           for f in select_match.group(1).split(",")]
 
-                    fields = [f.strip().split(" AS ")[0].strip()
-                              for f in select_match.group(1).split(",")]
+                    fields = [
+                        f.strip().split(" AS ")[0].strip() for f in select_match.group(1).split(",")
+                    ]
                 else:
                     fields = []
 
@@ -48,38 +51,39 @@ def get_access_auth(
                 if callable(allowed):
                     # C'est un lambda : on récupère son code source
                     source = inspect.getsource(allowed).strip()
-                    #match = re.search(r'lambda\s.*', source)
-                    #roles = [match.group(0).strip() if match else source]
+                    # match = re.search(r'lambda\s.*', source)
+                    # roles = [match.group(0).strip() if match else source]
                     roles = ["".join(source.split(":")[1:]).strip()]
                 else:
                     roles = allowed
 
                 for role in roles:
-                    result.append({
-                        "fichier": fichier,
-                        "data_access": endpoint_name,
-                        "data": ", ".join(fields),
-                        "allowed_access": role
-                    })
+                    result.append(
+                        {
+                            "fichier": fichier,
+                            "data_access": endpoint_name,
+                            "data": ", ".join(fields),
+                            "allowed_access": role,
+                        }
+                    )
         return result
     else:
-        return {"response" : "User not allowed"}
-
+        return {"response": "User not allowed"}
 
 
 def parse_select_fields(sql: str) -> list[dict]:
     """Extrait les champs d'un SELECT sous forme {table, field}."""
-    match = re.search(r'SELECT\s+(.*?)\s+FROM', sql, re.IGNORECASE | re.DOTALL)
+    match = re.search(r"SELECT\s+(.*?)\s+FROM", sql, re.IGNORECASE | re.DOTALL)
     if not match:
         return []
 
-    raw_fields = match.group(1).split(',')
+    raw_fields = match.group(1).split(",")
     fields = []
 
     for raw in raw_fields:
         raw = raw.strip()
-        if '.' in raw:
-            table, field = raw.split('.', 1)
+        if "." in raw:
+            table, field = raw.split(".", 1)
             fields.append({"table": table.strip(), "field": field.strip()})
         else:
             fields.append({"table": "_unknown", "field": raw})
@@ -90,36 +94,24 @@ def parse_select_fields(sql: str) -> list[dict]:
 def build_tree(config: dict) -> dict:
     """Construit l'arbre de droits d'accès depuis la config JSON."""
 
-    root = {
-        "id": "root",
-        "name": "root",
-        "type": "root",
-        "children": []
-    }
+    root = {"id": "root", "name": "root", "type": "root", "children": []}
 
     for file_name, functions in config.items():
-
         # Niveau 1 — fichier
-        file_node = {
-            "id": file_name,
-            "name": file_name,
-            "type": "file",
-            "children": []
-        }
+        file_node = {"id": file_name, "name": file_name, "type": "file", "children": []}
 
         for func_name, func_def in functions.items():
-
             # Niveau 2 — fonction
             func_node = {
                 "id": f"{file_name}.{func_name}",
                 "name": func_name,
                 "type": "function",
-                "children": []
+                "children": [],
             }
 
-            sql            = func_def.get("request", "")
-            allowed_roles  = func_def.get("allowedRolesRequester", [])
-            fields         = parse_select_fields(sql)
+            sql = func_def.get("request", "")
+            allowed_roles = func_def.get("allowedRolesRequester", [])
+            fields = parse_select_fields(sql)
 
             # Regroupement des champs par table
             tables: dict[str, list[str]] = {}
@@ -127,23 +119,21 @@ def build_tree(config: dict) -> dict:
                 tables.setdefault(f["table"], []).append(f["field"])
 
             for table_name, field_list in tables.items():
-
                 # Niveau 3 — table
                 table_node = {
                     "id": f"{file_name}.{func_name}.{table_name}",
                     "name": table_name,
                     "type": "table",
-                    "children": []
+                    "children": [],
                 }
 
                 for field_name in field_list:
-
                     # Niveau 4 — champ
                     field_node = {
                         "id": f"{file_name}.{func_name}.{table_name}.{field_name}",
                         "name": field_name,
                         "type": "field",
-                        "children": []
+                        "children": [],
                     }
                     if callable(allowed_roles):
                         source = inspect.getsource(allowed_roles).strip()
@@ -154,18 +144,17 @@ def build_tree(config: dict) -> dict:
                             "id": f"{file_name}.{func_name}.{table_name}.{field_name}.{id}",
                             "name": name,
                             "type": "role",
-                            "children": []
+                            "children": [],
                         }
                         field_node["children"].append(role_node)
                     else:
                         for role in allowed_roles:
-
                             # Niveau 5 — static rôle
                             role_node = {
                                 "id": f"{file_name}.{func_name}.{table_name}.{field_name}.{role}",
                                 "name": role,
                                 "type": "role",
-                                "children": []
+                                "children": [],
                             }
                             field_node["children"].append(role_node)
 
@@ -180,13 +169,16 @@ def build_tree(config: dict) -> dict:
     return root
 
 
-@router.get("/access_auth_tree",
-            tags=["check", "tree"],
-            summary="Teacher without session",
-            description="Check teacher without session.")
+@router.get(
+    "/access_auth_tree",
+    tags=["check", "tree"],
+    summary="Teacher without session",
+    description="Check teacher without session.",
+    response_model=None,
+)
 def get_access_auth_tree(
-        current_user: Annotated[User, Depends(get_current_active_user)],
-):
+    current_user: Annotated[User, Depends(get_current_active_user)],
+) -> object:
     response = {
         "success": None,
         "meta": {
@@ -204,38 +196,42 @@ def get_access_auth_tree(
         response["data"] = build_tree(all_requests)
     else:
         response["success"] = False
-        response ["errors"] = [
-                {
-                  "code": "ACCESS_DENIED",
-                  "message": "You are not authorized to access this resource.",
-                }
-            ]
+        response["errors"] = [
+            {
+                "code": "ACCESS_DENIED",
+                "message": "You are not authorized to access this resource.",
+            }
+        ]
 
     return response
-
-
-
 
 
 # ─────────────────────────────────────────────
 # Helpers de classification
 # ─────────────────────────────────────────────
 
-def is_direct_wrapper(node) -> bool:
+
+def is_direct_wrapper(node: exp.Expression) -> bool:
     """
     Retourne True si le nœud est une simple transformation
     qui expose directement le champ sous-jacent :
     CAST, ROUND, FLOOR, CEIL, COALESCE à 1 arg, alias simple...
     """
-    DIRECT_WRAPPERS = {
-        exp.Cast, exp.Round, exp.Floor, exp.Ceil,
-        exp.Upper, exp.Lower, exp.Trim, exp.Coalesce,
+    direct_wrappers = {
+        exp.Cast,
+        exp.Round,
+        exp.Floor,
+        exp.Ceil,
+        exp.Upper,
+        exp.Lower,
+        exp.Trim,
+        exp.Coalesce,
         exp.TryCast,
     }
-    return type(node) in DIRECT_WRAPPERS
+    return type(node) in direct_wrappers
 
 
-def classify_column_in_expression(col: exp.Column, root_expr) -> str:
+def classify_column_in_expression(col: exp.Column, root_expr: exp.Expression) -> str:
     """
     Détermine si une colonne dans une expression est accédée
     de manière 'direct' ou 'indirect'.
@@ -252,9 +248,11 @@ def classify_column_in_expression(col: exp.Column, root_expr) -> str:
     # Wrapper direct (CAST, ROUND simple, etc.)
     if parent is not None and is_direct_wrapper(parent):
         # Vérifie que c'est le seul argument significatif
-        col_siblings = [c for c in parent.args.values()
-                        if isinstance(c, (exp.Expression,))
-                        and not isinstance(c, exp.DataType)]
+        col_siblings = [
+            c
+            for c in parent.args.values()
+            if isinstance(c, (exp.Expression,)) and not isinstance(c, exp.DataType)
+        ]
         if len(col_siblings) == 1:
             return "direct"
 
@@ -263,17 +261,19 @@ def classify_column_in_expression(col: exp.Column, root_expr) -> str:
         return "direct"
 
     # Fonctions d'agrégation → indirect
-    AGGREGATE_FUNCTIONS = {
-        exp.Sum, exp.Avg, exp.Max, exp.Min, exp.Count,
-        exp.StddevPop, exp.VariancePop,
+    aggregate_functions = {
+        exp.Sum,
+        exp.Avg,
+        exp.Max,
+        exp.Min,
+        exp.Count,
+        exp.StddevPop,
+        exp.VariancePop,
     }
-    for ancestor in col.walk():
-        pass  # on va utiliser find_ancestor à la place
-
     # Remontée manuelle vers la racine
     node = col.parent
     while node is not None and node is not root_expr:
-        if type(node) in AGGREGATE_FUNCTIONS:
+        if type(node) in aggregate_functions:
             return "indirect"
         if isinstance(node, exp.Subquery):
             return "indirect"
@@ -281,7 +281,7 @@ def classify_column_in_expression(col: exp.Column, root_expr) -> str:
             return "indirect"
         if isinstance(node, exp.Anonymous):  # fonctions inconnues ex: IFNULL
             return "indirect"
-        if isinstance(node, exp.If) or isinstance(node, exp.Case):
+        if isinstance(node, exp.If | exp.Case):
             return "indirect"
         node = node.parent
 
@@ -291,6 +291,7 @@ def classify_column_in_expression(col: exp.Column, root_expr) -> str:
 # ─────────────────────────────────────────────
 # Extraction des accès depuis un SELECT
 # ─────────────────────────────────────────────
+
 
 def extract_accesses(sql: str, dialect: str = "mysql") -> list[dict]:
     """
@@ -317,14 +318,13 @@ def extract_accesses(sql: str, dialect: str = "mysql") -> list[dict]:
     seen: set[tuple] = set()  # dédoublonnage
 
     for select_expr in statement.selects:
-
         # Alias exposé dans le résultat
         if isinstance(select_expr, exp.Alias):
             exposed_as = select_expr.alias
-            inner      = select_expr.this
+            inner = select_expr.this
         else:
             exposed_as = None
-            inner      = select_expr
+            inner = select_expr
 
         # Toutes les colonnes dans cette expression SELECT
         for col in inner.find_all(exp.Column):
@@ -338,12 +338,14 @@ def extract_accesses(sql: str, dialect: str = "mysql") -> list[dict]:
                 continue
             seen.add(key)
 
-            accesses.append({
-                "table":      col.table,
-                "column":     col.name,
-                "access":     access_type,
-                "exposed_as": exposed_as if access_type == "direct" else None,
-            })
+            accesses.append(
+                {
+                    "table": col.table,
+                    "column": col.name,
+                    "access": access_type,
+                    "exposed_as": exposed_as if access_type == "direct" else None,
+                }
+            )
 
     return accesses
 
@@ -352,25 +354,24 @@ def extract_accesses(sql: str, dialect: str = "mysql") -> list[dict]:
 # Construction de l'arbre de data lineage
 # ─────────────────────────────────────────────
 
+
 def build_lineage_tree(config: dict) -> dict:
 
     root = {"id": "root", "name": "root", "type": "root", "children": []}
 
     for file_name, functions in config.items():
-
         file_node = {"id": file_name, "name": file_name, "type": "file", "children": []}
 
         for func_name, func_def in functions.items():
-
             func_node = {
-                #"id":       f"{file_name}.{func_name}",
-                "id":       f"function.{func_name}",
-                "name":     func_name,
-                "type":     "function",
-                "children": []
+                # "id":       f"{file_name}.{func_name}",
+                "id": f"function.{func_name}",
+                "name": func_name,
+                "type": "function",
+                "children": [],
             }
 
-            sql           = func_def.get("request", "")
+            sql = func_def.get("request", "")
             allowed_roles = func_def.get("allowedRolesRequester", [])
 
             try:
@@ -385,37 +386,36 @@ def build_lineage_tree(config: dict) -> dict:
                 tables.setdefault(a["table"], []).append(a)
 
             for table_name, field_accesses in tables.items():
-
                 table_node = {
-                    #"id":       f"{file_name}.{func_name}.{table_name}",
-                    "id":       f"table.{table_name}",
-                    "name":     table_name,
-                    "type":     "table",
-                    "children": []
+                    # "id":       f"{file_name}.{func_name}.{table_name}",
+                    "id": f"table.{table_name}",
+                    "name": table_name,
+                    "type": "table",
+                    "children": [],
                 }
 
                 for access in field_accesses:
-                    col_name    = access["column"]
+                    col_name = access["column"]
                     access_type = access["access"]
-                    exposed_as  = access["exposed_as"]
+                    exposed_as = access["exposed_as"]
 
                     field_node = {
-                        #"id":          f"{file_name}.{func_name}.{table_name}.{col_name}",
-                        "id":          f"field.{table_name}.{col_name}",
-                        "name":        col_name,
-                        "type":        "field",
-                        "access":      access_type,   # "direct" | "indirect"
-                        "exposed_as":  exposed_as,    # alias retourné, None si indirect
-                        "children":    []
+                        # "id":          f"{file_name}.{func_name}.{table_name}.{col_name}",
+                        "id": f"field.{table_name}.{col_name}",
+                        "name": col_name,
+                        "type": "field",
+                        "access": access_type,  # "direct" | "indirect"
+                        "exposed_as": exposed_as,  # alias retourné, None si indirect
+                        "children": [],
                     }
 
                     for role in allowed_roles:
                         role_node = {
-                            #"id":       f"{file_name}.{func_name}.{table_name}.{col_name}.{role}",
-                            "id":       f"role.{role}",
-                            "name":     role,
-                            "type":     "role",
-                            "children": []
+                            # "id":       f"{file_name}.{func_name}.{table_name}.{col_name}.{role}",
+                            "id": f"role.{role}",
+                            "name": role,
+                            "type": "role",
+                            "children": [],
                         }
                         field_node["children"].append(role_node)
 
@@ -430,13 +430,16 @@ def build_lineage_tree(config: dict) -> dict:
     return root
 
 
-@router.get("/access_auth_tree_sqlglot",
-            tags=["check", "tree"],
-            summary="Teacher without session",
-            description="Check teacher without session.")
+@router.get(
+    "/access_auth_tree_sqlglot",
+    tags=["check", "tree"],
+    summary="Teacher without session",
+    description="Check teacher without session.",
+    response_model=None,
+)
 def get_access_auth_tree_sqlglot(
-        current_user: Annotated[User, Depends(get_current_active_user)],
-):
+    current_user: Annotated[User, Depends(get_current_active_user)],
+) -> object:
     response = {
         "success": None,
         "meta": {
@@ -454,11 +457,11 @@ def get_access_auth_tree_sqlglot(
         response["data"] = build_lineage_tree(all_requests)
     else:
         response["success"] = False
-        response ["errors"] = [
-                {
-                  "code": "ACCESS_DENIED",
-                  "message": "You are not authorized to access this resource.",
-                }
-            ]
+        response["errors"] = [
+            {
+                "code": "ACCESS_DENIED",
+                "message": "You are not authorized to access this resource.",
+            }
+        ]
 
     return response

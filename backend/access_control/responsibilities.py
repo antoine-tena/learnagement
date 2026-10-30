@@ -1,6 +1,7 @@
 from access_control.types import Responsibility
 from models.user import User
 
+
 def _responsibility_covers(stored: dict, required: Responsibility) -> bool:
     """
     Vérifie qu'une responsabilité stockée en BD couvre la responsabilité requise.
@@ -16,6 +17,7 @@ def _responsibility_covers(stored: dict, required: Responsibility) -> bool:
         for dim, val in stored["dimensions"].items()
     )
 
+
 def has_any_of_responsibilities(user: User, required_list: list[Responsibility]) -> bool:
     """
     L'utilisateur doit couvrir AU MOINS UNE des responsabilités de la liste.
@@ -25,14 +27,12 @@ def has_any_of_responsibilities(user: User, required_list: list[Responsibility])
         for required in required_list
     )
 
+
 def has_all_responsibilities(user: User, required_list: list[Responsibility]) -> bool:
     """
     L'utilisateur doit avoir UNE responsabilité couvrant CHACUNE des entrées.
     """
-    return all(
-        has_any_of_responsibilities(user, [required])
-        for required in required_list
-    )
+    return all(has_any_of_responsibilities(user, [required]) for required in required_list)
 
 
 def has_hierarchy_responsibilities(user: User, ordered_list: list[Responsibility]) -> bool:

@@ -1,10 +1,12 @@
-import re
-import logging
-from fastapi import APIRouter, Depends
-from typing import Annotated
 import inspect
+import logging
+import re
+from collections.abc import Callable
+from typing import Annotated
 
-from api.dependencies import db_request, get_current_active_user
+from fastapi import APIRouter, Depends
+
+from api.dependencies import Rows, db_request, get_current_active_user
 from models.request import SQLRequest
 from models.user import User
 
@@ -16,6 +18,7 @@ _META_KEYS = {"route", "tags", "summary", "description", "auth", "auto"}
 # Extrait les noms de paramètres de route, ex: "{nom_filiere:str}" → "nom_filiere"
 _PATH_PARAM_RE = re.compile(r"\{(\w+)(?::\w+)?\}")
 
+
 def register_auto_routes(router: APIRouter, all_requests: dict) -> None:
     """
     Génère automatiquement les endpoints GET pour toutes les entrées
@@ -25,11 +28,11 @@ def register_auto_routes(router: APIRouter, all_requests: dict) -> None:
         if not definition.get("auto", True):
             continue  # endpoint défini manuellement → on saute
 
-        route    = definition.get("route")
-        tags     = definition.get("tags", [])
-        summary  = definition.get("summary", key)
-        desc     = definition.get("description", "")
-        auth     = definition.get("auth", True)
+        route = definition.get("route")
+        tags = definition.get("tags", [])
+        summary = definition.get("summary", key)
+        desc = definition.get("description", "")
+        auth = definition.get("auth", True)
 
         if route is None:
             logger.warning(f"Entrée '{key}' sans 'route' — ignorée")
@@ -42,10 +45,12 @@ def register_auto_routes(router: APIRouter, all_requests: dict) -> None:
         path_param_names = _PATH_PARAM_RE.findall(route)
 
         # Capture des variables pour la closure
-        def make_handler(k: str, d: dict, requires_auth: bool, param_names: list[str]):
+        def make_handler(
+            k: str, d: dict, requires_auth: bool, param_names: list[str]
+        ) -> Callable[..., Rows]:
             params_def = d.get("params")
 
-            def resolve_params(path_values: dict):
+            def resolve_params(path_values: dict) -> dict | None:
                 if params_def is None:
                     return None
                 if callable(params_def):
@@ -54,21 +59,29 @@ def register_auto_routes(router: APIRouter, all_requests: dict) -> None:
 
             if requires_auth:
                 if param_names:
-                    def handler(current_user: Annotated[User, Depends(get_current_active_user)], **path_values):
+
+                    def handler(
+                        current_user: Annotated[User, Depends(get_current_active_user)],
+                        **path_values: str,
+                    ) -> Rows:
                         resolved = {**d, "params": resolve_params(path_values)}
                         return db_request(current_user, SQLRequest(**resolved))
                 else:
-                    def handler(current_user: Annotated[User, Depends(get_current_active_user)]):
+
+                    def handler(
+                        current_user: Annotated[User, Depends(get_current_active_user)],
+                    ) -> Rows:
                         return db_request(current_user, SQLRequest(**d))
             else:
                 if param_names:
-                    def handler(**path_values):
+
+                    def handler(**path_values: str) -> Rows:
                         resolved = {**d, "params": resolve_params(path_values)}
                         return db_request(None, SQLRequest(**resolved))
                 else:
-                    def handler():
-                        return db_request(None, SQLRequest(**d))
 
+                    def handler() -> Rows:
+                        return db_request(None, SQLRequest(**d))
 
             # Construit dynamiquement la signature pour que FastAPI détecte
             # les paramètres de route (sinon ils restent invisibles, comme actuellement)
@@ -79,16 +92,19 @@ def register_auto_routes(router: APIRouter, all_requests: dict) -> None:
                 ]
                 existing_params = list(inspect.signature(handler).parameters.values())
                 # Retire le **path_values générique, le remplace par les vrais params typés
-                base_params = [p for p in existing_params if p.kind != inspect.Parameter.VAR_KEYWORD]
+                base_params = [
+                    p for p in existing_params if p.kind != inspect.Parameter.VAR_KEYWORD
+                ]
                 handler.__signature__ = inspect.Signature(base_params + extra_params)
 
             return handler
 
-        handler = make_handler(key, sql_def, auth, path_param_names)
+        endpoint = make_handler(key, sql_def, auth, path_param_names)
 
         router.add_api_route(
             path=route,
-            endpoint=handler,
+            endpoint=endpoint,
+            response_model=None,  # JSON inchangé : pas de validation par l'annotation
             methods=["GET"],
             tags=tags,
             summary=summary,

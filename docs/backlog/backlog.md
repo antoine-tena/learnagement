@@ -29,18 +29,6 @@ installés, `middleware.ts` → `proxy.ts`.
 
 ## 🟠 Important
 
-### T-17 · L'API passe ruff : format, imports, annotations
-- **Type**: improvement
-- **Status**: todo
-- **Opened**: 2026-10-30
-- **Effort**: M · **Owner**: — · **Due**: —
-- **Origin**: hook `ruff-check-backend` de kiln, 1 468 erreurs sur `backend/`
-
-Tant que la dette ruff reste, toute retouche d'un fichier de `backend/` est refusée au commit.
-`ruff format` et les corrections sûres d'abord (style), puis les annotations (ANN, 400), les
-noms de modules (`LNM_*.py`, N999) et le reste à la main, tests verts à chaque étape.
-
-
 
 ### T-05 · uv partout : `pyproject.toml` et `uv.lock`
 - **Type**: improvement

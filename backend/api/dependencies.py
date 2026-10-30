@@ -1,38 +1,34 @@
-import dotenv
 import re
+from typing import Annotated, Any
 
-from auth.authenticate_tools import decode_access_token
-#import mysql.connector
+import dotenv
+from fastapi import Depends, Header, HTTPException, status
+from jwt.exceptions import InvalidTokenError
+
+# import mysql.connector
 from sqlalchemy import text
-from sqlalchemy.exc import TimeoutError as PoolTimeout, SQLAlchemyError
 from sqlalchemy.engine import Connection
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import TimeoutError as PoolTimeout
 
+from access_control.checker import check_access
+from auth.authenticate_tools import decode_access_token
+from core.logging import logger
+from core.security import oauth2_scheme
 from db.connection import get_connection, get_read_connection
 from models.request import SQLRequest
 from models.token import TokenData
 from models.user import User, UserInDB
-from core.security import SECRET_KEY, ALGORITHM, oauth2_scheme
-from core.logging import logger
-
-from typing import Annotated
-
-import jwt
-from jwt.exceptions import InvalidTokenError
-
-from fastapi import Header, HTTPException, Depends, status
-
-from access_control.checker import check_access
-
-
 
 dotenv.load_dotenv("../.env")
 
-async def get_token_header(x_token: Annotated[str, Header()]):
+
+async def get_token_header(x_token: Annotated[str, Header()]) -> None:
     if x_token != "fake-super-secret-token":
         raise HTTPException(status_code=400, detail="X-Token header invalid")
 
 
-async def get_query_token(token: str):
+async def get_query_token(token: str) -> None:
     if token != "jessica":
         raise HTTPException(status_code=400, detail="No Jessica token provided")
 
@@ -47,7 +43,8 @@ async def get_query_token(token: str):
 #                                  LNM_administratif.*,
 #                                  ExplicitSecondaryKs_LNM_administratif.ExplicitSecondaryK
 #                           FROM LNM_administratif
-#                           JOIN ExplicitSecondaryKs_LNM_administratif ON ExplicitSecondaryKs_LNM_administratif.id_administratif = LNM_administratif.id_administratif
+# JOIN ExplicitSecondaryKs_LNM_administratif ON
+# ExplicitSecondaryKs_LNM_administratif.id_administratif = LNM_administratif.id_administratif
 #                           WHERE login = %s""",
 #                        (user_login,))
 #         users = cursor.fetchall()
@@ -59,13 +56,14 @@ async def get_query_token(token: str):
 #             logger.warning(f"Inactive user '{user_login}' try to connect")
 #             return None
 #         user_dict["main_role"] = "administratif"
-#         user_dict["roles"] = ["connected_user", user_dict["main_role"], users[0]['ExplicitSecondaryK']]
+# user_dict["roles"] = ["connected_user", user_dict["main_role"], users[0]['ExplicitSecondaryK']]
 #         connection = mysql.connector.connect(**db_connexion())
 #         cursor = connection.cursor()
 #         cursor.execute(
 #             f"""SELECT LNM_role.role
 #                         FROM LNM_administratif
-#                         JOIN LNM_administratif_as_role on LNM_administratif_as_role.id_administratif = LNM_administratif.id_administratif
+# JOIN LNM_administratif_as_role on LNM_administratif_as_role.id_administratif =
+# LNM_administratif.id_administratif
 #                         JOIN LNM_role on LNM_role.id_role = LNM_administratif_as_role.id_role
 #                         WHERE login = %s""",
 #             (user_login,))
@@ -85,7 +83,8 @@ async def get_query_token(token: str):
 #                               LNM_enseignant.*,
 #                               ExplicitSecondaryKs_LNM_enseignant.ExplicitSecondaryK
 #                        FROM LNM_enseignant
-#                        JOIN ExplicitSecondaryKs_LNM_enseignant ON ExplicitSecondaryKs_LNM_enseignant.id_enseignant = LNM_enseignant.id_enseignant
+# JOIN ExplicitSecondaryKs_LNM_enseignant ON ExplicitSecondaryKs_LNM_enseignant.id_enseignant =
+# LNM_enseignant.id_enseignant
 #                        WHERE login = %s""",
 #                        (user_login,))
 #         users = cursor.fetchall()
@@ -98,13 +97,14 @@ async def get_query_token(token: str):
 #             logger.warning(f"Inactive user '{user_login}' try to connect")
 #             return None
 #         user_dict["main_role"] = "enseignant"
-#         user_dict["roles"] = ["connected_user", user_dict["main_role"], users[0]['ExplicitSecondaryK']]
+# user_dict["roles"] = ["connected_user", user_dict["main_role"], users[0]['ExplicitSecondaryK']]
 #         connection = mysql.connector.connect(**db_connexion())
 #         cursor = connection.cursor()
 #         cursor.execute(
 #             f"""SELECT LNM_role.role
 #                         FROM LNM_enseignant
-#                         JOIN LNM_enseignant_as_role ON LNM_enseignant_as_role.id_enseignant = LNM_enseignant.id_enseignant
+# JOIN LNM_enseignant_as_role ON LNM_enseignant_as_role.id_enseignant =
+# LNM_enseignant.id_enseignant
 #                         JOIN LNM_role on LNM_role.id_role = LNM_enseignant_as_role.id_role
 #                         WHERE login = %s""",
 #             (user_login,))
@@ -121,9 +121,13 @@ async def get_query_token(token: str):
 #                     LNM_enseignant_responsabilite_dimensions.dimension,
 #                     LNM_enseignant_responsabilite_dimensions.valeur
 #                 FROM LNM_responsabilite
-#                 JOIN LNM_enseignant_responsabilites ON LNM_enseignant_responsabilites.id_responsabilite = LNM_responsabilite.id_responsabilite
-#                 JOIN LNM_enseignant ON LNM_enseignant.id_enseignant = LNM_enseignant_responsabilites.id_enseignant
-#                 LEFT JOIN LNM_enseignant_responsabilite_dimensions ON LNM_enseignant_responsabilite_dimensions.id_enseignant_responsabilites = LNM_enseignant_responsabilites.id_enseignant_responsabilites
+# JOIN LNM_enseignant_responsabilites ON LNM_enseignant_responsabilites.id_responsabilite =
+# LNM_responsabilite.id_responsabilite
+# JOIN LNM_enseignant ON LNM_enseignant.id_enseignant =
+# LNM_enseignant_responsabilites.id_enseignant
+# LEFT JOIN LNM_enseignant_responsabilite_dimensions ON
+# LNM_enseignant_responsabilite_dimensions.id_enseignant_responsabilites =
+# LNM_enseignant_responsabilites.id_enseignant_responsabilites
 #                 WHERE login = %s""",
 #             (user_login,))
 #         responsibilities = cursor.fetchall()
@@ -143,7 +147,8 @@ async def get_query_token(token: str):
 #                                  LNM_etudiant.*,
 #                                  ExplicitSecondaryKs_LNM_etudiant.ExplicitSecondaryK
 #                           FROM LNM_etudiant
-#                           JOIN ExplicitSecondaryKs_LNM_etudiant ON ExplicitSecondaryKs_LNM_etudiant.id_etudiant = LNM_etudiant.id_etudiant
+# JOIN ExplicitSecondaryKs_LNM_etudiant ON ExplicitSecondaryKs_LNM_etudiant.id_etudiant =
+# LNM_etudiant.id_etudiant
 #                           WHERE login = %s""",
 #                        (user_login,))
 #         users = cursor.fetchall()
@@ -156,20 +161,29 @@ async def get_query_token(token: str):
 #             logger.warning(f"Inactive user '{user_login}' try to connect")
 #             return None
 #         user_dict["main_role"] = "etudiant"
-#         user_dict["roles"] = ["connected_user", user_dict["main_role"], users[0]['ExplicitSecondaryK']]
+# user_dict["roles"] = ["connected_user", user_dict["main_role"], users[0]['ExplicitSecondaryK']]
 #         return UserInDB(**user_dict)
 #     return None
 
+
 def _fetch_administratif(conn: Connection, user_login: str) -> UserInDB | None:
-    row = conn.execute(text("""
+    row = (
+        conn.execute(
+            text("""
         SELECT LNM_administratif.id_administratif AS id,
                LNM_administratif.*,
                ExplicitSecondaryKs_LNM_administratif.ExplicitSecondaryK
         FROM LNM_administratif
         JOIN ExplicitSecondaryKs_LNM_administratif
-          ON ExplicitSecondaryKs_LNM_administratif.id_administratif = LNM_administratif.id_administratif
+          ON ExplicitSecondaryKs_LNM_administratif.id_administratif
+              = LNM_administratif.id_administratif
         WHERE login = :login
-    """), {"login": user_login}).mappings().first()
+    """),
+            {"login": user_login},
+        )
+        .mappings()
+        .first()
+    )
 
     if row is None:
         return None
@@ -182,21 +196,30 @@ def _fetch_administratif(conn: Connection, user_login: str) -> UserInDB | None:
     user_dict["main_role"] = "administratif"
     user_dict["roles"] = ["connected_user", "administratif", user_dict["ExplicitSecondaryK"]]
 
-    roles = conn.execute(text("""
+    roles = (
+        conn.execute(
+            text("""
         SELECT LNM_role.role
         FROM LNM_administratif
         JOIN LNM_administratif_as_role
           ON LNM_administratif_as_role.id_administratif = LNM_administratif.id_administratif
         JOIN LNM_role ON LNM_role.id_role = LNM_administratif_as_role.id_role
         WHERE login = :login
-    """), {"login": user_login}).scalars().all()
+    """),
+            {"login": user_login},
+        )
+        .scalars()
+        .all()
+    )
     user_dict["roles"] += roles
 
     return UserInDB(**user_dict)
 
 
 def _fetch_enseignant(conn: Connection, user_login: str) -> UserInDB | None:
-    row = conn.execute(text("""
+    row = (
+        conn.execute(
+            text("""
         SELECT LNM_enseignant.id_enseignant AS id,
                LNM_enseignant.*,
                ExplicitSecondaryKs_LNM_enseignant.ExplicitSecondaryK
@@ -204,7 +227,12 @@ def _fetch_enseignant(conn: Connection, user_login: str) -> UserInDB | None:
         JOIN ExplicitSecondaryKs_LNM_enseignant
           ON ExplicitSecondaryKs_LNM_enseignant.id_enseignant = LNM_enseignant.id_enseignant
         WHERE login = :login
-    """), {"login": user_login}).mappings().first()
+    """),
+            {"login": user_login},
+        )
+        .mappings()
+        .first()
+    )
 
     if row is None:
         return None
@@ -217,17 +245,26 @@ def _fetch_enseignant(conn: Connection, user_login: str) -> UserInDB | None:
     user_dict["main_role"] = "enseignant"
     user_dict["roles"] = ["connected_user", "enseignant", user_dict["ExplicitSecondaryK"]]
 
-    roles = conn.execute(text("""
+    roles = (
+        conn.execute(
+            text("""
         SELECT LNM_role.role
         FROM LNM_enseignant
         JOIN LNM_enseignant_as_role
           ON LNM_enseignant_as_role.id_enseignant = LNM_enseignant.id_enseignant
         JOIN LNM_role ON LNM_role.id_role = LNM_enseignant_as_role.id_role
         WHERE login = :login
-    """), {"login": user_login}).scalars().all()
+    """),
+            {"login": user_login},
+        )
+        .scalars()
+        .all()
+    )
     user_dict["roles"] += roles
 
-    responsibilities = conn.execute(text("""
+    responsibilities = (
+        conn.execute(
+            text("""
         SELECT LNM_enseignant_responsabilites.id_enseignant_responsabilites,
                LNM_responsabilite.type_objet,
                LNM_enseignant_responsabilite_dimensions.dimension,
@@ -238,16 +275,24 @@ def _fetch_enseignant(conn: Connection, user_login: str) -> UserInDB | None:
         JOIN LNM_enseignant
           ON LNM_enseignant.id_enseignant = LNM_enseignant_responsabilites.id_enseignant
         LEFT JOIN LNM_enseignant_responsabilite_dimensions
-          ON LNM_enseignant_responsabilite_dimensions.id_enseignant_responsabilites = LNM_enseignant_responsabilites.id_enseignant_responsabilites
+          ON LNM_enseignant_responsabilite_dimensions.id_enseignant_responsabilites
+              = LNM_enseignant_responsabilites.id_enseignant_responsabilites
         WHERE login = :login
-    """), {"login": user_login}).mappings().all()
+    """),
+            {"login": user_login},
+        )
+        .mappings()
+        .all()
+    )
     user_dict["responsibilities"] = load_enseignant_responsibilities(responsibilities)
 
     return UserInDB(**user_dict)
 
 
 def _fetch_etudiant(conn: Connection, user_login: str) -> UserInDB | None:
-    row = conn.execute(text("""
+    row = (
+        conn.execute(
+            text("""
         SELECT LNM_etudiant.id_etudiant AS id,
                LNM_etudiant.*,
                ExplicitSecondaryKs_LNM_etudiant.ExplicitSecondaryK
@@ -255,7 +300,12 @@ def _fetch_etudiant(conn: Connection, user_login: str) -> UserInDB | None:
         JOIN ExplicitSecondaryKs_LNM_etudiant
           ON ExplicitSecondaryKs_LNM_etudiant.id_etudiant = LNM_etudiant.id_etudiant
         WHERE login = :login
-    """), {"login": user_login}).mappings().first()
+    """),
+            {"login": user_login},
+        )
+        .mappings()
+        .first()
+    )
 
     if row is None:
         return None
@@ -270,8 +320,9 @@ def _fetch_etudiant(conn: Connection, user_login: str) -> UserInDB | None:
 
     return UserInDB(**user_dict)
 
-def get_user(user_login: str):
-    #fetchers = [get_administratif, get_enseignant, get_etudiant]
+
+def get_user(user_login: str) -> UserInDB | None:
+    # fetchers = [get_administratif, get_enseignant, get_etudiant]
     user = None
     fetchers = (_fetch_administratif, _fetch_enseignant, _fetch_etudiant)
 
@@ -287,11 +338,10 @@ def get_user(user_login: str):
                     break
     except SQLAlchemyError as e:
         logger.exception(e)
-        raise HTTPException(status_code=503, detail="Database unavailable")
+        raise HTTPException(status_code=503, detail="Database unavailable") from e
     except Exception as e:
         logger.exception(e)
-        raise HTTPException(status_code=500, detail="Undefined Get User Error")
-
+        raise HTTPException(status_code=500, detail="Undefined Get User Error") from e
 
     if user is not None:
         logger.info(f"User {user_login} logged")
@@ -299,7 +349,6 @@ def get_user(user_login: str):
         logger.error(f"Loging error with login: {user_login}")
 
     return user
-
 
 
 def load_enseignant_responsibilities(rows: list[dict]) -> list[dict]:
@@ -314,14 +363,16 @@ def load_enseignant_responsibilities(rows: list[dict]) -> list[dict]:
         if rid not in resp_map:
             resp_map[rid] = {
                 "type_objet": row["type_objet"],
-                "dimensions": {}   # { "filiere": "IDU", "niveau": "FI4", ... }
+                "dimensions": {},  # { "filiere": "IDU", "niveau": "FI4", ... }
             }
         if row["dimension"]:  # LEFT JOIN → peut être NULL si aucune dimension
             resp_map[rid]["dimensions"][row["dimension"]] = row["valeur"]
 
     return list(resp_map.values())
 
-# ToDo Utiliser get_user_cached dans get_current_user en interface entre get_current_user et get_user pour avoir un cache Redis et limiter les requesters SQL relative à l'utilisateur
+
+# ToDo Utiliser get_user_cached dans get_current_user en interface entre get_current_user et
+# get_user pour avoir un cache Redis et limiter les requesters SQL relative à l'utilisateur
 # import redis
 # import pickle
 #
@@ -344,38 +395,41 @@ def load_enseignant_responsibilities(rows: list[dict]) -> list[dict]:
 # def invalidate_user_cache(user_login: str):
 #     for method in ["byMail", "byLogin"]:
 #         redis_client.delete(f"user:{method}:{user_login}")
-# # À appeler dans vos endpoints de modification d'utilisateur, logout, voire périodiquement "timeout".
+# # À appeler dans vos endpoints de modification d'utilisateur, logout, voire périodiquement
+# "timeout".
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> UserInDB:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    #print(token, flush=True)
+    # print(token, flush=True)
     try:
-        #payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        # payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         payload = decode_access_token(token)
         user_login = payload.get("login")
-        #print("userlogin", userlogin, flush=True)
+        # print("userlogin", userlogin, flush=True)
         if user_login is None:
             logger.error(f"Login error with payload: {payload}")
             raise credentials_exception
         token_data = TokenData(login=user_login)
-        #print("token_data", token_data, flush=True)
+        # print("token_data", token_data, flush=True)
     except InvalidTokenError as e:
         logger.error(f"Invalid token : {e}")
-        raise credentials_exception
+        raise credentials_exception from e
     user = get_user(token_data.login)
     if user is None:
         logger.error(f"Login error with payload: {payload}")
         raise credentials_exception
     return user
 
+
 async def get_current_active_user(
     current_user: Annotated[User, Depends(get_current_user)],
-):
-    #if current_user.disabled:
+) -> User:
+    # if current_user.disabled:
     #    raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
 
@@ -428,16 +482,22 @@ async def get_current_active_user(
 
 _PYFORMAT = re.compile(r"%\((\w+)\)s")
 
+
 def _to_named(sql: str) -> str:
     """Shim transitoire : %(x)s -> :x (à supprimer après migration des requêtes)."""
     return _PYFORMAT.sub(r":\1", sql)
 
-def _execute(conn: Connection, request: SQLRequest) -> list[dict]:
+
+# Rows of a SQL result, as db_request returns them and the routes send them back.
+type Rows = list[dict[str, Any]]
+
+
+def _execute(conn: Connection, request: SQLRequest) -> Rows:
     result = conn.execute(text(_to_named(request.request)), request.params or {})
     return [dict(r) for r in result.mappings()] if result.returns_rows else []
 
 
-def db_request(requester: User, request: SQLRequest, conn: Connection | None = None):
+def db_request(requester: User, request: SQLRequest, conn: Connection | None = None) -> Rows:
     """
     Sans `conn` : une connexion et une transaction pour cette seule requête (comportement actuel).
     Avec `conn` : la requête s'exécute dans la transaction de l'appelant, sans commit ici.
@@ -450,7 +510,7 @@ def db_request(requester: User, request: SQLRequest, conn: Connection | None = N
         logger.info(f"Anonymous user requests {request}")
 
     check_access(request=request, user=requester)
-    
+
     rows = []
 
     try:
@@ -459,18 +519,20 @@ def db_request(requester: User, request: SQLRequest, conn: Connection | None = N
         with get_connection() as conn:
             result = conn.execute(text(_to_named(request.request)), request.params or {})
             rows = [dict(r) for r in result.mappings()] if result.returns_rows else []
-    except PoolTimeout:
-        raise HTTPException(status_code=503, detail="Database busy, retry later")
+    except PoolTimeout as e:
+        raise HTTPException(status_code=503, detail="Database busy, retry later") from e
     except Exception as e:
         logger.exception(e)
-        raise HTTPException(status_code=500, detail=f"Database request failed")
+        raise HTTPException(status_code=500, detail="Database request failed") from e
     return rows
 
 
 ###################################
 
-def main():
+
+def main() -> bool:
     return True
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

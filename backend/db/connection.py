@@ -1,14 +1,13 @@
 import os
-from warnings import deprecated
-from core.logging import logger
-
+from collections.abc import Iterator
 from contextlib import contextmanager
 
-from sqlalchemy import create_engine, URL
+from sqlalchemy import URL, Connection, Engine, create_engine
 
-_engine = None
+_engine: Engine | None = None
 
-def get_engine():
+
+def get_engine() -> Engine:
     global _engine
     if _engine is None:
         url = URL.create(  # gère les caractères spéciaux du mot de passe
@@ -24,21 +23,24 @@ def get_engine():
             pool_size=int(os.getenv("DB_POOL_SIZE", "10")),
             max_overflow=int(os.getenv("DB_MAX_OVERFLOW", "10")),
             pool_timeout=10,
-            pool_pre_ping=True,   # teste la connexion avant usage
-            pool_recycle=1800,    # évite les "MySQL server has gone away"
+            pool_pre_ping=True,  # teste la connexion avant usage
+            pool_recycle=1800,  # évite les "MySQL server has gone away"
         )
     return _engine
 
+
 @contextmanager
-def get_connection():
+def get_connection() -> Iterator[Connection]:
     """Connexion + transaction : commit à la sortie, rollback sur exception."""
     with get_engine().begin() as conn:
         yield conn
 
+
 @contextmanager
-def get_read_connection():
+def get_read_connection() -> Iterator[Connection]:
     with get_engine().connect() as conn:
         yield conn  # fermeture = rollback implicite, retour au pool
+
 
 # @deprecated("Migration to sqlalchemy, use get_connection() instead")
 # def db_connexion():

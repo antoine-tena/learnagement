@@ -1,24 +1,23 @@
+from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-
-from typing import Annotated
-
 from pwdlib import PasswordHash
 from pwdlib.hashers.bcrypt import BcryptHasher
 
-from api.dependencies import logger, get_user
-from models.token import Token
+from api.dependencies import get_user, logger
 from auth.authenticate_tools import create_access_token
-
+from models.token import Token
+from models.user import UserInDB
 
 password_hash = PasswordHash((BcryptHasher(),))
 
-def verify_password(plain_password, hashed_password):
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
     return password_hash.verify(plain_password, hashed_password)
 
 
-def __authenticate_user_lnm(user_login: str, password: str):
+def __authenticate_user_lnm(user_login: str, password: str) -> UserInDB | None:
     user = get_user(user_login)
     if not user:
         logger.info(f"User {user_login} does not exist")
@@ -28,6 +27,7 @@ def __authenticate_user_lnm(user_login: str, password: str):
         logger.info(f"User {user_login} password does not match")
         return None
     return user
+
 
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
@@ -40,18 +40,19 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token = create_access_token(
-        data={"id": user.id,
-              "login": user.mail,
-              "email": user.mail,
-              "firstname": user.prenom,
-              "lastname": user.nom,
-              "roles" : user.roles,
-              "password2update" : user.password2update
-              },
+        data={
+            "id": user.id,
+            "login": user.mail,
+            "email": user.mail,
+            "firstname": user.prenom,
+            "lastname": user.nom,
+            "roles": user.roles,
+            "password2update": user.password2update,
+        },
     )
     logger.info(f"LNM user {user.mail} connected with roles {user.roles}")
     return Token(access_token=access_token, token_type="bearer")
 
 
-def logout():
+def logout() -> dict[str, str]:
     return {"message": "Logout page in construction"}

@@ -10,7 +10,7 @@ def get_all_requests(package_name: str) -> dict:
     """
     package = importlib.import_module(package_name)
     results = {}
-    for importer, module_name, is_pkg in pkgutil.iter_modules(package.__path__):
+    for _importer, module_name, _is_pkg in pkgutil.iter_modules(package.__path__):
         full_name = f"{package_name}.{module_name}"
         module = importlib.import_module(full_name)
 
@@ -27,7 +27,7 @@ def get_all_local_requests() -> dict:
 
     results = {}
 
-    for importer, module_name, is_pkg in pkgutil.iter_modules(package.__path__):
+    for _importer, module_name, _is_pkg in pkgutil.iter_modules(package.__path__):
         full_name = f"{package_name}.{module_name}"
         module = importlib.import_module(full_name)
 

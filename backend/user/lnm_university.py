@@ -1,22 +1,18 @@
-import logging
-
-from fastapi import APIRouter, Depends, HTTPException, Body
-from fastapi.responses import StreamingResponse
 import io
-import openpyxl
+import logging
 from datetime import datetime
-
-from pygments.lexers.julia import allowed_variable
 from typing import Annotated
-from typing import Dict, List, Optional, Tuple
-from pydantic import BaseModel, Field
 
-from api.dependencies import db_request, get_current_active_user
+import openpyxl
+from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel, Field
+from sqlalchemy import Connection
+
+from api.dependencies import Rows, db_request, get_current_active_user
+from db.connection import get_connection
 from models.request import SQLRequest
 from models.user import User
-
-from functools import partial
-from db.connection import get_connection
 
 logger = logging.getLogger(__name__)
 
@@ -32,40 +28,41 @@ class UniversityPlacePayload(BaseModel):
 class UniversityAdminPayload(BaseModel):
     name: str
     country: str
-    code: Optional[str] = None
-    address: Optional[str] = None
+    code: str | None = None
+    address: str | None = None
     latitude: float = 0.0
     longitude: float = 0.0
-    website: Optional[str] = None
-    languages: Optional[str] = None
-    note_min: Optional[float] = None
-    type: Optional[str] = "ERASMUS"
+    website: str | None = None
+    languages: str | None = None
+    note_min: float | None = None
+    type: str | None = "ERASMUS"
     S8_total_places: int = 0
     S9_total_places: int = 0
-    places: List[UniversityPlacePayload] = []
+    places: list[UniversityPlacePayload] = []
+
+
 class DoublantScore(BaseModel):
     id_etudiant: int
     z_score: float
 
+
 class CampaignLaunchRequestPayload(BaseModel):
-    doublants: List[DoublantScore] = []
-
-
+    doublants: list[DoublantScore] = []
 
 
 def _sync_university_places(
     current_user: User,
     id_partner_university: int,
-    places: List[UniversityPlacePayload],
-    conn,
+    places: list[UniversityPlacePayload],
+    conn: Connection,
 ) -> None:
-    normalized_places: Dict[Tuple[int, int], int] = {}
+    normalized_places: dict[tuple[int, int], int] = {}
     for place in places:
         if place.number_of_places <= 0:
             continue
         normalized_places[(place.id_filiere, place.annee)] = int(place.number_of_places)
 
-    resolved_places: List[Dict[str, int]] = []
+    resolved_places: list[dict[str, int]] = []
     for (id_filiere, annee), number_of_places in normalized_places.items():
         resolved_places.append(
             {
@@ -90,8 +87,10 @@ def _sync_university_places(
     for place in resolved_places:
         insert_place_request = {
             "request": """
-                            INSERT INTO MOB_partner_university_places (id_partner_university, id_filiere, annee, number_of_places)
-                            VALUES (%(id_partner_university)s, %(id_filiere)s, %(annee)s, %(number_of_places)s)
+                            INSERT INTO MOB_partner_university_places (id_partner_university,
+                                id_filiere, annee, number_of_places)
+                            VALUES (%(id_partner_university)s, %(id_filiere)s, %(annee)s,
+                                %(number_of_places)s)
                         """,
             "params": {
                 "id_partner_university": id_partner_university,
@@ -104,85 +103,98 @@ def _sync_university_places(
         db_request(current_user, SQLRequest(**insert_place_request), conn=conn)
 
 
-@router.get("/university",
-            tags=["mobility"],
-            summary="Universities",
-            description="Return the list of partner universities")
+@router.get(
+    "/university",
+    tags=["mobility"],
+    summary="Universities",
+    description="Return the list of partner universities",
+    response_model=None,
+)
 def list_universities(
-    #current_user: Annotated[User, Depends(get_current_active_user)],
-):
+    # current_user: Annotated[User, Depends(get_current_active_user)],
+) -> Rows:
     request = {
-        "request" : """
+        "request": """
                         SELECT * FROM MOB_partner_university
                     """,
-        "allowedRolesRequester" : "anonymous",
+        "allowedRolesRequester": "anonymous",
     }
-    #return db_request(current_user, SQLRequest(**request))
+    # return db_request(current_user, SQLRequest(**request))
     return db_request(None, SQLRequest(**request))
 
-@router.get("/university/etudiant/{id_etudiant:int}",
-            tags=["mobility"],
-            summary="Universities for student",
-            description="Return the list of partner universities with the number of places for the student")
+
+@router.get(
+    "/university/etudiant/{id_etudiant:int}",
+    tags=["mobility"],
+    summary="Universities for student",
+    description="Return the list of partner universities with the number of places for the student",
+    response_model=None,
+)
 def list_universities_etudiant(
     id_etudiant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
 
     request = {
-        "request" : """
-                        SELECT u.*, pl.number_of_places, pl.annee, CASE WHEN pl.annee = 4 THEN 8 ELSE 9 END as id_semestre
+        "request": """
+                        SELECT u.*, pl.number_of_places, pl.annee, CASE WHEN pl.annee = 4 THEN 8
+                            ELSE 9 END as id_semestre
                         FROM MOB_partner_university_places pl
-                        JOIN MOB_partner_university u ON u.id_partner_university = pl.id_partner_university 
+                        JOIN MOB_partner_university u
+                            ON u.id_partner_university = pl.id_partner_university
                         WHERE pl.id_filiere = (
                             SELECT p.id_filiere
-                            FROM LNM_etudiant e 
+                            FROM LNM_etudiant e
                             JOIN LNM_promo p ON e.id_promo = p.id_promo
                             WHERE e.id_etudiant = %(id_etudiant)s
                         )
                         UNION
                         SELECT u.*, 999 as number_of_places,
-                               (SELECT p.annee FROM LNM_etudiant e JOIN LNM_promo p ON e.id_promo = p.id_promo WHERE e.id_etudiant = %(id_etudiant)s) as annee,
-                               CASE WHEN (SELECT p.annee FROM LNM_etudiant e JOIN LNM_promo p ON e.id_promo = p.id_promo WHERE e.id_etudiant = %(id_etudiant)s) = 4 THEN 8 ELSE 9 END as id_semestre
+                               (SELECT p.annee FROM LNM_etudiant e JOIN LNM_promo p
+                                   ON e.id_promo = p.id_promo
+                                   WHERE e.id_etudiant = %(id_etudiant)s) as annee,
+                               CASE WHEN (SELECT p.annee FROM LNM_etudiant e JOIN LNM_promo p
+                                   ON e.id_promo = p.id_promo
+                                   WHERE e.id_etudiant = %(id_etudiant)s) = 4 THEN 8 ELSE 9
+                                   END as id_semestre
                         FROM MOB_partner_university u
                         WHERE u.type = 'stage'
                     """,
-        "params": {
-            "id_etudiant": id_etudiant
-        },
+        "params": {"id_etudiant": id_etudiant},
         "allowedRolesRequester": {
             "roles": [],
             "owner": {"role": "etudiant", "id": "id_etudiant"},
         },
     }
-    #if(current_user.id == id_etudiant):
+    # if(current_user.id == id_etudiant):
     #    request["allowedRolesRequester"] += [current_user.ExplicitSecondaryK]
     return db_request(current_user, SQLRequest(**request))
 
 
-@router.get("/university/etudiant/{id_etudiant:int}/campaign-status",
-            tags=["mobility"],
-            summary="Statut de la campagne pour l'étudiant",
-            description="Indique si la campagne de mobilité est ouverte pour cet étudiant")
+@router.get(
+    "/university/etudiant/{id_etudiant:int}/campaign-status",
+    tags=["mobility"],
+    summary="Statut de la campagne pour l'étudiant",
+    description="Indique si la campagne de mobilité est ouverte pour cet étudiant",
+    response_model=None,
+)
 def get_campaign_status(
     id_etudiant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> object:
     request = {
-        "request" : """
-                    SELECT mobility_z_score 
-                    FROM LNM_etudiant 
+        "request": """
+                    SELECT mobility_z_score
+                    FROM LNM_etudiant
                     WHERE id_etudiant = %(id_etudiant)s""",
-        "params" : {
-            "id_etudiant": id_etudiant
-        },
+        "params": {"id_etudiant": id_etudiant},
         "allowedRolesRequester": {
             "roles": [],
             "owner": {"role": "etudiant", "id": "id_etudiant"},
         },
     }
 
-    #if(current_user.id == id_etudiant):
+    # if(current_user.id == id_etudiant):
     #    request["allowedRolesRequester"] += [current_user.ExplicitSecondaryK]
 
     result = db_request(current_user, SQLRequest(**request))
@@ -191,15 +203,17 @@ def get_campaign_status(
     return {"is_open": is_open}
 
 
-
-@router.get("/university/etudiant/{id_etudiant:int}/wishes",
-            tags=["mobility"],
-            summary="Wishes for student",
-            description="Return the student's current mobility wishes")
+@router.get(
+    "/university/etudiant/{id_etudiant:int}/wishes",
+    tags=["mobility"],
+    summary="Wishes for student",
+    description="Return the student's current mobility wishes",
+    response_model=None,
+)
 def list_university_wishes_etudiant(
     id_etudiant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     if current_user.id != id_etudiant:
         raise HTTPException(status_code=403, detail="Unauthorized access")
 
@@ -207,7 +221,8 @@ def list_university_wishes_etudiant(
         "request": """
                         SELECT w.priority, w.submission_date, w.id_semestre, u.*
                         FROM MOB_wishes w
-                        JOIN MOB_partner_university u ON u.id_partner_university = w.id_partner_university
+                        JOIN MOB_partner_university u
+                            ON u.id_partner_university = w.id_partner_university
                         WHERE w.id_etudiant = %(id_etudiant)s
                         ORDER BY w.priority ASC
                     """,
@@ -219,22 +234,25 @@ def list_university_wishes_etudiant(
             "owner": {"role": "etudiant", "id": "id_etudiant"},
         },
     }
-    #if(current_user.id == id_etudiant):
+    # if(current_user.id == id_etudiant):
     #    request["allowedRolesRequester"] += [current_user.ExplicitSecondaryK]
 
     return db_request(current_user, SQLRequest(**request))
 
 
-@router.post("/university/etudiant/{id_etudiant:int}/wish/{id_partner_university:int}",
-            tags=["mobility"],
-            summary="Add university to wishes",
-            description="Add a partner university to the student's mobility wishes")
+@router.post(
+    "/university/etudiant/{id_etudiant:int}/wish/{id_partner_university:int}",
+    tags=["mobility"],
+    summary="Add university to wishes",
+    description="Add a partner university to the student's mobility wishes",
+    response_model=None,
+)
 def add_university_to_wishes(
     id_etudiant: int,
     id_partner_university: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-    payload: dict = Body(default={})
-):
+    payload: Annotated[dict | None, Body()] = None,
+) -> Rows:
     if current_user.id != id_etudiant:
         raise HTTPException(status_code=403, detail="Unauthorized access")
 
@@ -243,33 +261,40 @@ def add_university_to_wishes(
 
     # Sécurité : bloquer l'ajout de vœux si la campagne n'est pas encore ouverte
     request = {
-        "request" : """
-                    SELECT mobility_z_score 
-                    FROM LNM_etudiant 
+        "request": """
+                    SELECT mobility_z_score
+                    FROM LNM_etudiant
                     WHERE id_etudiant = %(id_etudiant)s""",
-        "params" : {
-            "id_etudiant": id_etudiant
-        },
+        "params": {"id_etudiant": id_etudiant},
         "allowedRolesRequester": {
             "roles": [],
             "owner": {"role": "etudiant", "id": "id_etudiant"},
         },
     }
-    #if(current_user.id == id_etudiant):
+    # if(current_user.id == id_etudiant):
     #    request["allowedRolesRequester"] += [current_user.ExplicitSecondaryK]
 
     student_data = db_request(current_user, SQLRequest(**request))
 
     if not student_data or student_data[0].get("mobility_z_score") is None:
-        raise HTTPException(status_code=403, detail="La campagne de mobilité n'est pas encore ouverte. Vous ne pouvez pas ajouter de vœux.")
+        raise HTTPException(
+            status_code=403,
+            detail=(
+                "La campagne de mobilité n'est pas encore ouverte. Vous ne pouvez pas ajouter "
+                "de vœux."
+            ),
+        )
 
     request = {
         "request": """
                         SELECT
                             COUNT(*) AS wishes_count,
                             COALESCE(MAX(priority), 0) AS max_priority,
-                            COALESCE(SUM(CASE WHEN id_partner_university = %(id_partner_university)s AND id_semestre = %(id_semestre)s THEN 1 ELSE 0 END), 0) AS already_exists,
-                            MAX(CASE WHEN submission_date IS NOT NULL THEN 1 ELSE 0 END) AS is_submitted
+                            COALESCE(SUM(CASE WHEN id_partner_university = %(id_partner_university)s
+                                AND id_semestre = %(id_semestre)s THEN 1 ELSE 0
+                                END), 0) AS already_exists,
+                            MAX(CASE WHEN submission_date IS NOT NULL THEN 1 ELSE 0
+                                END) AS is_submitted
                         FROM MOB_wishes
                         WHERE id_etudiant = %(id_etudiant)s
                     """,
@@ -283,30 +308,37 @@ def add_university_to_wishes(
             "owner": {"role": "etudiant", "id": "id_etudiant"},
         },
     }
-    #if(current_user.id == id_etudiant):
+    # if(current_user.id == id_etudiant):
     #    request["allowedRolesRequester"] += [current_user.ExplicitSecondaryK]
 
     check_rows = db_request(current_user, SQLRequest(**request))
-    wishes_count = int((check_rows[0].get("wishes_count") or 0)) if check_rows else 0
-    max_priority = int((check_rows[0].get("max_priority") or 0)) if check_rows else 0
-    already_exists = int((check_rows[0].get("already_exists") or 0)) if check_rows else 0
-    is_submitted = int((check_rows[0].get("is_submitted") or 0)) if check_rows else 0
+    wishes_count = int(check_rows[0].get("wishes_count") or 0) if check_rows else 0
+    max_priority = int(check_rows[0].get("max_priority") or 0) if check_rows else 0
+    already_exists = int(check_rows[0].get("already_exists") or 0) if check_rows else 0
+    is_submitted = int(check_rows[0].get("is_submitted") or 0) if check_rows else 0
 
     if is_submitted > 0:
-        raise HTTPException(status_code=400, detail="Vos voeux ont déjà été soumis et ne peuvent plus être modifiés.")
+        raise HTTPException(
+            status_code=400,
+            detail="Vos voeux ont déjà été soumis et ne peuvent plus être modifiés.",
+        )
 
     if wishes_count >= 5:
         raise HTTPException(status_code=400, detail="Vous ne pouvez pas ajouter plus de 5 voeux.")
 
     if already_exists > 0:
-        raise HTTPException(status_code=400, detail="Cette universite est deja dans vos voeux pour ce semestre.")
+        raise HTTPException(
+            status_code=400, detail="Cette universite est deja dans vos voeux pour ce semestre."
+        )
 
     next_priority = max_priority + 1
 
     request = {
         "request": """
-                        INSERT INTO MOB_wishes (id_etudiant, id_partner_university, priority, id_semestre)
-                        VALUES (%(id_etudiant)s, %(id_partner_university)s, %(priority)s, %(id_semestre)s)
+                        INSERT INTO MOB_wishes (id_etudiant, id_partner_university, priority,
+                            id_semestre)
+                        VALUES (%(id_etudiant)s, %(id_partner_university)s, %(priority)s,
+                            %(id_semestre)s)
                     """,
         "params": {
             "id_etudiant": id_etudiant,
@@ -319,28 +351,31 @@ def add_university_to_wishes(
             "owner": {"role": "etudiant", "id": "id_etudiant"},
         },
     }
-    #if(current_user.id == id_etudiant):
+    # if(current_user.id == id_etudiant):
     #    request["allowedRolesRequester"] += [current_user.ExplicitSecondaryK]
 
     return db_request(current_user, SQLRequest(**request))
 
 
-@router.delete("/university/etudiant/{id_etudiant:int}/wish/{id_partner_university:int}/semestre/{id_semestre:int}",
-            tags=["mobility"],
-            summary="Delete university from wishes",
-            description="Delete a partner university from the student's mobility wishes")
+@router.delete(
+    "/university/etudiant/{id_etudiant:int}/wish/{id_partner_university:int}/semestre/{id_semestre:int}",
+    tags=["mobility"],
+    summary="Delete university from wishes",
+    description="Delete a partner university from the student's mobility wishes",
+    response_model=None,
+)
 def delete_university_from_wishes(
     id_etudiant: int,
     id_partner_university: int,
     id_semestre: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> object:
     if current_user.id != id_etudiant:
         raise HTTPException(status_code=403, detail="Unauthorized access")
     allowed = {
-            "roles": [],
-            "owner": {"role": "etudiant", "id": "id_etudiant"},
-        }
+        "roles": [],
+        "owner": {"role": "etudiant", "id": "id_etudiant"},
+    }
     with get_connection() as conn:
         request = {
             "request": """
@@ -357,7 +392,7 @@ def delete_university_from_wishes(
             },
             "allowedRolesRequester": allowed,
         }
-        #if(current_user.id == id_etudiant):
+        # if(current_user.id == id_etudiant):
         #    request["allowedRolesRequester"] += [current_user.ExplicitSecondaryK]
 
         check_rows = db_request(current_user, SQLRequest(**request), conn=conn)
@@ -365,8 +400,10 @@ def delete_university_from_wishes(
             raise HTTPException(status_code=404, detail="Voeu introuvable.")
 
         if check_rows[0].get("submission_date") is not None:
-            raise HTTPException(status_code=400, detail="Vos voeux ont déjà été soumis et ne peuvent plus être modifiés.")
-
+            raise HTTPException(
+                status_code=400,
+                detail="Vos voeux ont déjà été soumis et ne peuvent plus être modifiés.",
+            )
 
         removed_priority = int(check_rows[0]["priority"])
 
@@ -384,7 +421,7 @@ def delete_university_from_wishes(
             },
             "allowedRolesRequester": allowed,
         }
-        #if(current_user.id == id_etudiant):
+        # if(current_user.id == id_etudiant):
         #    request["allowedRolesRequester"] += [current_user.ExplicitSecondaryK]
 
         db_request(current_user, SQLRequest(**request), conn=conn)
@@ -406,30 +443,33 @@ def delete_university_from_wishes(
             },
         }
 
-        #if(current_user.id == id_etudiant):
+        # if(current_user.id == id_etudiant):
         #    request["allowedRolesRequester"] += [current_user.ExplicitSecondaryK]
         db_request(current_user, SQLRequest(**request), conn=conn)
 
     return {"message": "Voeu supprime."}
 
 
-@router.post("/university/etudiant/{id_etudiant:int}/wish/{id_partner_university:int}/semestre/{id_semestre:int}/move/{direction}",
-            tags=["mobility"],
-            summary="Move university wish",
-            description="Move a wish up or down in the student's priority list")
+@router.post(
+    "/university/etudiant/{id_etudiant:int}/wish/{id_partner_university:int}/semestre/{id_semestre:int}/move/{direction}",
+    tags=["mobility"],
+    summary="Move university wish",
+    description="Move a wish up or down in the student's priority list",
+    response_model=None,
+)
 def move_university_wish(
     id_etudiant: int,
     id_partner_university: int,
     id_semestre: int,
     direction: str,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> object:
     # if current_user.id != id_etudiant:
     #     raise HTTPException(status_code=403, detail="Unauthorized access")
     allowed = {
-            "roles": [],
-            "owner": {"role": "etudiant", "id": "id_etudiant"},
-        }
+        "roles": [],
+        "owner": {"role": "etudiant", "id": "id_etudiant"},
+    }
 
     if direction not in ["up", "down"]:
         raise HTTPException(status_code=400, detail="Direction invalide. Utilisez 'up' ou 'down'.")
@@ -450,14 +490,17 @@ def move_university_wish(
             },
             "allowedRolesRequester": allowed,
         }
-        #if(current_user.id == id_etudiant):
+        # if(current_user.id == id_etudiant):
         #    request["allowedRolesRequester"] += [current_user.ExplicitSecondaryK]
         current_rows = db_request(current_user, SQLRequest(**request), conn=conn)
         if not current_rows:
             raise HTTPException(status_code=404, detail="Voeu introuvable.")
 
         if current_rows[0].get("submission_date") is not None:
-            raise HTTPException(status_code=400, detail="Vos voeux ont déjà été soumis et ne peuvent plus être modifiés.")
+            raise HTTPException(
+                status_code=400,
+                detail="Vos voeux ont déjà été soumis et ne peuvent plus être modifiés.",
+            )
 
         current_priority = int(current_rows[0]["priority"])
         target_priority = current_priority - 1 if direction == "up" else current_priority + 1
@@ -475,7 +518,7 @@ def move_university_wish(
             },
             "allowedRolesRequester": allowed,
         }
-        #if(current_user.id == id_etudiant):
+        # if(current_user.id == id_etudiant):
         #    request["allowedRolesRequester"] += [current_user.ExplicitSecondaryK]
 
         target_rows = db_request(current_user, SQLRequest(**request), conn=conn)
@@ -484,7 +527,6 @@ def move_university_wish(
 
         target_id_partner_university = int(target_rows[0]["id_partner_university"])
         target_id_semestre = int(target_rows[0]["id_semestre"])
-
 
         # Step 1: move current wish to a temporary priority to avoid unique collisions.
         request = {
@@ -502,7 +544,7 @@ def move_university_wish(
             },
             "allowedRolesRequester": allowed,
         }
-        #if(current_user.id == id_etudiant):
+        # if(current_user.id == id_etudiant):
         #    request["allowedRolesRequester"] += [current_user.ExplicitSecondaryK]
         db_request(current_user, SQLRequest(**request), conn=conn)
 
@@ -523,7 +565,7 @@ def move_university_wish(
             },
             "allowedRolesRequester": allowed,
         }
-        #if(current_user.id == id_etudiant):
+        # if(current_user.id == id_etudiant):
         #    request["allowedRolesRequester"] += [current_user.ExplicitSecondaryK]
         db_request(current_user, SQLRequest(**request), conn=conn)
 
@@ -545,29 +587,33 @@ def move_university_wish(
             },
             "allowedRolesRequester": allowed,
         }
-        #if(current_user.id == id_etudiant):
+        # if(current_user.id == id_etudiant):
         #    request["allowedRolesRequester"] += [current_user.ExplicitSecondaryK]
         db_request(current_user, SQLRequest(**request), conn=conn)
 
     return {"message": "Voeu deplace.", "direction": direction}
 
 
-@router.post("/university/etudiant/{id_etudiant:int}/wishes/submit",
-            tags=["mobility"],
-            summary="Submit university wishes",
-            description="Submit the student's mobility wishes for processing")
+@router.post(
+    "/university/etudiant/{id_etudiant:int}/wishes/submit",
+    tags=["mobility"],
+    summary="Submit university wishes",
+    description="Submit the student's mobility wishes for processing",
+    response_model=None,
+)
 def submit_university_wishes(
     id_etudiant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> object:
     if current_user.id != id_etudiant:
         raise HTTPException(status_code=403, detail="Unauthorized access")
 
     request = {
         "request": """
-                        SELECT 
+                        SELECT
                             COUNT(*) AS wishes_count,
-                            MAX(CASE WHEN submission_date IS NOT NULL THEN 1 ELSE 0 END) AS is_submitted
+                            MAX(CASE WHEN submission_date IS NOT NULL THEN 1 ELSE 0
+                                END) AS is_submitted
                         FROM MOB_wishes
                         WHERE id_etudiant = %(id_etudiant)s
                     """,
@@ -579,17 +625,19 @@ def submit_university_wishes(
             "owner": {"role": "etudiant", "id": "id_etudiant"},
         },
     }
-    #if(current_user.id == id_etudiant):
+    # if(current_user.id == id_etudiant):
     #    request["allowedRolesRequester"] += [current_user.ExplicitSecondaryK]
     check_rows = db_request(current_user, SQLRequest(**request))
-    wishes_count = int((check_rows[0].get("wishes_count") or 0)) if check_rows else 0
-    is_submitted = int((check_rows[0].get("is_submitted") or 0)) if check_rows else 0
+    wishes_count = int(check_rows[0].get("wishes_count") or 0) if check_rows else 0
+    is_submitted = int(check_rows[0].get("is_submitted") or 0) if check_rows else 0
 
     if is_submitted > 0:
         raise HTTPException(status_code=400, detail="Vos voeux ont déjà été soumis.")
 
     if wishes_count < 1:
-        raise HTTPException(status_code=400, detail="Vous devez avoir au moins 1 voeu pour soumettre votre dossier.")
+        raise HTTPException(
+            status_code=400, detail="Vous devez avoir au moins 1 voeu pour soumettre votre dossier."
+        )
 
     # Update the submission date for all submitted wishes
     request = {
@@ -606,19 +654,25 @@ def submit_university_wishes(
             "owner": {"role": "etudiant", "id": "id_etudiant"},
         },
     }
-    #if(current_user.id == id_etudiant):
+    # if(current_user.id == id_etudiant):
     #    request["allowedRolesRequester"] += [current_user.ExplicitSecondaryK]
     db_request(current_user, SQLRequest(**request))
 
     return {"message": "Voeux soumis avec succes."}
 
-@router.post("/university/admin/wishes/force-submit",
-            tags=["admin", "mobility"],
-            summary="Force submit all incomplete wishes",
-            description="Force the submission of all existing student wishes that have not been submitted yet.")
+
+@router.post(
+    "/university/admin/wishes/force-submit",
+    tags=["admin", "mobility"],
+    summary="Force submit all incomplete wishes",
+    description=(
+        "Force the submission of all existing student wishes that have not been submitted yet."
+    ),
+    response_model=None,
+)
 def force_submit_wishes(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> object:
     update_request = {
         "request": """
                         UPDATE MOB_wishes
@@ -632,13 +686,18 @@ def force_submit_wishes(
     return {"message": "Tous les voeux incomplets ont ete clotures avec succes."}
 
 
-@router.get("/university/admin/wishes",
-            tags=["mobility"],
-            summary="All wishes for RI",
-            description="Return all student wishes (submitted and in progress) for International Relations admins")
+@router.get(
+    "/university/admin/wishes",
+    tags=["mobility"],
+    summary="All wishes for RI",
+    description=(
+        "Return all student wishes (submitted and in progress) for International Relations admins"
+    ),
+    response_model=None,
+)
 def list_all_wishes_ri(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
                         SELECT
@@ -661,7 +720,8 @@ def list_all_wishes_ri(
                         JOIN LNM_promo p ON e.id_promo = p.id_promo
                         LEFT JOIN LNM_filiere f ON p.id_filiere = f.id_filiere
                         LEFT JOIN MOB_wishes w ON e.id_etudiant = w.id_etudiant
-                        LEFT JOIN MOB_partner_university u ON u.id_partner_university = w.id_partner_university
+                        LEFT JOIN MOB_partner_university u
+                            ON u.id_partner_university = w.id_partner_university
                         LEFT JOIN MOB_assignment a ON a.id_etudiant = e.id_etudiant
                         WHERE p.annee = 4
                         ORDER BY e.nom ASC, e.prenom ASC, w.priority ASC
@@ -671,13 +731,19 @@ def list_all_wishes_ri(
     return db_request(current_user, SQLRequest(**request))
 
 
-@router.get("/university/admin/catalog",
-            tags=["mobility"],
-            summary="University catalog for RI",
-            description="Return partner universities enriched with their available filieres for International Relations admins")
+@router.get(
+    "/university/admin/catalog",
+    tags=["mobility"],
+    summary="University catalog for RI",
+    description=(
+        "Return partner universities enriched with their available filieres for "
+        "International Relations admins"
+    ),
+    response_model=None,
+)
 def list_university_catalog_ri(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> object:
     request_catalog = {
         "request": """
                         SELECT
@@ -688,7 +754,8 @@ def list_university_catalog_ri(
                             f.nom_filiere,
                             f.nom_long
                         FROM MOB_partner_university u
-                        LEFT JOIN MOB_partner_university_places pl ON u.id_partner_university = pl.id_partner_university
+                        LEFT JOIN MOB_partner_university_places pl
+                            ON u.id_partner_university = pl.id_partner_university
                         LEFT JOIN LNM_filiere f ON f.id_filiere = pl.id_filiere
                         ORDER BY u.name ASC, f.nom_filiere ASC, pl.annee ASC
                     """,
@@ -710,25 +777,25 @@ def list_university_catalog_ri(
     semesters = db_request(current_user, SQLRequest(**request_semesters))
 
     if not semesters:
-        semesters = [
-            {"id": 4, "label": "S8"},
-            {"id": 5, "label": "S9"}
-        ]
+        semesters = [{"id": 4, "label": "S8"}, {"id": 5, "label": "S9"}]
 
-    return {
-        "universities": universities if universities else [],
-        "semesters": semesters
-    }
+    return {"universities": universities if universities else [], "semesters": semesters}
 
 
-@router.post("/university/admin",
-            tags=["mobility"],
-            summary="Create partner university for RI",
-            description="Create a partner university and its places by filiere/semester for International Relations admins")
+@router.post(
+    "/university/admin",
+    tags=["mobility"],
+    summary="Create partner university for RI",
+    description=(
+        "Create a partner university and its places by filiere/semester for International "
+        "Relations admins"
+    ),
+    response_model=None,
+)
 def create_university_ri(
     payload: UniversityAdminPayload,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> object:
     name = payload.name.strip()
     country = payload.country.strip()
     if not name:
@@ -739,10 +806,10 @@ def create_university_ri(
     insert_request = {
         "request": """
                         INSERT INTO MOB_partner_university (
-                            name, code, country, address, latitude, longitude, website, 
+                            name, code, country, address, latitude, longitude, website,
                             languages, note_min, type, S8_total_places, S9_total_places
                         ) VALUES (
-                            %(name)s, %(code)s, %(country)s, %(address)s, %(latitude)s, 
+                            %(name)s, %(code)s, %(country)s, %(address)s, %(latitude)s,
                             %(longitude)s, %(website)s, %(languages)s, %(note_min)s, %(type)s,
                             %(S8_total_places)s, %(S9_total_places)s
                         )
@@ -786,23 +853,28 @@ def create_university_ri(
     # }
     # rows = db_request(current_user, SQLRequest(**select_request))
     # if not rows:
-    #     raise HTTPException(status_code=500, detail="Universite creee mais identifiant introuvable.")
+    # raise HTTPException(status_code=500, detail="Universite creee mais identifiant
+    # introuvable.")
     #
     # id_partner_university = int(rows[0]["id_partner_university"])
     # _sync_university_places(current_user, id_partner_university, payload.places)
     try:
         with get_connection() as conn:
             db_request(current_user, SQLRequest(**insert_request), conn=conn)
-            rows = db_request(current_user, SQLRequest(
-                request="SELECT LAST_INSERT_ID() AS id_partner_university",
-                allowedRolesRequester=["relations_internationales"],
-            ), conn=conn)
+            rows = db_request(
+                current_user,
+                SQLRequest(
+                    request="SELECT LAST_INSERT_ID() AS id_partner_university",
+                    allowedRolesRequester=["relations_internationales"],
+                ),
+                conn=conn,
+            )
             id_partner_university = int(rows[0]["id_partner_university"])
             _sync_university_places(current_user, id_partner_university, payload.places, conn)
     except HTTPException as exc:
         if exc.status_code == 403:
             raise
-        raise HTTPException(status_code=400, detail=f"Creation impossible: {exc.detail}")
+        raise HTTPException(status_code=400, detail=f"Creation impossible: {exc.detail}") from exc
 
     return {
         "message": "Universite creee.",
@@ -810,15 +882,21 @@ def create_university_ri(
     }
 
 
-@router.put("/university/admin/{id_partner_university:int}",
-            tags=["mobility"],
-            summary="Update partner university for RI",
-            description="Update a partner university and its places by filiere/semester for International Relations admins")
+@router.put(
+    "/university/admin/{id_partner_university:int}",
+    tags=["mobility"],
+    summary="Update partner university for RI",
+    description=(
+        "Update a partner university and its places by filiere/semester for International "
+        "Relations admins"
+    ),
+    response_model=None,
+)
 def update_university_ri(
     id_partner_university: int,
     payload: UniversityAdminPayload,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> object:
     allowed = ["relations_internationales"]
 
     exists_request = {
@@ -891,21 +969,25 @@ def update_university_ri(
     except HTTPException as exc:
         if exc.status_code == 403:
             raise
-        raise HTTPException(status_code=400, detail=f"Mise a jour impossible: {exc.detail}")
+        raise HTTPException(
+            status_code=400, detail=f"Mise a jour impossible: {exc.detail}"
+        ) from exc
 
     return {
         "message": "Universite mise a jour.",
         "id_partner_university": id_partner_university,
     }
 
-@router.get("/university/admin/wishes/export",
-            tags=["admin", "mobility"],
-            summary="Export student mobility wishes to Excel")
-def export_admin_wishes(
-    current_user: Annotated[User, Depends(get_current_active_user)]
-):
+
+@router.get(
+    "/university/admin/wishes/export",
+    tags=["admin", "mobility"],
+    summary="Export student mobility wishes to Excel",
+    response_model=None,
+)
+def export_admin_wishes(current_user: Annotated[User, Depends(get_current_active_user)]) -> object:
     sql_request = SQLRequest(
-        request='''
+        request="""
             SELECT
                 e.id_etudiant AS ID_Etudiant,
                 e.nom AS Nom,
@@ -928,54 +1010,74 @@ def export_admin_wishes(
             JOIN LNM_semestre sem ON sem.id_semestre = w.id_semestre
             WHERE p.annee = 4
             ORDER BY e.nom ASC, e.prenom ASC, w.priority ASC
-        ''',
+        """,
         params=None,
-        allowedRolesRequester=["relations_internationales"]
+        allowedRolesRequester=["relations_internationales"],
     )
     result = db_request(current_user, sql_request)
-    
+
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "Voeux Etudiants"
-    
+
     headers = [
-        "ID Etudiant", "Nom", "Prénom", "Email", "Filière", "Statut", 
-        "Note de Mobilité", "Priorité", "Université Partenaire", 
-        "Pays", "Semestre Demandé", "Date de Soumission"
+        "ID Etudiant",
+        "Nom",
+        "Prénom",
+        "Email",
+        "Filière",
+        "Statut",
+        "Note de Mobilité",
+        "Priorité",
+        "Université Partenaire",
+        "Pays",
+        "Semestre Demandé",
+        "Date de Soumission",
     ]
     ws.append(headers)
-    
+
     for row in result:
-        ws.append([
-            row.get("ID_Etudiant", ""), row.get("Nom", ""), row.get("Prenom", ""), row.get("Email", ""),
-            row.get("Filiere", ""), row.get("Statut", ""),
-            row.get("Note", ""), row.get("Priorite", ""), row.get("Universite_Partenaire", ""),
-            row.get("Pays", ""), row.get("Semestre_Demande", ""),
-            str(row.get("Date_Soumission", "")) if row.get("Date_Soumission") else "Non Soumis"
-        ])
-        
+        ws.append(
+            [
+                row.get("ID_Etudiant", ""),
+                row.get("Nom", ""),
+                row.get("Prenom", ""),
+                row.get("Email", ""),
+                row.get("Filiere", ""),
+                row.get("Statut", ""),
+                row.get("Note", ""),
+                row.get("Priorite", ""),
+                row.get("Universite_Partenaire", ""),
+                row.get("Pays", ""),
+                row.get("Semestre_Demande", ""),
+                str(row.get("Date_Soumission", "")) if row.get("Date_Soumission") else "Non Soumis",
+            ]
+        )
+
     stream = io.BytesIO()
     wb.save(stream)
     stream.seek(0)
-    
+
     filename = f"Export_Voeux_Mobilite_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.xlsx"
-    headers_dict = {
-        'Content-Disposition': f'attachment; filename="{filename}"'
-    }
+    headers_dict = {"Content-Disposition": f'attachment; filename="{filename}"'}
     return StreamingResponse(
-        stream, 
-        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
-        headers=headers_dict
+        stream,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers=headers_dict,
     )
 
-@router.get("/university/admin/assignments/export",
-            tags=["admin", "mobility"],
-            summary="Export student mobility assignments to Excel")
+
+@router.get(
+    "/university/admin/assignments/export",
+    tags=["admin", "mobility"],
+    summary="Export student mobility assignments to Excel",
+    response_model=None,
+)
 def export_admin_assignments(
-    current_user: Annotated[User, Depends(get_current_active_user)]
-):
+    current_user: Annotated[User, Depends(get_current_active_user)],
+) -> object:
     sql_request = SQLRequest(
-        request='''
+        request="""
             SELECT
                 e.id_etudiant AS ID_Etudiant,
                 e.nom AS Nom,
@@ -985,23 +1087,25 @@ def export_admin_assignments(
                 s.nom_statut AS Statut,
                 IFNULL(e.mobility_note, 'N/A') AS Note,
                 IFNULL(e.mobility_z_score, 'N/A') AS Moyenne_Centree_Reduite,
-                CASE 
+                CASE
                     WHEN u.name IS NOT NULL THEN u.name
-                    WHEN (SELECT COUNT(*) FROM MOB_wishes w WHERE w.id_etudiant = e.id_etudiant) = 0 THEN 'Aucun vœu'
+                    WHEN (SELECT COUNT(*) FROM MOB_wishes w
+                        WHERE w.id_etudiant = e.id_etudiant) = 0 THEN 'Aucun vœu'
                     ELSE 'Non affecté'
                 END AS Universite_Affectee,
                 IFNULL((
-                    SELECT mw.priority 
-                    FROM MOB_wishes mw 
-                    WHERE mw.id_etudiant = e.id_etudiant 
-                      AND mw.id_partner_university = a.id_partner_university 
+                    SELECT mw.priority
+                    FROM MOB_wishes mw
+                    WHERE mw.id_etudiant = e.id_etudiant
+                      AND mw.id_partner_university = a.id_partner_university
                     LIMIT 1
                 ), 'N/A') AS Ordre_Voeu,
                 IFNULL(u.country, 'N/A') AS Pays,
                 IFNULL(sem.semestre, 'N/A') AS Semestre_Affecte,
-                CASE 
+                CASE
                     WHEN a.status IS NOT NULL THEN a.status
-                    WHEN (SELECT COUNT(*) FROM MOB_wishes w WHERE w.id_etudiant = e.id_etudiant) = 0 THEN 'Retardataire'
+                    WHEN (SELECT COUNT(*) FROM MOB_wishes w
+                        WHERE w.id_etudiant = e.id_etudiant) = 0 THEN 'Retardataire'
                     ELSE 'Non affecté'
                 END AS Statut_Affectation
             FROM LNM_etudiant e
@@ -1014,98 +1118,122 @@ def export_admin_assignments(
             LEFT JOIN LNM_semestre sem ON sem.id_semestre = a.id_semestre
             WHERE p.annee = 4
             ORDER BY e.nom ASC, e.prenom ASC
-        ''',
+        """,
         params=None,
-        allowedRolesRequester=["relations_internationales"]
+        allowedRolesRequester=["relations_internationales"],
     )
     result = db_request(current_user, sql_request)
-    
+
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "Affectations Etudiants"
-    
+
     headers = [
-        "ID Etudiant", "Nom", "Prénom", "Email", "Filière", "Statut", 
-        "Note de Mobilité", "Moyenne Centrée Réduite", "Université Affectée", "Pays", 
-        "Semestre Affecté", "Statut de l'affectation"
+        "ID Etudiant",
+        "Nom",
+        "Prénom",
+        "Email",
+        "Filière",
+        "Statut",
+        "Note de Mobilité",
+        "Moyenne Centrée Réduite",
+        "Université Affectée",
+        "Pays",
+        "Semestre Affecté",
+        "Statut de l'affectation",
     ]
     ws.append(headers)
-    
+
     for row in result:
-        ws.append([
-            row.get("ID_Etudiant", ""), row.get("Nom", ""), row.get("Prenom", ""), row.get("Email", ""),
-            row.get("Filiere", ""), row.get("Statut", ""),
-            row.get("Note", ""), row.get("Moyenne_Centree_Reduite", ""), row.get("Universite_Affectee", ""),
-            row.get("Pays", ""), row.get("Semestre_Affecte", ""), row.get("Statut_Affectation", "")
-        ])
-        
+        ws.append(
+            [
+                row.get("ID_Etudiant", ""),
+                row.get("Nom", ""),
+                row.get("Prenom", ""),
+                row.get("Email", ""),
+                row.get("Filiere", ""),
+                row.get("Statut", ""),
+                row.get("Note", ""),
+                row.get("Moyenne_Centree_Reduite", ""),
+                row.get("Universite_Affectee", ""),
+                row.get("Pays", ""),
+                row.get("Semestre_Affecte", ""),
+                row.get("Statut_Affectation", ""),
+            ]
+        )
+
     stream = io.BytesIO()
     wb.save(stream)
     stream.seek(0)
-    
+
     filename = f"Export_Affectations_Mobilite_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.xlsx"
-    headers_dict = {
-        'Content-Disposition': f'attachment; filename="{filename}"'
-    }
+    headers_dict = {"Content-Disposition": f'attachment; filename="{filename}"'}
     return StreamingResponse(
-        stream, 
-        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
-        headers=headers_dict
+        stream,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers=headers_dict,
     )
 
-@router.get("/university/admin/mobility/submitted-students",
-            tags=["admin", "mobility"],
-            summary="Get list of students who have submitted wishes")
+
+@router.get(
+    "/university/admin/mobility/submitted-students",
+    tags=["admin", "mobility"],
+    summary="Get list of students who have submitted wishes",
+    response_model=None,
+)
 def get_submitted_students(
-    current_user: Annotated[User, Depends(get_current_active_user)]
-):
+    current_user: Annotated[User, Depends(get_current_active_user)],
+) -> object:
     sql_request = SQLRequest(
-        request='''
+        request="""
             SELECT e.id_etudiant, e.nom, e.prenom, e.mail, f.nom_filiere
             FROM LNM_etudiant e
             JOIN LNM_promo p ON e.id_promo = p.id_promo
             JOIN LNM_filiere f ON p.id_filiere = f.id_filiere
             WHERE p.annee = 4
               AND EXISTS (
-                  SELECT 1 FROM MOB_wishes w 
-                  WHERE w.id_etudiant = e.id_etudiant 
+                  SELECT 1 FROM MOB_wishes w
+                  WHERE w.id_etudiant = e.id_etudiant
                     AND w.submission_date IS NOT NULL
               )
             ORDER BY e.nom ASC, e.prenom ASC
-        ''',
+        """,
         params=None,
-        allowedRolesRequester=["relations_internationales"]
+        allowedRolesRequester=["relations_internationales"],
     )
     result = db_request(current_user, sql_request)
     return result if result else []
 
-@router.post("/university/admin/mobility/reset-wishes/{id_etudiant}",
-             tags=["admin", "mobility"],
-             summary="Reset submission date for a student's wishes")
+
+@router.post(
+    "/university/admin/mobility/reset-wishes/{id_etudiant}",
+    tags=["admin", "mobility"],
+    summary="Reset submission date for a student's wishes",
+    response_model=None,
+)
 def reset_student_wishes(
-    id_etudiant: int,
-    current_user: Annotated[User, Depends(get_current_active_user)]
-):
+    id_etudiant: int, current_user: Annotated[User, Depends(get_current_active_user)]
+) -> object:
     check_request = SQLRequest(
-        request='''
+        request="""
             SELECT 1 FROM LNM_etudiant e
             JOIN LNM_promo p ON e.id_promo = p.id_promo
             WHERE e.id_etudiant = %(id)s AND p.annee = 4
-        ''',
+        """,
         params={"id": id_etudiant},
-        allowedRolesRequester=["relations_internationales"]
+        allowedRolesRequester=["relations_internationales"],
     )
     if not db_request(current_user, check_request):
         raise HTTPException(status_code=400, detail="Étudiant invalide ou non éligible.")
 
     sql_request = SQLRequest(
-        request='''
+        request="""
             UPDATE MOB_wishes
             SET submission_date = NULL
             WHERE id_etudiant = %(id)s
-        ''',
+        """,
         params={"id": id_etudiant},
-        allowedRolesRequester=["relations_internationales"]
+        allowedRolesRequester=["relations_internationales"],
     )
     db_request(current_user, sql_request)
     return {"message": "La soumission a été annulée avec succès."}
@@ -1115,15 +1243,19 @@ class UpdateAssignmentStatusPayload(BaseModel):
     id_assignment: int
     new_status: str
 
-@router.get("/university/admin/mobility/assigned-students",
-            tags=["admin", "mobility"],
-            summary="Get list of students who have an assignment")
+
+@router.get(
+    "/university/admin/mobility/assigned-students",
+    tags=["admin", "mobility"],
+    summary="Get list of students who have an assignment",
+    response_model=None,
+)
 def get_assigned_students(
-    current_user: Annotated[User, Depends(get_current_active_user)]
-):
+    current_user: Annotated[User, Depends(get_current_active_user)],
+) -> object:
     sql_request = SQLRequest(
-        request='''
-            SELECT a.id_assignment, a.id_etudiant, a.status, e.nom, e.prenom, e.mail, 
+        request="""
+            SELECT a.id_assignment, a.id_etudiant, a.status, e.nom, e.prenom, e.mail,
                    f.nom_filiere, u.name as university_name
             FROM MOB_assignment a
             JOIN LNM_etudiant e ON a.id_etudiant = e.id_etudiant
@@ -1132,25 +1264,28 @@ def get_assigned_students(
             JOIN MOB_partner_university u ON a.id_partner_university = u.id_partner_university
             WHERE p.annee = 4
             ORDER BY e.nom ASC, e.prenom ASC
-        ''',
+        """,
         params=None,
-        allowedRolesRequester=["relations_internationales"]
+        allowedRolesRequester=["relations_internationales"],
     )
     result = db_request(current_user, sql_request)
     return result if result else []
 
-@router.get("/university/admin/mobility/assigned-students/export/{status}",
-            tags=["admin", "mobility"],
-            summary="Export assigned students by status")
+
+@router.get(
+    "/university/admin/mobility/assigned-students/export/{status}",
+    tags=["admin", "mobility"],
+    summary="Export assigned students by status",
+    response_model=None,
+)
 def export_assigned_students_status(
-    status: str,
-    current_user: Annotated[User, Depends(get_current_active_user)]
-):
-    if status not in ['accepted', 'pending', 'declined']:
+    status: str, current_user: Annotated[User, Depends(get_current_active_user)]
+) -> object:
+    if status not in ["accepted", "pending", "declined"]:
         raise HTTPException(status_code=400, detail="Invalid status")
-        
+
     sql_request = SQLRequest(
-        request='''
+        request="""
             SELECT a.id_etudiant, a.status, e.nom, e.prenom, e.mail, e.mobility_z_score,
                    f.nom_filiere, s.nom_statut, u.name as university_name, u.country
             FROM MOB_assignment a
@@ -1161,56 +1296,76 @@ def export_assigned_students_status(
             JOIN MOB_partner_university u ON a.id_partner_university = u.id_partner_university
             WHERE p.annee = 4 AND a.status = %(status)s
             ORDER BY e.nom ASC, e.prenom ASC
-        ''',
+        """,
         params={"status": status},
-        allowedRolesRequester=["relations_internationales"]
+        allowedRolesRequester=["relations_internationales"],
     )
     result = db_request(current_user, sql_request)
-    
-    import openpyxl
+
     import io
+
+    import openpyxl
     from fastapi.responses import StreamingResponse
-    
+
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = f"Affectations {status.capitalize()}"
-    
-    headers = ["ID Etudiant", "Nom", "Prénom", "Email", "Filière", "Statut Etudiant", "Moyenne Centrée Réduite", "Université Attribuée", "Pays", "Statut Affectation"]
+
+    headers = [
+        "ID Etudiant",
+        "Nom",
+        "Prénom",
+        "Email",
+        "Filière",
+        "Statut Etudiant",
+        "Moyenne Centrée Réduite",
+        "Université Attribuée",
+        "Pays",
+        "Statut Affectation",
+    ]
     ws.append(headers)
-    
+
     if result:
         for row in result:
-            ws.append([
-                row.get("id_etudiant", ""),
-                row.get("nom", ""),
-                row.get("prenom", ""),
-                row.get("mail", ""),
-                row.get("nom_filiere", ""),
-                row.get("nom_statut", ""),
-                row.get("mobility_z_score", ""),
-                row.get("university_name", ""),
-                row.get("country", ""),
-                row.get("status", "")
-            ])
-            
+            ws.append(
+                [
+                    row.get("id_etudiant", ""),
+                    row.get("nom", ""),
+                    row.get("prenom", ""),
+                    row.get("mail", ""),
+                    row.get("nom_filiere", ""),
+                    row.get("nom_statut", ""),
+                    row.get("mobility_z_score", ""),
+                    row.get("university_name", ""),
+                    row.get("country", ""),
+                    row.get("status", ""),
+                ]
+            )
+
     stream = io.BytesIO()
     wb.save(stream)
     stream.seek(0)
-    
-    filename = f"Export_Affectations_{status}_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.xlsx"
-    headers_res = {
-        'Content-Disposition': f'attachment; filename="{filename}"'
-    }
-    return StreamingResponse(iter([stream.getvalue()]), media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", headers=headers_res)
 
-@router.get("/university/admin/mobility/unassigned-students/export",
-            tags=["admin", "mobility"],
-            summary="Export students with submitted wishes but no assignments")
+    filename = f"Export_Affectations_{status}_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.xlsx"
+    headers_res = {"Content-Disposition": f'attachment; filename="{filename}"'}
+    return StreamingResponse(
+        iter([stream.getvalue()]),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers=headers_res,
+    )
+
+
+@router.get(
+    "/university/admin/mobility/unassigned-students/export",
+    tags=["admin", "mobility"],
+    summary="Export students with submitted wishes but no assignments",
+    response_model=None,
+)
 def export_unassigned_students(
-    current_user: Annotated[User, Depends(get_current_active_user)]
-):
+    current_user: Annotated[User, Depends(get_current_active_user)],
+) -> object:
     sql_request = SQLRequest(
-        request='''
+        request="""
             SELECT DISTINCT e.id_etudiant, e.nom, e.prenom, e.mail, e.mobility_z_score,
                    f.nom_filiere, s.nom_statut
             FROM MOB_wishes w
@@ -1219,121 +1374,150 @@ def export_unassigned_students(
             JOIN LNM_filiere f ON p.id_filiere = f.id_filiere
             JOIN LNM_statut s ON p.id_statut = s.id_statut
             LEFT JOIN MOB_assignment a ON e.id_etudiant = a.id_etudiant
-            WHERE p.annee = 4 
-              AND w.submission_date IS NOT NULL 
+            WHERE p.annee = 4
+              AND w.submission_date IS NOT NULL
               AND a.id_etudiant IS NULL
             ORDER BY e.nom ASC, e.prenom ASC
-        ''',
+        """,
         params={},
-        allowedRolesRequester=["relations_internationales"]
+        allowedRolesRequester=["relations_internationales"],
     )
     result = db_request(current_user, sql_request)
-    
-    import openpyxl
+
     import io
-    from fastapi.responses import StreamingResponse
     from datetime import datetime
-    
+
+    import openpyxl
+    from fastapi.responses import StreamingResponse
+
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "Non Affectes"
-    
-    headers = ["ID Etudiant", "Nom", "Prénom", "Email", "Filière", "Statut Etudiant", "Moyenne Centrée Réduite", "Statut Affectation"]
+
+    headers = [
+        "ID Etudiant",
+        "Nom",
+        "Prénom",
+        "Email",
+        "Filière",
+        "Statut Etudiant",
+        "Moyenne Centrée Réduite",
+        "Statut Affectation",
+    ]
     ws.append(headers)
-    
+
     if result:
         for row in result:
-            ws.append([
-                row.get("id_etudiant", ""),
-                row.get("nom", ""),
-                row.get("prenom", ""),
-                row.get("mail", ""),
-                row.get("nom_filiere", ""),
-                row.get("nom_statut", ""),
-                row.get("mobility_z_score", ""),
-                "Non Affecté"
-            ])
-            
+            ws.append(
+                [
+                    row.get("id_etudiant", ""),
+                    row.get("nom", ""),
+                    row.get("prenom", ""),
+                    row.get("mail", ""),
+                    row.get("nom_filiere", ""),
+                    row.get("nom_statut", ""),
+                    row.get("mobility_z_score", ""),
+                    "Non Affecté",
+                ]
+            )
+
     stream = io.BytesIO()
     wb.save(stream)
     stream.seek(0)
-    
+
     filename = f"Export_Non_Affectes_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.xlsx"
-    headers_res = {
-        'Content-Disposition': f'attachment; filename="{filename}"'
-    }
-    return StreamingResponse(iter([stream.getvalue()]), media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", headers=headers_res)
+    headers_res = {"Content-Disposition": f'attachment; filename="{filename}"'}
+    return StreamingResponse(
+        iter([stream.getvalue()]),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers=headers_res,
+    )
 
 
-@router.post("/university/admin/mobility/update-assignment-status",
-             tags=["admin", "mobility"],
-             summary="Update assignment status")
+@router.post(
+    "/university/admin/mobility/update-assignment-status",
+    tags=["admin", "mobility"],
+    summary="Update assignment status",
+    response_model=None,
+)
 def update_assignment_status(
     payload: UpdateAssignmentStatusPayload,
-    current_user: Annotated[User, Depends(get_current_active_user)]
-):
-    if payload.new_status not in ['pending', 'accepted', 'declined']:
+    current_user: Annotated[User, Depends(get_current_active_user)],
+) -> object:
+    if payload.new_status not in ["pending", "accepted", "declined"]:
         raise HTTPException(status_code=400, detail="Invalid status")
-        
+
     sql_request = SQLRequest(
-        request='UPDATE MOB_assignment SET status = %(status)s WHERE id_assignment = %(id)s',
+        request="UPDATE MOB_assignment SET status = %(status)s WHERE id_assignment = %(id)s",
         params={"status": payload.new_status, "id": payload.id_assignment},
-        allowedRolesRequester=["relations_internationales"]
+        allowedRolesRequester=["relations_internationales"],
     )
     db_request(current_user, sql_request)
     return {"message": "Assignment status updated successfully"}
 
-@router.get("/university/admin/mobility/diagnostics",
-            tags=["admin", "mobility"],
-            summary="Get statistics and diagnostics for mobility procedure")
+
+@router.get(
+    "/university/admin/mobility/diagnostics",
+    tags=["admin", "mobility"],
+    summary="Get statistics and diagnostics for mobility procedure",
+    response_model=None,
+)
 def get_mobility_diagnostics(
-    current_user: Annotated[User, Depends(get_current_active_user)]
-):
+    current_user: Annotated[User, Depends(get_current_active_user)],
+) -> object:
     sql_request = SQLRequest(
-        request='''
-            SELECT 
+        request="""
+            SELECT
                 e.id_etudiant,
                 e.mobility_completed,
-                (SELECT COUNT(w.id_partner_university) FROM MOB_wishes w WHERE w.id_etudiant = e.id_etudiant) as wish_count,
-                (SELECT MAX(w.submission_date) FROM MOB_wishes w WHERE w.id_etudiant = e.id_etudiant) as last_submission_date
-            FROM LNM_etudiant e 
-            JOIN LNM_promo p ON e.id_promo = p.id_promo 
+                (SELECT COUNT(w.id_partner_university) FROM MOB_wishes w
+                    WHERE w.id_etudiant = e.id_etudiant) as wish_count,
+                (SELECT MAX(w.submission_date) FROM MOB_wishes w
+                    WHERE w.id_etudiant = e.id_etudiant) as last_submission_date
+            FROM LNM_etudiant e
+            JOIN LNM_promo p ON e.id_promo = p.id_promo
             WHERE p.annee = 4
-        ''',
+        """,
         params=None,
-        allowedRolesRequester=["relations_internationales"]
+        allowedRolesRequester=["relations_internationales"],
     )
     result = db_request(current_user, sql_request)
-    
+
     validated_mobility = 0
     remaining_students = 0
-    
+
     wishes_submitted = 0
     wishes_in_progress = 0
     retardataires = 0
-    
+
     wishes_distribution = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0}
-    
+
     if result:
         for row in result:
             if row.get("mobility_completed") == 1:
                 validated_mobility += 1
             else:
                 remaining_students += 1
-                
+
             wish_count = row.get("wish_count", 0)
             last_sub = row.get("last_submission_date")
-            
+
             # Distribution of wishes (for all students)
             if wish_count == 0:
                 retardataires += 1
             else:
                 last_sub_str = str(last_sub).strip().lower() if last_sub is not None else ""
-                if last_sub_str and last_sub_str not in ["none", "null", "0000-00-00 00:00:00", "0000-00-00", "0"]:
+                if last_sub_str and last_sub_str not in [
+                    "none",
+                    "null",
+                    "0000-00-00 00:00:00",
+                    "0000-00-00",
+                    "0",
+                ]:
                     wishes_submitted += 1
                 else:
                     wishes_in_progress += 1
-                
+
                 # Update distribution (clamp to max 5)
                 w_key = str(min(wish_count, 5))
                 wishes_distribution[w_key] = wishes_distribution.get(w_key, 0) + 1
@@ -1344,19 +1528,22 @@ def get_mobility_diagnostics(
         "wishes_submitted": wishes_submitted,
         "wishes_in_progress": wishes_in_progress,
         "retardataires": retardataires,
-        "wishes_distribution": wishes_distribution
+        "wishes_distribution": wishes_distribution,
     }
 
-@router.get("/university/admin/mobility/diagnostics/export/{category}",
-            tags=["admin", "mobility"],
-            summary="Export specific diagnostic category to Excel")
+
+@router.get(
+    "/university/admin/mobility/diagnostics/export/{category}",
+    tags=["admin", "mobility"],
+    summary="Export specific diagnostic category to Excel",
+    response_model=None,
+)
 def export_mobility_diagnostics(
-    category: str,
-    current_user: Annotated[User, Depends(get_current_active_user)]
-):
+    category: str, current_user: Annotated[User, Depends(get_current_active_user)]
+) -> object:
     sql_request = SQLRequest(
-        request='''
-            SELECT 
+        request="""
+            SELECT
                 e.id_etudiant,
                 e.nom,
                 e.prenom,
@@ -1365,58 +1552,70 @@ def export_mobility_diagnostics(
                 s.nom_statut,
                 e.mobility_note,
                 e.mobility_completed,
-                (SELECT COUNT(w.id_partner_university) FROM MOB_wishes w WHERE w.id_etudiant = e.id_etudiant) as wish_count,
-                (SELECT MAX(w.submission_date) FROM MOB_wishes w WHERE w.id_etudiant = e.id_etudiant) as last_submission_date
-            FROM LNM_etudiant e 
-            JOIN LNM_promo p ON e.id_promo = p.id_promo 
+                (SELECT COUNT(w.id_partner_university) FROM MOB_wishes w
+                    WHERE w.id_etudiant = e.id_etudiant) as wish_count,
+                (SELECT MAX(w.submission_date) FROM MOB_wishes w
+                    WHERE w.id_etudiant = e.id_etudiant) as last_submission_date
+            FROM LNM_etudiant e
+            JOIN LNM_promo p ON e.id_promo = p.id_promo
             JOIN LNM_filiere f ON p.id_filiere = f.id_filiere
             JOIN LNM_statut s ON p.id_statut = s.id_statut
             WHERE p.annee = 4
             ORDER BY e.nom ASC, e.prenom ASC
-        ''',
+        """,
         params=None,
-        allowedRolesRequester=["relations_internationales"]
+        allowedRolesRequester=["relations_internationales"],
     )
     result = db_request(current_user, sql_request)
-    
+
     filtered_students = []
-    
+
     if result:
         for row in result:
             wish_count = row.get("wish_count", 0)
             last_sub = row.get("last_submission_date")
             is_completed = row.get("mobility_completed") == 1
-            
+
             last_sub_str = str(last_sub).strip().lower() if last_sub is not None else ""
-            is_submitted = last_sub_str and last_sub_str not in ["none", "null", "0000-00-00 00:00:00", "0000-00-00", "0"]
-            
+            is_submitted = last_sub_str and last_sub_str not in [
+                "none",
+                "null",
+                "0000-00-00 00:00:00",
+                "0000-00-00",
+                "0",
+            ]
+
             match = False
-            if category == "validated" and is_completed:
+            if (
+                (category == "validated" and is_completed)
+                or (category == "remaining" and not is_completed)
+                or (category == "submitted" and wish_count > 0 and is_submitted)
+                or (category == "in_progress" and wish_count > 0 and not is_submitted)
+                or (category == "retardataires" and wish_count == 0)
+            ):
                 match = True
-            elif category == "remaining" and not is_completed:
-                match = True
-            elif category == "submitted" and wish_count > 0 and is_submitted:
-                match = True
-            elif category == "in_progress" and wish_count > 0 and not is_submitted:
-                match = True
-            elif category == "retardataires" and wish_count == 0:
-                match = True
-                
+
             if match:
                 filtered_students.append(row)
-                
+
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = f"Export {category.capitalize()}"
-    
+
     headers = [
-        "ID Etudiant", "Nom", "Prénom", "Email", "Filière", "Statut Etudiant", "Note de Mobilité"
+        "ID Etudiant",
+        "Nom",
+        "Prénom",
+        "Email",
+        "Filière",
+        "Statut Etudiant",
+        "Note de Mobilité",
     ]
     if category not in ["retardataires", "validated"]:
         headers.append("Nombre de vœux enregistrés")
-        
+
     ws.append(headers)
-    
+
     for student in filtered_students:
         row_data = [
             student.get("id_etudiant", ""),
@@ -1425,28 +1624,27 @@ def export_mobility_diagnostics(
             student.get("mail", ""),
             student.get("nom_filiere", ""),
             student.get("nom_statut", ""),
-            student.get("mobility_note", "")
+            student.get("mobility_note", ""),
         ]
         if category not in ["retardataires", "validated"]:
             row_data.append(student.get("wish_count", 0))
-            
+
         ws.append(row_data)
-        
+
     stream = io.BytesIO()
     wb.save(stream)
     stream.seek(0)
-    
+
     filename = f"Export_{category}_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.xlsx"
-    headers_dict = {
-        'Content-Disposition': f'attachment; filename="{filename}"'
-    }
+    headers_dict = {"Content-Disposition": f'attachment; filename="{filename}"'}
     return StreamingResponse(
-        stream, 
-        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
-        headers=headers_dict
+        stream,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers=headers_dict,
     )
 
-def sync_db_remaining_places(current_user, conn=None):
+
+def sync_db_remaining_places(current_user: User, conn: Connection | None = None) -> None:
     """
     Recalculates the remaining places for all universities and specialties based
     strictly on the number of 'accepted' assignments.
@@ -1484,25 +1682,44 @@ def sync_db_remaining_places(current_user, conn=None):
         )
     """
     if conn:
-        db_request(current_user, SQLRequest(request=query1, params=None, allowedRolesRequester=allowed), conn=conn)
-        db_request(current_user, SQLRequest(request=query2, params=None, allowedRolesRequester=allowed), conn=conn)
+        db_request(
+            current_user,
+            SQLRequest(request=query1, params=None, allowedRolesRequester=allowed),
+            conn=conn,
+        )
+        db_request(
+            current_user,
+            SQLRequest(request=query2, params=None, allowedRolesRequester=allowed),
+            conn=conn,
+        )
     else:
         with get_connection() as conn:
-            db_request(current_user, SQLRequest(request=query1, params=None, allowedRolesRequester=allowed), conn=conn)
-            db_request(current_user, SQLRequest(request=query2, params=None, allowedRolesRequester=allowed), conn=conn)
+            db_request(
+                current_user,
+                SQLRequest(request=query1, params=None, allowedRolesRequester=allowed),
+                conn=conn,
+            )
+            db_request(
+                current_user,
+                SQLRequest(request=query2, params=None, allowedRolesRequester=allowed),
+                conn=conn,
+            )
 
-@router.get("/university/admin/places/export",
-            tags=["admin", "mobility"],
-            summary="Export partner university places status to Excel")
-def export_admin_places(
-    current_user: Annotated[User, Depends(get_current_active_user)]
-):
+
+@router.get(
+    "/university/admin/places/export",
+    tags=["admin", "mobility"],
+    summary="Export partner university places status to Excel",
+    response_model=None,
+)
+def export_admin_places(current_user: Annotated[User, Depends(get_current_active_user)]) -> object:
     sync_db_remaining_places(current_user)
-    
-    # Requête pour récupérer les universités, leurs places globales (S8/S9) et le détail par filière.
+
+    # Requête pour récupérer les universités, leurs places globales (S8/S9) et le détail par
+    # filière.
     sql_request = SQLRequest(
-        request='''
-            SELECT 
+        request="""
+            SELECT
                 u.id_partner_university,
                 u.name AS university_name,
                 u.country,
@@ -1515,68 +1732,78 @@ def export_admin_places(
                 pl.number_of_places AS filiere_total,
                 pl.number_of_places AS filiere_restant
             FROM MOB_partner_university u
-            LEFT JOIN MOB_partner_university_places pl ON u.id_partner_university = pl.id_partner_university
+            LEFT JOIN MOB_partner_university_places pl
+                ON u.id_partner_university = pl.id_partner_university
             LEFT JOIN LNM_filiere f ON pl.id_filiere = f.id_filiere
             WHERE u.type != 'stage'
             ORDER BY u.name ASC, f.nom_filiere ASC, pl.annee ASC
-        ''',
+        """,
         params=None,
-        allowedRolesRequester=["relations_internationales"]
+        allowedRolesRequester=["relations_internationales"],
     )
     result = db_request(current_user, sql_request)
     # Récupérer la liste des filières pour construire les colonnes
-    filiere_req = SQLRequest(request='SELECT nom_filiere FROM LNM_filiere ORDER BY nom_filiere ASC', allowedRolesRequester=["relations_internationales"])
+    filiere_req = SQLRequest(
+        request="SELECT nom_filiere FROM LNM_filiere ORDER BY nom_filiere ASC",
+        allowedRolesRequester=["relations_internationales"],
+    )
     filieres_result = db_request(current_user, filiere_req)
-    filieres = [f['nom_filiere'] for f in filieres_result] if filieres_result else []
+    filieres = [f["nom_filiere"] for f in filieres_result] if filieres_result else []
 
     # Récupérer les affectations actives (acceptées ou en attente) pour calculer le vrai reste
-    assign_req = SQLRequest(request='''
+    assign_req = SQLRequest(
+        request="""
         SELECT a.id_partner_university, a.id_semestre, f.nom_filiere
         FROM MOB_assignment a
         JOIN LNM_etudiant e ON a.id_etudiant = e.id_etudiant
         JOIN LNM_promo p ON e.id_promo = p.id_promo
         JOIN LNM_filiere f ON p.id_filiere = f.id_filiere
         WHERE a.status = 'accepted'
-    ''', allowedRolesRequester=["relations_internationales"])
+    """,
+        allowedRolesRequester=["relations_internationales"],
+    )
     assign_result = db_request(current_user, assign_req)
-    
+
     taken_global = {}
     taken_filiere = {}
     if assign_result:
         for a in assign_result:
-            u_id = a.get('id_partner_university')
-            sem = a.get('id_semestre')
-            f_nom = a.get('nom_filiere')
-            
+            u_id = a.get("id_partner_university")
+            sem = a.get("id_semestre")
+            f_nom = a.get("nom_filiere")
+
             taken_global[(u_id, sem)] = taken_global.get((u_id, sem), 0) + 1
             taken_filiere[(u_id, sem, f_nom)] = taken_filiere.get((u_id, sem, f_nom), 0) + 1
-    
+
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "Etat des Places"
-    
+
     headers = [
-        "Université", "Pays", 
-        "Total S8 Initial", "Total S8 Restant",
-        "Total S9 Initial", "Total S9 Restant"
+        "Université",
+        "Pays",
+        "Total S8 Initial",
+        "Total S8 Restant",
+        "Total S9 Initial",
+        "Total S9 Restant",
     ]
-    
+
     for f in filieres:
         headers.append(f"S8 {f} Initial")
         headers.append(f"S8 {f} Restant")
-        
+
     for f in filieres:
         headers.append(f"S9 {f} Initial")
         headers.append(f"S9 {f} Restant")
-        
+
     ws.append(headers)
-    
+
     if result:
         uni_map = {}
         for row in result:
             u_name = row.get("university_name", "")
             u_id = row.get("id_partner_university")
-            
+
             if u_name not in uni_map:
                 s8_tot = row.get("S8_total", 0)
                 s9_tot = row.get("S9_total", 0)
@@ -1586,10 +1813,10 @@ def export_admin_places(
                     "S9_total": s9_tot,
                     "S8_restant": max(0, s8_tot - taken_global.get((u_id, 8), 0)),
                     "S9_restant": max(0, s9_tot - taken_global.get((u_id, 9), 0)),
-                    "filieres": {}
+                    "filieres": {},
                 }
-            
-            annee = row.get('annee')
+
+            annee = row.get("annee")
             nom_filiere = row.get("nom_filiere")
             if annee and nom_filiere:
                 sem_num = 8 if annee == 4 else (9 if annee == 5 else annee * 2)
@@ -1598,9 +1825,9 @@ def export_admin_places(
                 fil_tot = row.get("filiere_total", 0)
                 uni_map[u_name]["filieres"][key] = {
                     "total": fil_tot,
-                    "restant": max(0, fil_tot - taken_filiere.get((u_id, sem_num, nom_filiere), 0))
+                    "restant": max(0, fil_tot - taken_filiere.get((u_id, sem_num, nom_filiere), 0)),
                 }
-                
+
         for u_name, data in uni_map.items():
             row_data = [
                 u_name,
@@ -1608,9 +1835,9 @@ def export_admin_places(
                 data["S8_total"],
                 data["S8_restant"],
                 data["S9_total"],
-                data["S9_restant"]
+                data["S9_restant"],
             ]
-            
+
             for f in filieres:
                 key_s8 = f"S8_{f}"
                 if key_s8 in data["filieres"]:
@@ -1619,7 +1846,7 @@ def export_admin_places(
                 else:
                     row_data.append("")
                     row_data.append("")
-                    
+
             for f in filieres:
                 key_s9 = f"S9_{f}"
                 if key_s9 in data["filieres"]:
@@ -1628,49 +1855,50 @@ def export_admin_places(
                 else:
                     row_data.append("")
                     row_data.append("")
-                    
+
             ws.append(row_data)
-            
+
     stream = io.BytesIO()
     wb.save(stream)
     stream.seek(0)
-    
+
     filename = f"Export_Etat_Places_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.xlsx"
-    headers_dict = {
-        'Content-Disposition': f'attachment; filename="{filename}"'
-    }
+    headers_dict = {"Content-Disposition": f'attachment; filename="{filename}"'}
     return StreamingResponse(
-        stream, 
-        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
-        headers=headers_dict
+        stream,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers=headers_dict,
     )
+
 
 class StudentDecisionPayload(BaseModel):
     decision: str
 
-@router.get("/university/etudiant/{id_etudiant}/assignment",
-            tags=["etudiant", "mobility"],
-            summary="Get the assigned university for a student")
+
+@router.get(
+    "/university/etudiant/{id_etudiant}/assignment",
+    tags=["etudiant", "mobility"],
+    summary="Get the assigned university for a student",
+    response_model=None,
+)
 def get_student_assignment(
-    id_etudiant: int,
-    current_user: Annotated[User, Depends(get_current_active_user)]
-):
+    id_etudiant: int, current_user: Annotated[User, Depends(get_current_active_user)]
+) -> object:
     request = {
-        "request":"""
-            SELECT a.id_assignment, a.status, u.id_partner_university, u.name, u.code, u.country, u.address
+        "request": """
+            SELECT a.id_assignment, a.status, u.id_partner_university, u.name, u.code, u.country,
+                u.address
             FROM MOB_assignment a
             JOIN MOB_partner_university u ON a.id_partner_university = u.id_partner_university
             WHERE a.id_etudiant = %(id_etudiant)s
         """,
-        "params":{
-            "id_etudiant": id_etudiant
-        },
+        "params": {"id_etudiant": id_etudiant},
         "allowedRolesRequester": {
             "roles": [],
             "owner": {"role": "etudiant", "id": "id_etudiant"},
         },
     }
-    #if(current_user.id == id_etudiant):
+    # if(current_user.id == id_etudiant):
     #    request["allowedRolesRequester"] += [current_user.ExplicitSecondaryK]
 
     result = db_request(current_user, SQLRequest(**request))
@@ -1680,35 +1908,39 @@ def get_student_assignment(
         return result[0]
     return None
 
-@router.post("/university/etudiant/{id_etudiant}/assignment/decision",
-             tags=["etudiant", "mobility"],
-             summary="Submit student decision for assignment")
+
+@router.post(
+    "/university/etudiant/{id_etudiant}/assignment/decision",
+    tags=["etudiant", "mobility"],
+    summary="Submit student decision for assignment",
+    response_model=None,
+)
 def submit_student_decision(
     id_etudiant: int,
     payload: StudentDecisionPayload,
-    current_user: Annotated[User, Depends(get_current_active_user)]
-):
+    current_user: Annotated[User, Depends(get_current_active_user)],
+) -> object:
     if current_user.id != id_etudiant:
         raise HTTPException(status_code=403, detail="Unauthorized access")
 
-    if payload.decision not in ['accepted', 'declined']:
-        raise HTTPException(status_code=400, detail="Invalid decision. Must be 'accepted' or 'declined'.")
+    if payload.decision not in ["accepted", "declined"]:
+        raise HTTPException(
+            status_code=400, detail="Invalid decision. Must be 'accepted' or 'declined'."
+        )
 
     # Vérifier que l'affectation existe et est "pending"
     request = {
-        "request" : """
-                    SELECT id_assignment, status 
-                    FROM MOB_assignment 
+        "request": """
+                    SELECT id_assignment, status
+                    FROM MOB_assignment
                     WHERE id_etudiant = %(id_etudiant)s""",
-        "params" : {
-            "id_etudiant": id_etudiant
-        },
+        "params": {"id_etudiant": id_etudiant},
         "allowedRolesRequester": {
             "roles": [],
             "owner": {"role": "etudiant", "id": "id_etudiant"},
         },
     }
-    #if(current_user.id == id_etudiant):
+    # if(current_user.id == id_etudiant):
     #    request["allowedRolesRequester"] += [current_user.ExplicitSecondaryK]
 
     assignment = db_request(current_user, SQLRequest(**request))
@@ -1716,79 +1948,100 @@ def submit_student_decision(
     if not assignment or len(assignment) == 0:
         raise HTTPException(status_code=404, detail="Aucune affectation trouvée pour cet étudiant.")
 
-    if assignment[0]["status"] != 'pending':
-        raise HTTPException(status_code=400, detail="La décision a déjà été prise pour cette affectation.")
+    if assignment[0]["status"] != "pending":
+        raise HTTPException(
+            status_code=400, detail="La décision a déjà été prise pour cette affectation."
+        )
 
     # Mettre à jour le statut
     request = {
-        "request" : """
-                    UPDATE MOB_assignment 
-                    SET status = %(status)s 
+        "request": """
+                    UPDATE MOB_assignment
+                    SET status = %(status)s
                     WHERE id_etudiant = %(id_etudiant)s""",
-        "params" : {
-            "status": payload.decision,
-            "id_etudiant": id_etudiant
-        },
+        "params": {"status": payload.decision, "id_etudiant": id_etudiant},
         "allowedRolesRequester": {
             "roles": [],
             "owner": {"role": "etudiant", "id": "id_etudiant"},
         },
     }
 
-    #if(current_user.id == id_etudiant):
+    # if(current_user.id == id_etudiant):
     #    request["allowedRolesRequester"] += [current_user.ExplicitSecondaryK]
 
     db_request(current_user, SQLRequest(**request))
 
     return {"message": "Décision enregistrée avec succès"}
 
-@router.post("/university/admin/mobility/assignment/close",
-             tags=["admin", "mobility"],
-             summary="Decline all pending assignments to close the acceptance phase")
+
+@router.post(
+    "/university/admin/mobility/assignment/close",
+    tags=["admin", "mobility"],
+    summary="Decline all pending assignments to close the acceptance phase",
+    response_model=None,
+)
 def close_assignment_phase(
-    current_user: Annotated[User, Depends(get_current_active_user)]
-):
+    current_user: Annotated[User, Depends(get_current_active_user)],
+) -> object:
     with get_connection() as conn:
         sql_request = SQLRequest(
             request="UPDATE MOB_assignment SET status = 'declined' WHERE status = 'pending'",
             params=None,
-            allowedRolesRequester=["relations_internationales"]
+            allowedRolesRequester=["relations_internationales"],
         )
         db_request(current_user, sql_request, conn=conn)
         sync_db_remaining_places(current_user, conn=conn)
     return {"message": "Toutes les affectations en attente ont été refusées."}
 
-@router.post("/university/admin/campaign/launch",
-             tags=["admin", "mobility"],
-             summary="Lancer la campagne et calculer les Z-scores")
+
+@router.post(
+    "/university/admin/campaign/launch",
+    tags=["admin", "mobility"],
+    summary="Lancer la campagne et calculer les Z-scores",
+    response_model=None,
+)
 def launch_mobility_campaign(
     payload: CampaignLaunchRequestPayload,
-    current_user: Annotated[User, Depends(get_current_active_user)]
-):
+    current_user: Annotated[User, Depends(get_current_active_user)],
+) -> object:
     with get_connection() as conn:
-
         # 1. Update doublants
         doublant_ids = []
         if payload.doublants:
             for d in payload.doublants:
                 doublant_ids.append(d.id_etudiant)
                 # Supprimer affectations / voeux existants pour le doublant
-                db_request(current_user, SQLRequest(
-                    request="DELETE FROM MOB_assignment WHERE id_etudiant = %(id)s",
-                    params={"id": d.id_etudiant},
-                    allowedRolesRequester=["relations_internationales"]
-                ), conn=conn)
-                db_request(current_user, SQLRequest(
-                    request="DELETE FROM MOB_wishes WHERE id_etudiant = %(id)s",
-                    params={"id": d.id_etudiant},
-                    allowedRolesRequester=["relations_internationales"]
-                ), conn=conn)
+                db_request(
+                    current_user,
+                    SQLRequest(
+                        request="DELETE FROM MOB_assignment WHERE id_etudiant = %(id)s",
+                        params={"id": d.id_etudiant},
+                        allowedRolesRequester=["relations_internationales"],
+                    ),
+                    conn=conn,
+                )
+                db_request(
+                    current_user,
+                    SQLRequest(
+                        request="DELETE FROM MOB_wishes WHERE id_etudiant = %(id)s",
+                        params={"id": d.id_etudiant},
+                        allowedRolesRequester=["relations_internationales"],
+                    ),
+                    conn=conn,
+                )
                 # Maj du score
-                db_request(current_user, SQLRequest(
-                    request="UPDATE LNM_etudiant SET mobility_z_score = %(z)s WHERE id_etudiant = %(id)s",
-                    params={"z": d.z_score, "id": d.id_etudiant},
-                    allowedRolesRequester=["relations_internationales"]
-                ), conn=conn)
+                db_request(
+                    current_user,
+                    SQLRequest(
+                        request=(
+                            "UPDATE LNM_etudiant SET mobility_z_score = %(z)s WHERE "
+                            "id_etudiant = %(id)s"
+                        ),
+                        params={"z": d.z_score, "id": d.id_etudiant},
+                        allowedRolesRequester=["relations_internationales"],
+                    ),
+                    conn=conn,
+                )
 
         # 2. Calculer stats par filière pour les autres
         # On prend tous les étudiants de 4ème année ayant une note
@@ -1797,18 +2050,27 @@ def launch_mobility_campaign(
             doublant_filter = f"AND e.id_etudiant NOT IN ({','.join(map(str, doublant_ids))})"
 
         stats_query = f"""
-            SELECT p.id_filiere, AVG(e.mobility_note) as mean_note, STDDEV(e.mobility_note) as std_note
+            SELECT p.id_filiere, AVG(e.mobility_note) as mean_note,
+                STDDEV(e.mobility_note) as std_note
             FROM LNM_etudiant e
             JOIN LNM_promo p ON e.id_promo = p.id_promo
             WHERE p.annee = 4 AND e.mobility_note IS NOT NULL {doublant_filter}
             GROUP BY p.id_filiere
         """
-        stats_req = db_request(current_user, SQLRequest(request=stats_query, params=None, allowedRolesRequester=["relations_internationales"]), conn=conn)
+        stats_req = db_request(
+            current_user,
+            SQLRequest(
+                request=stats_query,
+                params=None,
+                allowedRolesRequester=["relations_internationales"],
+            ),
+            conn=conn,
+        )
 
         stats_map = {}
         if stats_req and isinstance(stats_req, list):
             for row in stats_req:
-                stats_map[row['id_filiere']] = row
+                stats_map[row["id_filiere"]] = row
 
         # 3. Récupérer et mettre à jour les autres étudiants
         students_query = f"""
@@ -1817,36 +2079,54 @@ def launch_mobility_campaign(
             JOIN LNM_promo p ON e.id_promo = p.id_promo
             WHERE p.annee = 4 {doublant_filter}
         """
-        students_req = db_request(current_user, SQLRequest(request=students_query, params=None, allowedRolesRequester=["relations_internationales"]), conn=conn)
+        students_req = db_request(
+            current_user,
+            SQLRequest(
+                request=students_query,
+                params=None,
+                allowedRolesRequester=["relations_internationales"],
+            ),
+            conn=conn,
+        )
 
         if students_req and isinstance(students_req, list):
             for student in students_req:
-                note = student.get('mobility_note')
-                f_id = student.get('id_filiere')
+                note = student.get("mobility_note")
+                f_id = student.get("id_filiere")
                 z_score = 0.0
                 if note is not None and f_id in stats_map:
                     f_stats = stats_map[f_id]
-                    std = float(f_stats.get('std_note') or 0.0)
-                    mean = float(f_stats.get('mean_note') or 0.0)
+                    std = float(f_stats.get("std_note") or 0.0)
+                    mean = float(f_stats.get("mean_note") or 0.0)
                     if std > 0:
                         z_score = round((float(note) - mean) / std, 4)
 
                 # Update
-                db_request(current_user, SQLRequest(
-                    request="UPDATE LNM_etudiant SET mobility_z_score = %(z)s WHERE id_etudiant = %(id)s",
-                    params={"z": z_score, "id": student['id_etudiant']},
-                    allowedRolesRequester=["relations_internationales"]
-                ), conn=conn)
+                db_request(
+                    current_user,
+                    SQLRequest(
+                        request=(
+                            "UPDATE LNM_etudiant SET mobility_z_score = %(z)s WHERE "
+                            "id_etudiant = %(id)s"
+                        ),
+                        params={"z": z_score, "id": student["id_etudiant"]},
+                        allowedRolesRequester=["relations_internationales"],
+                    ),
+                    conn=conn,
+                )
 
     return {"message": "Campagne lancée et scores calculés avec succès."}
 
-@router.get("/university/admin/campaign/doublant/{id_etudiant:int}",
-             tags=["admin", "mobility"],
-             summary="Vérifier un étudiant doublant avant l'ajout")
+
+@router.get(
+    "/university/admin/campaign/doublant/{id_etudiant:int}",
+    tags=["admin", "mobility"],
+    summary="Vérifier un étudiant doublant avant l'ajout",
+    response_model=None,
+)
 def verify_doublant(
-    id_etudiant: int,
-    current_user: Annotated[User, Depends(get_current_active_user)]
-):
+    id_etudiant: int, current_user: Annotated[User, Depends(get_current_active_user)]
+) -> object:
     query = """
         SELECT e.id_etudiant, e.nom, e.prenom, f.nom_filiere, p.annee
         FROM LNM_etudiant e
@@ -1854,7 +2134,11 @@ def verify_doublant(
         JOIN LNM_filiere f ON p.id_filiere = f.id_filiere
         WHERE e.id_etudiant = %(id)s
     """
-    req = SQLRequest(request=query, params={"id": id_etudiant}, allowedRolesRequester=["relations_internationales"])
+    req = SQLRequest(
+        request=query,
+        params={"id": id_etudiant},
+        allowedRolesRequester=["relations_internationales"],
+    )
     result = db_request(current_user, req)
 
     if not result:
@@ -1863,6 +2147,9 @@ def verify_doublant(
     student = result[0]
     # L'utilisateur a demandé "si il est du 4 eme anne". On vérifie l'année.
     if student["annee"] != 4:
-        raise HTTPException(status_code=400, detail=f"L'étudiant est en année {student['annee']} (doit être en 4ème année).")
+        raise HTTPException(
+            status_code=400,
+            detail=f"L'étudiant est en année {student['annee']} (doit être en 4ème année).",
+        )
 
     return student

@@ -1,13 +1,14 @@
-from access_control.types import AccessRule
 from access_control.responsibilities import (
-    has_any_of_responsibilities,
     has_all_responsibilities,
+    has_any_of_responsibilities,
     has_hierarchy_responsibilities,
     parse_responsibility,
 )
-from core.logging import logger
+from access_control.types import AccessRule
+from models.user import User
 
-def evaluate_rule(rule: AccessRule, user, params: dict | None) -> bool:
+
+def evaluate_rule(rule: AccessRule, user: User | None, params: dict | None) -> bool:
     """
     Point d'entrée principal. Évalue si user satisfait la règle d'accès.
     Résout d'abord les lambdas, puis dispatche selon le type de règle.
@@ -15,7 +16,7 @@ def evaluate_rule(rule: AccessRule, user, params: dict | None) -> bool:
     # Résolution du lambda → valeur concrète
     if callable(rule):
         rule = rule(params, user)
-    
+
     if isinstance(rule, str):
         return _evaluate_string(rule, user)
 
@@ -30,7 +31,8 @@ def evaluate_rule(rule: AccessRule, user, params: dict | None) -> bool:
 
 # --- Évaluateurs par type ---
 
-def _evaluate_string(rule: str, user) -> bool:
+
+def _evaluate_string(rule: str, user: User | None) -> bool:
     """
     "anonymous"      → toujours autorisé
     "connected_user" → autorisé si authentifié
@@ -44,14 +46,16 @@ def _evaluate_string(rule: str, user) -> bool:
     raise ValueError(f"Valeur de règle string inconnue : '{rule}'")
 
 
-def _evaluate_role_list(roles: list[str], user) -> bool:
+def _evaluate_role_list(roles: list[str], user: User | None) -> bool:
     """
     L'utilisateur doit avoir AU MOINS UN des rôles listés.
     """
     if not roles:
-        #raise ValueError("La liste de rôles ne peut pas être vide")
-        # Si la liste des rôles est vide, ceci ne signifie pas qu'il ne faut pas de rôle (cf. anonymous)
-        # L'utilisateur ne peut avoir de rôles explicitement définis, la liste étant vide, False est donc retourné
+        # raise ValueError("La liste de rôles ne peut pas être vide")
+        # Si la liste des rôles est vide, ceci ne signifie pas qu'il ne faut pas de rôle
+        # (cf. anonymous)
+        # L'utilisateur ne peut avoir de rôles explicitement définis, la liste étant vide,
+        # False est donc retourné
         return False
 
     if user is None:
@@ -60,7 +64,7 @@ def _evaluate_role_list(roles: list[str], user) -> bool:
     return len(intersection) > 0
 
 
-def _evaluate_dict(rule: dict, user, params: dict) -> bool:
+def _evaluate_dict(rule: dict, user: User | None, params: dict) -> bool:
     """
     Dictionnaire de conditions — l'utilisateur doit satisfaire AU MOINS UNE entrée.
 
@@ -76,22 +80,13 @@ def _evaluate_dict(rule: dict, user, params: dict) -> bool:
         return False
 
     evaluators = {
-        "roles":     lambda v: _evaluate_role_list(v, user),
-        "any":       lambda v: has_any_of_responsibilities(
-                                   user,
-                                   [parse_responsibility(r) for r in v]
-                               ),
-        "all":       lambda v: has_all_responsibilities(
-                                   user,
-                                   [parse_responsibility(r) for r in v]
-                               ),
+        "roles": lambda v: _evaluate_role_list(v, user),
+        "any": lambda v: has_any_of_responsibilities(user, [parse_responsibility(r) for r in v]),
+        "all": lambda v: has_all_responsibilities(user, [parse_responsibility(r) for r in v]),
         "hierarchy": lambda v: has_hierarchy_responsibilities(
-                                   user,
-                                   [parse_responsibility(r) for r in v]
-                               ),
-        "owner": lambda v: user.main_role == v["role"]
-                           and user.id == (params or {}).get(v["id"]),
-
+            user, [parse_responsibility(r) for r in v]
+        ),
+        "owner": lambda v: user.main_role == v["role"] and user.id == (params or {}).get(v["id"]),
         "predicate": lambda fn: bool(fn(user, params)),
     }
 

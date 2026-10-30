@@ -15,4 +15,4 @@ class User(BaseModel):
 
 class UserInDB(User):
     login: str
-    password: str | None = None # None in case of external login like CAS
+    password: str | None = None  # None in case of external login like CAS
