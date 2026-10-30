@@ -3,24 +3,21 @@ import time
 from typing import Annotated, Any
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+from pydantic import BaseModel
 
-from api.dependencies import Rows
+from api.dependencies import Rows, db_request, get_current_active_user
 from db.connection import get_connection
+from models.request import SQLRequest
+from models.user import User
 
 # FixMe global variable that store app data must be store in data area (BD or other) not in API
 # backend
 assignment_progress = {"is_running": False, "progress": 0, "step": "", "error": None}
 
-from api.dependencies import db_request, get_current_active_user
-from models.request import SQLRequest
-from models.user import User
-
 logger = logging.getLogger(__name__)
 
 # Création du routeur FastAPI pour ce module
 router = APIRouter()
-
-from pydantic import BaseModel
 
 
 class MobilityQuota(BaseModel):
@@ -207,7 +204,7 @@ def run_round_robin_assignment(
     students: list[dict],
     wishes: list[dict],
     places: dict,
-    mobility_quotas: list[MobilityQuota] = None,
+    mobility_quotas: list[MobilityQuota] | None = None,
 ) -> dict[str, Any]:
     """
     Étape 5: Logique d'affectation Round-Robin.
@@ -216,7 +213,7 @@ def run_round_robin_assignment(
     Pour chaque étudiant, examine ses vœux par ordre de priorité (1 à 5) :
       - Condition 1 : places globales S8 ou S9 restantes > 0 (toujours vrai si stage)
       - Condition 2 : places spécialité restantes > 0 (toujours vrai si stage)
-      - Condition 3 : quota de départ restant (filière × semestre) > 0 (toujours vrai si stage)
+      - Condition 3 : quota de départ restant (filière, semestre) > 0 (toujours vrai si stage)
 
     Si les 3 conditions sont satisfaites → affectation validée.
     Si aucun vœu n'est accepté → l'étudiant n'est pas inséré dans MOB_assignment.
@@ -225,7 +222,7 @@ def run_round_robin_assignment(
       {
         "assignments"      : List[dict],  affectations validées
         "final_places"     : dict,        état des places restantes en mémoire
-        "remaining_quotas" : dict          état des quotas restants par filière×semestre
+        "remaining_quotas" : dict          état des quotas restants par (filière, semestre)
       }
     Les quotas restants sont retournés en mémoire uniquement (pas persistés en base).
     """

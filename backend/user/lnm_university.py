@@ -7,6 +7,7 @@ import openpyxl
 from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
+from sqlalchemy import Connection
 
 from api.dependencies import Rows, db_request, get_current_active_user
 from db.connection import get_connection
@@ -53,7 +54,7 @@ def _sync_university_places(
     current_user: User,
     id_partner_university: int,
     places: list[UniversityPlacePayload],
-    conn,
+    conn: Connection,
 ) -> None:
     normalized_places: dict[tuple[int, int], int] = {}
     for place in places:
@@ -250,7 +251,7 @@ def add_university_to_wishes(
     id_etudiant: int,
     id_partner_university: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-    payload: dict = Body(default={}),
+    payload: Annotated[dict | None, Body()] = None,
 ) -> Rows:
     if current_user.id != id_etudiant:
         raise HTTPException(status_code=403, detail="Unauthorized access")
@@ -873,7 +874,7 @@ def create_university_ri(
     except HTTPException as exc:
         if exc.status_code == 403:
             raise
-        raise HTTPException(status_code=400, detail=f"Creation impossible: {exc.detail}")
+        raise HTTPException(status_code=400, detail=f"Creation impossible: {exc.detail}") from exc
 
     return {
         "message": "Universite creee.",
@@ -968,7 +969,9 @@ def update_university_ri(
     except HTTPException as exc:
         if exc.status_code == 403:
             raise
-        raise HTTPException(status_code=400, detail=f"Mise a jour impossible: {exc.detail}")
+        raise HTTPException(
+            status_code=400, detail=f"Mise a jour impossible: {exc.detail}"
+        ) from exc
 
     return {
         "message": "Universite mise a jour.",
@@ -1641,7 +1644,7 @@ def export_mobility_diagnostics(
     )
 
 
-def sync_db_remaining_places(current_user, conn=None) -> None:
+def sync_db_remaining_places(current_user: User, conn: Connection | None = None) -> None:
     """
     Recalculates the remaining places for all universities and specialties based
     strictly on the number of 'accepted' assignments.

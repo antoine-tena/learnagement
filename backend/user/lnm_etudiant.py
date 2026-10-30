@@ -1,5 +1,5 @@
 import logging
-from typing import Annotated, Any
+from typing import Annotated, Any, Self
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, model_validator
@@ -57,7 +57,7 @@ class AbsencesFilters(BaseModel):
     id_enseignant: int | None = None
 
     @model_validator(mode="after")
-    def check_exclusive(self):
+    def check_exclusive(self) -> Self:
         if self.id_responsable is not None and self.id_enseignant is not None:
             raise ValueError("Fournissez soit id_responsable, soit id_enseignant, pas les deux")
         return self
