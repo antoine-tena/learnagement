@@ -9,7 +9,7 @@ _PYFORMAT = re.compile(r"%\((\w+)\)s")
 
 
 class TestRequestStructures:
-    def test_requests_portable_to_postgres(self):
+    def test_requests_portable_to_postgres(self) -> None:
         errors = []
         for module, reqs in get_all_requests("repositories").items():
             for name, r in reqs.items():
@@ -20,7 +20,7 @@ class TestRequestStructures:
                     errors.append(f"{module}.{name}: {e}")
         assert not errors, "\n".join(errors)
 
-    def test_user_request_structures(self):
+    def test_user_request_structures(self) -> None:
         all_requests = get_all_requests(package_name="repositories")
         errors = []
 

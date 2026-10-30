@@ -4,7 +4,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
 
 from access_control.rules import evaluate_rule
-from api.dependencies import get_current_active_user
+from api.dependencies import Rows, get_current_active_user
 from models.request import SQLRequest
 from models.user import User
 from user import LNM_university
@@ -30,11 +30,11 @@ def make_student(user_id: int = ID_ETUDIANT) -> User:
 
 
 @pytest.fixture
-def recorded(monkeypatch):
+def recorded(monkeypatch: pytest.MonkeyPatch) -> list[SQLRequest]:
     """Remplace db_request par un faux qui enregistre les SQLRequest reçues."""
     calls = []
 
-    def fake_db_request(requester, request):
+    def fake_db_request(requester: User, request: SQLRequest) -> Rows:
         calls.append(request)
         sql = request.request
         if "mobility_z_score" in sql:
@@ -75,7 +75,7 @@ ENDPOINT_CALLS = {
 
 
 class TestRootCause:
-    def test_sqlrequest_is_not_subscriptable(self):
+    def test_sqlrequest_is_not_subscriptable(self) -> None:
         req = SQLRequest(request="SELECT 1", allowedRolesRequester=[])
         with pytest.raises(TypeError):
             req["allowedRolesRequester"] += ["Dupont Jean"]
@@ -94,14 +94,16 @@ EXPECTED_OWNER_RULE = {
 
 @pytest.mark.parametrize("endpoint", ENDPOINT_CALLS.keys())
 class TestLegitStudent:
-    def test_no_type_error(self, endpoint, recorded):
+    def test_no_type_error(self, endpoint: str, recorded: list[SQLRequest]) -> None:
         user = make_student(ID_ETUDIANT)
         try:
             ENDPOINT_CALLS[endpoint](user)
         except TypeError as exc:
             pytest.fail(f"{endpoint} : TypeError pour l'étudiant légitime : {exc}")
 
-    def test_first_request_grants_student_secondary_key(self, endpoint, recorded):
+    def test_first_request_grants_student_secondary_key(
+        self, endpoint: str, recorded: list[SQLRequest]
+    ) -> None:
         user = make_student(ID_ETUDIANT)
         ENDPOINT_CALLS[endpoint](user)
         assert recorded, "db_request n'a jamais été appelé"
@@ -109,7 +111,9 @@ class TestLegitStudent:
         assert isinstance(first, SQLRequest)
         assert first.allowedRolesRequester == EXPECTED_OWNER_RULE
 
-    def test_first_request_declares_owner_rule(self, endpoint, recorded):
+    def test_first_request_declares_owner_rule(
+        self, endpoint: str, recorded: list[SQLRequest]
+    ) -> None:
         user = make_student(ID_ETUDIANT)
         ENDPOINT_CALLS[endpoint](user)
         assert recorded, "db_request n'a jamais été appelé"
@@ -117,7 +121,9 @@ class TestLegitStudent:
         assert isinstance(first, SQLRequest)
         assert first.allowedRolesRequester == EXPECTED_OWNER_RULE
 
-    def test_owner_rule_grants_student_on_own_data(self, endpoint, recorded):
+    def test_owner_rule_grants_student_on_own_data(
+        self, endpoint: str, recorded: list[SQLRequest]
+    ) -> None:
         user = make_student(ID_ETUDIANT)
         ENDPOINT_CALLS[endpoint](user)
         first = recorded[0]
@@ -132,14 +138,18 @@ class TestLegitStudent:
 
 class TestOtherUserControl:
     @pytest.mark.parametrize("endpoint", ["add_university_to_wishes", "submit_student_decision"])
-    def test_other_user_gets_403_before_the_bug(self, endpoint, recorded):
+    def test_other_user_gets_403_before_the_bug(
+        self, endpoint: str, recorded: list[SQLRequest]
+    ) -> None:
         other = make_student(user_id=999)
         with pytest.raises(HTTPException) as exc:
             ENDPOINT_CALLS[endpoint](other)
         assert exc.value.status_code == 403
 
     @pytest.mark.parametrize("endpoint", ["get_campaign_status", "get_student_assignment"])
-    def test_other_user_is_refused_by_owner_rule(self, endpoint, recorded):
+    def test_other_user_is_refused_by_owner_rule(
+        self, endpoint: str, recorded: list[SQLRequest]
+    ) -> None:
         other = make_student(user_id=999)
         ENDPOINT_CALLS[endpoint](other)
         first = recorded[0]
@@ -155,27 +165,27 @@ class TestOtherUserControl:
 
 class TestHttpLevel:
     @pytest.fixture
-    def client(self, recorded):
+    def client(self, recorded: list[SQLRequest]) -> TestClient:
         app = FastAPI()
         app.include_router(LNM_university.router)
         app.dependency_overrides[get_current_active_user] = lambda: make_student(ID_ETUDIANT)
         # raise_server_exceptions=False : on veut le code HTTP, pas l'exception
         return TestClient(app, raise_server_exceptions=False)
 
-    def test_campaign_status_returns_200(self, client):
+    def test_campaign_status_returns_200(self, client: TestClient) -> None:
         r = client.get(f"/university/etudiant/{ID_ETUDIANT}/campaign-status")
         assert r.status_code == 200, r.text
 
-    def test_assignment_returns_200(self, client):
+    def test_assignment_returns_200(self, client: TestClient) -> None:
         r = client.get(f"/university/etudiant/{ID_ETUDIANT}/assignment")
         assert r.status_code == 200, r.text
 
-    def test_decision_returns_200(self, client):
+    def test_decision_returns_200(self, client: TestClient) -> None:
         r = client.post(
             f"/university/etudiant/{ID_ETUDIANT}/assignment/decision", json={"decision": "accepted"}
         )
         assert r.status_code == 200, r.text
 
-    def test_add_wish_returns_200(self, client):
+    def test_add_wish_returns_200(self, client: TestClient) -> None:
         r = client.post(f"/university/etudiant/{ID_ETUDIANT}/wish/7", json={"id_semestre": 8})
         assert r.status_code == 200, r.text
