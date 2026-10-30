@@ -1,53 +1,66 @@
+import logging
+import os
+
+import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-import os
-import uvicorn
-import logging
 
 import init
-
-from system import check, access_auth
 from auth import authenticate
-from user import LNM_enseignant, LNM_etudiant, LNM_evaluation, LNM_filiere,  LNM_university, LNM_mobility_assignment, MAQUETTE_module, LNM_calendar, APC_data, apc_KPI_competence, apc_competence
+from system import access_auth, check
+from user import (
+    APC_data,
+    LNM_calendar,
+    LNM_enseignant,
+    LNM_etudiant,
+    LNM_evaluation,
+    LNM_filiere,
+    LNM_mobility_assignment,
+    LNM_university,
+    MAQUETTE_module,
+    apc_competence,
+    apc_KPI_competence,
+)
+
 
 class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+    HEADER = "\033[95m"
+    OKBLUE = "\033[94m"
+    OKCYAN = "\033[96m"
+    OKGREEN = "\033[92m"
+    WARNING = "\033[93m"
+    FAIL = "\033[91m"
+    ENDC = "\033[0m"
+    BOLD = "\033[1m"
+    UNDERLINE = "\033[4m"
+
 
 access_logger = logging.getLogger("uvicorn.access")
+
+
 class HealthFilter(logging.Filter):
     def filter(self, record):
         return "/health" not in record.getMessage()
 
+
 access_logger.addFilter(HealthFilter())
 
-formatter = logging.Formatter(
-    fmt="%(levelname)s:     %(filename)s:%(lineno)d - %(message)s"
-)
+formatter = logging.Formatter(fmt="%(levelname)s:     %(filename)s:%(lineno)d - %(message)s")
 
 for handler in access_logger.handlers:
     handler.setFormatter(formatter)
 
-#app = FastAPI(dependencies=[Depends(get_query_token)])
-origins = [
-    "*"
-]
+# app = FastAPI(dependencies=[Depends(get_query_token)])
+origins = ["*"]
 app = FastAPI()
 
 # Ajouter le middleware à l'application
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,           # Autorise ton port 40080
+    allow_origins=origins,  # Autorise ton port 40080
     allow_credentials=True,
-    allow_methods=["*"],              # Autorise GET, POST, OPTIONS, etc.
-    allow_headers=["*"],              # Autorise Authorization, Content-Type, etc.
+    allow_methods=["*"],  # Autorise GET, POST, OPTIONS, etc.
+    allow_headers=["*"],  # Autorise Authorization, Content-Type, etc.
 )
 
 app.include_router(authenticate.router)
@@ -71,6 +84,7 @@ app.include_router(LNM_mobility_assignment.router)
 def health():
     return {"status": "ok"}
 
+
 # make health silent (without log)
 @app.middleware("http")
 async def silence_health_logs(request: Request, call_next):
@@ -83,9 +97,12 @@ async def silence_health_logs(request: Request, call_next):
             access_logger.disabled = previous_state
         return response
     return await call_next(request)
+
+
 @app.get("/")
 async def root():
     return {"message": "Hello, I'm Learnagement BackEnd!"}
+
 
 if __name__ == "__main__":
     print(bcolors.OKGREEN + "Init BD framework..." + bcolors.ENDC)
@@ -101,9 +118,11 @@ if __name__ == "__main__":
     }
 
     if is_prod:
-        uvicorn_kwargs.update({
-            "ssl_certfile": os.path.join(ssl_dir, "cert.pem"),
-            "ssl_keyfile": os.path.join(ssl_dir, "key.pem"),
-        })
+        uvicorn_kwargs.update(
+            {
+                "ssl_certfile": os.path.join(ssl_dir, "cert.pem"),
+                "ssl_keyfile": os.path.join(ssl_dir, "key.pem"),
+            }
+        )
 
     uvicorn.run(app, **uvicorn_kwargs)
