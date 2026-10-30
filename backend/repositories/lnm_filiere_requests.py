@@ -1,7 +1,7 @@
 import copy
 
 
-def requests(key: str):
+def requests(key: str) -> dict:
     return copy.deepcopy(__requests[key])
 
 

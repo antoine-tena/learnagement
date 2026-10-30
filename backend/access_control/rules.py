@@ -5,9 +5,10 @@ from access_control.responsibilities import (
     parse_responsibility,
 )
 from access_control.types import AccessRule
+from models.user import User
 
 
-def evaluate_rule(rule: AccessRule, user, params: dict | None) -> bool:
+def evaluate_rule(rule: AccessRule, user: User | None, params: dict | None) -> bool:
     """
     Point d'entrée principal. Évalue si user satisfait la règle d'accès.
     Résout d'abord les lambdas, puis dispatche selon le type de règle.
@@ -31,7 +32,7 @@ def evaluate_rule(rule: AccessRule, user, params: dict | None) -> bool:
 # --- Évaluateurs par type ---
 
 
-def _evaluate_string(rule: str, user) -> bool:
+def _evaluate_string(rule: str, user: User | None) -> bool:
     """
     "anonymous"      → toujours autorisé
     "connected_user" → autorisé si authentifié
@@ -45,7 +46,7 @@ def _evaluate_string(rule: str, user) -> bool:
     raise ValueError(f"Valeur de règle string inconnue : '{rule}'")
 
 
-def _evaluate_role_list(roles: list[str], user) -> bool:
+def _evaluate_role_list(roles: list[str], user: User | None) -> bool:
     """
     L'utilisateur doit avoir AU MOINS UN des rôles listés.
     """
@@ -63,7 +64,7 @@ def _evaluate_role_list(roles: list[str], user) -> bool:
     return len(intersection) > 0
 
 
-def _evaluate_dict(rule: dict, user, params: dict) -> bool:
+def _evaluate_dict(rule: dict, user: User | None, params: dict) -> bool:
     """
     Dictionnaire de conditions — l'utilisateur doit satisfaire AU MOINS UNE entrée.
 

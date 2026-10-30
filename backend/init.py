@@ -1,8 +1,11 @@
 import os
 import traceback
+from typing import Any
 
 import dotenv
 import mysql.connector
+from mysql.connector.abstracts import MySQLConnectionAbstract
+from mysql.connector.pooling import PooledMySQLConnection
 
 from core.config import bcolors
 
@@ -13,7 +16,10 @@ USER = os.getenv("MYSQL_USER_LOGIN")
 PASSWORD = os.getenv("MYSQL_USER_PASSWORD")
 DATABASE = os.getenv("MYSQL_DB")
 
-requests = {"check": {}, "struct": {}, "api": {}}
+# A connection as mysql.connector.connect returns it.
+type Connection = MySQLConnectionAbstract | PooledMySQLConnection
+
+requests: dict[str, dict[str, str]] = {"check": {}, "struct": {}, "api": {}}
 
 """
 Return table without secondary key, that's prohibited by the framework
@@ -155,7 +161,7 @@ requests["api"]["secondary_key"] = """
 """
 
 
-def request(query, param=()):
+def request(query: str, param: tuple[Any, ...] = ()) -> list[Any]:
 
     # print("query/param: ", query, param, flush=True)
 
@@ -180,7 +186,7 @@ def request(query, param=()):
     return res
 
 
-def get_primary_key_fields(conn, table_name):
+def get_primary_key_fields(conn: Connection, table_name: str) -> list[Any]:
     """ """
 
     mysql_db = os.getenv("MYSQL_DB")
@@ -208,7 +214,7 @@ def get_primary_key_fields(conn, table_name):
     return primary_keys
 
 
-def get_secondary_key_fields(conn, table_name):
+def get_secondary_key_fields(conn: Connection, table_name: str) -> list[Any]:
     """ """
 
     # get secondary key fields
@@ -241,7 +247,7 @@ def get_secondary_key_fields(conn, table_name):
     return secondary_keys_fields
 
 
-def get_foreign_keys(conn, table_name):
+def get_foreign_keys(conn: Connection, table_name: str) -> dict[Any, Any]:
     """ """
 
     query = (
@@ -274,12 +280,8 @@ def get_foreign_keys(conn, table_name):
     return foreign_keys
 
 
-def __build_secondary_key_request(conn, table):
+def __build_secondary_key_request(conn: Connection, table: str) -> dict[str, Any]:
     """ """
-
-    mysql_db = os.getenv("MYSQL_DB")
-
-    cursor = conn.cursor()
 
     # get primary key fields
     primary_keys_fields = get_primary_key_fields(conn, table)
@@ -294,7 +296,7 @@ def __build_secondary_key_request(conn, table):
     # print("secondary_keys_fields", secondary_keys_fields, flush=True)
 
     # initial request dict
-    request_as_dict = {
+    request_as_dict: dict[str, Any] = {
         "SELECT": [],
         "SELECT_PRIM": [f"{table}.{pk}" for pk in primary_keys_fields],
         "FROM": "",
@@ -303,7 +305,7 @@ def __build_secondary_key_request(conn, table):
 
     # iterate over secondary keys
     for secondary_key_field in secondary_keys_fields:
-        if secondary_key_field in foreign_keys_fields.keys():
+        if secondary_key_field in foreign_keys_fields:
             # recursive call
             sub_request = __build_secondary_key_request(
                 conn, foreign_keys_fields[secondary_key_field]
@@ -326,7 +328,7 @@ def __build_secondary_key_request(conn, table):
     return request_as_dict
 
 
-def build_secondary_key_request(conn, table):
+def build_secondary_key_request(conn: Connection, table: str) -> str:
     # get first primary key field
     primary_key_field = get_primary_key_fields(conn, table)[0]
     # print("Primary key field: ", primary_key_field, flush=True)
@@ -352,7 +354,7 @@ def build_secondary_key_request(conn, table):
     return secondary_key_request
 
 
-def init():
+def init() -> None:
 
     conn = mysql.connector.connect(
         host=HOST,
@@ -386,7 +388,7 @@ def init():
         cursor = conn.cursor()
         try:
             cursor.execute(query)
-            rows = cursor.fetchall()
+            cursor.fetchall()
         except mysql.connector.Error as err:
             print(f"Impossible d'exécuter la requête \n {query}:\n {err}")
             print(traceback.format_exc())

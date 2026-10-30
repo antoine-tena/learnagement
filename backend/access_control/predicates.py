@@ -1,4 +1,7 @@
-def is_current_user_module_participant(user, params) -> bool:
+from models.user import User
+
+
+def is_current_user_module_participant(user: User, params: dict) -> bool:
     """L'étudiant connecté suit-il ce module ?"""
     if user.main_role != "etudiant":
         return False
@@ -27,7 +30,7 @@ def is_current_user_module_participant(user, params) -> bool:
     return bool(rows)
 
 
-def is_current_user_module_responsible(user, params) -> bool:
+def is_current_user_module_responsible(user: User | None, params: dict | None) -> bool:
     """L'enseignant connecté est-il responsable de ce module ?"""
     if user is None or user.main_role != "enseignant":
         return False

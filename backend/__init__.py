@@ -3,7 +3,7 @@ VERSION = "1.0.0"
 
 
 # Définir un point d'entrée
-def main():
+def main() -> bool:
     return True
 
 
