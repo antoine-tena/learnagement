@@ -1,6 +1,0 @@
-pymupdf
-sentence-transformers
-faiss-cpu
-numpy
-fastapi
-uvicorn

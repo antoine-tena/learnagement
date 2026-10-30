@@ -1,0 +1,15 @@
+[project]
+name = "learnagement"
+version = "0.1.0"
+description = "Le lanceur de Learnagement."
+requires-python = ">=3.12"
+dependencies = [
+    "click==8.5.0",
+    "click-default-group==1.2.4",
+    "cryptography==50.0.2",
+    "pwdlib[bcrypt]==0.3.1",
+    "python-dotenv==1.2.4",
+]
+
+[tool.uv]
+package = false

@@ -4,8 +4,8 @@
 
 [[waiver]]
 rule = "UV-PODMAN"
-paths = ["**/requirements*.txt", "requirements*.txt", "docker/**", "Learnagement.py", "launcher/**", "config/env.skeleton", "bootstrap.py"]
-reason = "Dette d'avant kiln : pip et docker remplacés par uv (T-05) et podman (T-06)"
+paths = ["docker/**", "Learnagement.py", "launcher/**", "config/env.skeleton"]
+reason = "Dette d'avant kiln : docker remplacé par podman (T-06)"
 by = "antoine-tena"
 since = 2026-10-30
 until = 2026-11-06
