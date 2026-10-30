@@ -8,7 +8,6 @@
     require __DIR__ . "/utils/endpoint.php";
     require_once __DIR__ . "/utils/cas.php";
     require_once __DIR__ . "/config.php";
-    include __DIR__ . "/utils/connectDB.php"; # must be refactored to load env here
 
     use Firebase\JWT\JWT;
     use Firebase\JWT\Key;
@@ -136,7 +135,7 @@
         requireGuest($user, $t->router);
         echo $t->render('base/login');
     });
-    
+
     $t->router->post('/login', 'login-post', function () use ($t, $user) {
         requireGuest($user, $t->router);
         echo $t->render('base/@post/login');
@@ -211,7 +210,7 @@ $t->router->get('/dashboard/mobility-map_open', 'dashboard-mobility-map_open', f
         requireOneRole($user, ["administratif", "enseignant"], $t->router);
         echo $t->render('dashboard/mobility-admin');
     });
-    
+
     $t->router->get('/dashboard/dependance_module', 'dashboard-dependance-module', function () use ($t, $user) {
         requireAuth($user, $t->router);
         echo $t->render('dashboard/dependance_module');
