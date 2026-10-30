@@ -9,7 +9,6 @@
 import axios from "axios";
 
 import { useEffect, useState} from "react";
-import {isEmpty} from "@jsonjoy.com/util/lib/isEmpty";
 import plus from "@/public/plus.png"
 import moins from "@/public/signe-moins-dune-ligne-en-position-horizontale.png"
 
@@ -20,7 +19,7 @@ import Image from "next/image";
 /**
  * Composant de la liste des apprentissages critiques
  * Affiche la liste des apprentissages critiques d'une compétence
- * 
+ *
  * @param {number} idCompetence - Identifiant de la compétence
  * @returns {JSX.Element} Composant React
  */
@@ -35,37 +34,28 @@ export default function ListApprentissagesCritiques({idCompetence}:{idCompetence
 
 
     useEffect(() => {
-        if (levels.length > 0 && apprentissagesCritiques != undefined){
-            let default_level: string = levels[0]
-            setLevelClicked(parseInt(default_level))
-        }
-    }, [levels, apprentissagesCritiques]);
-
-    useEffect(() => {
-        let form_data = new FormData
+        const form_data = new FormData
         form_data.append("idCompetence", idCompetence.toString())
         axios.post("/api/proxy/list/listApprentissagesCritiques", form_data, {withCredentials: true})
             .then(response => {
-                let data = response.data
+                const data = response.data
                 setApprentissagesCritiques(data)
-                setLevels(Object.keys(data))
+                const dataLevels = Object.keys(data)
+                setLevels(dataLevels)
+                if (dataLevels.length > 0) {
+                    setLevelClicked(parseInt(dataLevels[0]))
+                }
             })
     }, [idCompetence]);
 
     useEffect(() => {
-        let form_data = new FormData
+        const form_data = new FormData
         form_data.append("indexBy", "id_apprentissage_critique")
         axios.post("/api/proxy/list/listModulesOfAllAPC", form_data, {withCredentials: true})
             .then(response => {
                 setApcAsModule(response.data)
             })
     }, []);
-
-    function levelOfApcToShow(event: any) {
-        let text_event: string = event.target.innerText
-        let level: string[] = text_event.split(" ")
-        setLevelClicked(parseInt(level[1]))
-    }
 
     function showModules(idApc: number){
 
@@ -84,7 +74,7 @@ export default function ListApprentissagesCritiques({idCompetence}:{idCompetence
                     <div id={level} key={level} className={`w-32 h-14 px-2 flex justify-center items-center rounded-lg text-white cursor-pointer
                             ${levelClicked.toString() === level ? 'bg-usmb-blue' : 'bg-usmb-cyan'}`}
 
-                         onClick={levelOfApcToShow}
+                         onClick={() => setLevelClicked(parseInt(level))}
                     >
                         <p className={"font-semibold text-base/5"}>niveau {level}</p>
                     </div>
@@ -93,12 +83,12 @@ export default function ListApprentissagesCritiques({idCompetence}:{idCompetence
 
             <div className={"flex flex-col gap-4"}>
                 {/* Affichage des APC*/}
-                {(!isEmpty(apprentissagesCritiques) && levelClicked >= 0 && Object.keys(apcAsModule).length > 0) && (
+                {(Object.keys(apprentissagesCritiques).length > 0 && levelClicked >= 0 && Object.keys(apcAsModule).length > 0) && (
                     apprentissagesCritiques[levelClicked].map((apc: apprentissageCritique) => (
                         <div key={apc.id_apprentissage_critique}>
                             <div id={apc.id_apprentissage_critique.toString()}
                                  className={`flex justify-between items-center p-2 shadow-md font-medium bg-white
-                                 ${(apc.id_apprentissage_critique in Object.keys(apcAsModule)) ? 
+                                 ${(apc.id_apprentissage_critique in Object.keys(apcAsModule)) ?
                                      'cursor-pointer' : 'cursor-not-allowed'
                                  }
                                  ${idApcClicked === apc.id_apprentissage_critique ? 'rounded-t-lg' : 'rounded-lg'}
