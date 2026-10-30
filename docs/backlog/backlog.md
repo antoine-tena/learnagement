@@ -7,7 +7,7 @@ n'est ouvert.**
 
 North star: **Learnagement in service**.
 
-**Next free: T-34.**
+**Next free: T-39.**
 
 ---
 
@@ -16,6 +16,84 @@ North star: **Learnagement in service**.
 
 
 ## 🟠 Important
+
+### T-33 · Prévenir les contributeurs du refacto du fork
+- **Type**: task
+- **Status**: blocked — waiting for @antoine-tena : à lancer seulement sur sa demande
+- **Opened**: 2026-10-30
+- **Effort**: XS · **Owner**: @antoine-tena · **Due**: —
+- **Origin**: demande d'Antoine, pour que les travaux en cours ne divergent pas du fork
+
+À faire avant T-11 et T-29 : au 2026-10-30, le fork a 70 commits d'avance et 532 fichiers
+modifiés par rapport à `dev`, et Flavien travaille surtout dans le backend, sous les anciens
+chemins (`backend_python/`). Déplacer encore des fichiers rendrait la PR plus difficile à
+intégrer. Lui signaler aussi T-34 et décider avec lui de T-12.
+
+- [ ] En parler d'abord à Flavien : c'est son repo, et le fork lui propose ses changements par
+  PR vers `dev`. Il est le seul à pouvoir prévenir les étudiants de cette année qui n'ont encore
+  rien poussé.
+- [ ] Ouvrir la PR en brouillon vers `dev` :
+  https://github.com/FlavienVernier/learnagement/compare/dev...antoine-tena:learnagement:antoine-tena?expand=1
+- [ ] Revoir les destinataires et les renommages du message, relevés le 2026-10-30.
+- [ ] Poster le message, sous le compte d'Antoine et après son accord sur le texte :
+  https://github.com/FlavienVernier/learnagement/issues/new
+
+Les mentions notifient par GitHub, sans chercher d'e-mails dans les commits. Le message ne promet
+pas que rien n'est supprimé : le diff compte 33 suppressions (dont `ToDo.md`, anciens scripts de
+`scrapping/`) à vérifier, et les branches existantes risquent des conflits.
+
+**Titre** : Refacto de structure en cours : où merger votre travail
+
+> Bonjour @FlavienVernier @Houssam365 @maxencels576,
+>
+> Je fais une grosse réorganisation du repo sur mon fork, branche
+> [`antoine-tena`](https://github.com/antoine-tena/learnagement/tree/antoine-tena) : dossiers
+> renommés (`backend_python/` → `backend/`, `front_PHP/` → `web/`, `scrapping/` → `scraping/`…),
+> tests et documentation. Le but n'est pas de retirer des fonctionnalités : le code est surtout
+> déplacé, et le code mort va dans `archive/`.
+>
+> Pour éviter que nos travaux divergent, si vous avez du travail en cours, pouvez-vous le merger
+> dans ma branche, ou ouvrir une PR vers elle ?
+>
+> ```
+> git remote add antoine https://github.com/antoine-tena/learnagement.git
+> git fetch antoine
+> git merge antoine/antoine-tena
+> ```
+>
+> Si un conflit vous bloque ou s'il vous manque quelque chose, dites-le ici et je m'en occupe.
+> @FlavienVernier, je proposerai l'ensemble à `dev` par PR : dis-moi si tu préfères une autre
+> organisation.
+
+### T-34 · Plus de JWT dans les URL
+- **Type**: bug
+- **Status**: todo
+- **Opened**: 2026-10-30
+- **Effort**: S · **Owner**: — · **Due**: —
+- **Origin**: revue de l'architecture
+
+`web/views/dashboard/python.php` et `nextjs.php` redirigent vers Dash et Next avec
+`?jwt_token=…` ; `dashboards/apc_dash/apc_hub.py` le conserve dans ses liens. Le jeton peut finir
+dans les historiques et les logs. `nextjs.php` force en plus `http` quel que soit l'environnement,
+donc le jeton peut circuler en clair.
+
+- [ ] Vérifier le comportement sur une instance en HTTPS (code lu, pas encore lancé).
+- [ ] Transmettre l'authentification autrement : cookie `HttpOnly` et `Secure` sur un même domaine
+  ou code à usage unique échangé côté serveur.
+- [ ] Servir Next en HTTPS.
+
+### T-35 · Le PHP ne parle plus à la base
+- **Type**: improvement
+- **Status**: todo
+- **Opened**: 2026-10-30
+- **Effort**: M · **Owner**: — · **Due**: —
+- **Origin**: revue de l'architecture
+
+Quatre fichiers de `web/` exécutent du SQL par `mysqli`, hors de l'API : `views/base/@post/inscription.php`,
+`views/dashboard/@post/dependance_module.php`, `views/dashboard/create_stage.php`,
+`views/dashboard/rendus-enseignant.php`. Créer les routes manquantes dans le backend, avec leurs
+tests et leurs droits, puis les appeler par `utils/apiProxy.php`. C'est le premier pas vers un
+seul backend, et il ne dépend pas de T-12.
 
 ### T-18 · Plus de données personnelles dans les logs du front
 - **Type**: bug
@@ -64,48 +142,18 @@ Node 18 (fin de vie) → Node LTS.
 
 ## 🟡 Normal
 
-### T-33 · Prévenir les contributeurs du refacto du fork
-- **Type**: task
-- **Status**: blocked — waiting for @antoine-tena : à lancer seulement sur sa demande
+### T-36 · Les appels de Next visent des routes qui existent
+- **Type**: bug
+- **Status**: to verify — `frontend/app/`
 - **Opened**: 2026-10-30
-- **Effort**: XS · **Owner**: @antoine-tena · **Due**: —
-- **Origin**: demande d'Antoine, pour que les travaux en cours ne divergent pas du fork
+- **Effort**: M · **Owner**: — · **Due**: —
+- **Origin**: revue de l'architecture
 
-- [ ] En parler d'abord à Flavien : c'est son repo, et le fork lui propose ses changements par
-  PR vers `dev`. Il est le seul à pouvoir prévenir les étudiants de cette année qui n'ont encore
-  rien poussé.
-- [ ] Ouvrir la PR en brouillon vers `dev` :
-  https://github.com/FlavienVernier/learnagement/compare/dev...antoine-tena:learnagement:antoine-tena?expand=1
-- [ ] Revoir les destinataires et les renommages du message, relevés le 2026-10-30.
-- [ ] Poster le message, sous le compte d'Antoine et après son accord sur le texte :
-  https://github.com/FlavienVernier/learnagement/issues/new
-
-Les mentions notifient par GitHub, sans chercher d'e-mails dans les commits. Le message ne promet
-pas que rien n'est supprimé : le diff compte 33 suppressions (dont `ToDo.md`, anciens scripts de
-`scrapping/`) à vérifier, et les branches existantes risquent des conflits.
-
-**Titre** : Refacto de structure en cours : où merger votre travail
-
-> Bonjour @FlavienVernier @Houssam365 @maxencels576,
->
-> Je fais une grosse réorganisation du repo sur mon fork, branche
-> [`antoine-tena`](https://github.com/antoine-tena/learnagement/tree/antoine-tena) : dossiers
-> renommés (`backend_python/` → `backend/`, `front_PHP/` → `web/`, `scrapping/` → `scraping/`…),
-> tests et documentation. Le but n'est pas de retirer des fonctionnalités : le code est surtout
-> déplacé, et le code mort va dans `archive/`.
->
-> Pour éviter que nos travaux divergent, si vous avez du travail en cours, pouvez-vous le merger
-> dans ma branche, ou ouvrir une PR vers elle ?
->
-> ```
-> git remote add antoine https://github.com/antoine-tena/learnagement.git
-> git fetch antoine
-> git merge antoine/antoine-tena
-> ```
->
-> Si un conflit vous bloque ou s'il vous manque quelque chose, dites-le ici et je m'en occupe.
-> @FlavienVernier, je proposerai l'ensemble à `dev` par PR : dis-moi si tu préfères une autre
-> organisation.
+7 appels sur 13 passent par `/api/proxy/list/*` et `/api/proxy/select/*`, pour lesquels une
+recherche ne trouve aucune route du backend, sur aucune branche : `listApprentissagesCritiques`,
+`listModulesOfAllAPC` (deux appels), `selectChargeEnseignant`, `selectSeance`, `selectMaquette`,
+`listAPCbyIdModule`. Sont touchés : les charges, la maquette et une partie des modules. Confirmer
+en lançant le front, puis brancher ces écrans sur les routes actuelles ou les créer.
 
 ### T-20 · Le front passe ESLint
 - **Type**: improvement
@@ -153,9 +201,11 @@ plus en argument de `mysqldump`. `launcher/cli.py` et `launcher/env.py` ne passe
 - **Effort**: L · **Owner**: — · **Due**: —
 - **Origin**: charte FILE-SIZE
 
-`LNM_university.py` (1 868 lignes), `MAQUETTE_module.py` (1 067), `mobility-admin.php`
-(2 953), les deux cartes de mobilité presque identiques (`mobility-map.php`,
-`mobility-map_open.php`). Un module par domaine, tests d'abord (`/kiln:modernize`).
+`backend/domains/lnm_university.py` (2 155 lignes, à commencer par lui),
+`backend/domains/maquette_module.py` (1 312), `mobility-admin.php` (2 953), les deux cartes de
+mobilité presque identiques (`mobility-map.php`, `mobility-map_open.php`). Un module par domaine,
+tests d'abord (`/kiln:modernize`), sans changer les routes. Le backend attend T-33 ;
+`mobility-admin.php` est migré en dernier (T-12).
 
 ### T-13 · Logs de l'API en structlog
 - **Type**: improvement
@@ -196,13 +246,17 @@ en HTTPS, hacher dans l'API (`pwdlib`).
 
 ### T-29 · Le backend découpé par domaine
 - **Type**: improvement
-- **Status**: todo
+- **Status**: blocked — waiting for T-33
 - **Opened**: 2026-10-30
-- **Effort**: L · **Owner**: — · **Due**: —
-- **Origin**: revue de l'arborescence
+- **Effort**: M · **Owner**: — · **Due**: —
+- **Origin**: revue de l'arborescence, revue de l'architecture
 
-Regrouper routes, requêtes et modèles d'un même domaine (mobilité, maquette, auth…) au lieu de
-couches séparées (`api/`, `domains/`, `models/`, `repositories/`). À mener avec T-11.
+Le backend est déjà presque rangé par domaine : `domains/` a un fichier par domaine, avec ses
+routes et son SQL ; `repositories/` n'a qu'un fichier et `models/` trois petits. Il reste à faire
+de ces fichiers des paquets aux noms de kiln (`backend/app/<domaine>/api.py`, `services.py`,
+règles [ROUTERS] et [SERVICES]), avec T-11, sans changer les routes. Pas d'architecture
+hexagonale : seule la logique complexe, comme l'affectation des mobilités, est isolée pour être
+testée sans base.
 
 ### T-31 · Des noms parlants pour les tableaux de bord
 - **Type**: improvement
@@ -297,12 +351,37 @@ L'ancienne liste demandait de revoir le nommage : vérifier ce qu'il reste aprè
 
 Vérifier que la connexion à la base des tableaux de bord suit le standard LNM.
 
-### T-12 · Un seul front à terme
+### T-12 · Une seule API, une seule entrée, une seule authentification
 - **Type**: idea
 - **Status**: blocked — waiting for Flavien
 - **Opened**: 2026-10-30
 - **Effort**: L · **Owner**: — · **Due**: —
-- **Origin**: lecture du repo
+- **Origin**: lecture du repo, revue de l'architecture
 
-Trois fronts (PHP, Dash, Next) pour une seule application. Flavien a une branche
-`refactor/nextJS_front` : décider avec lui la cible et le calendrier.
+Trois fronts (PHP, Dash, Next) pour une seule application : Dash 11 233 lignes, PHP 9 720, Next
+2 235. Flavien a une branche `refactor/nextJS_front` : décider avec lui la cible et le calendrier.
+
+Proposition : Next remplace le PHP page par page, sans réécriture d'un coup, `mobility-admin.php`
+en dernier. Les écrans de saisie de Dash passent à Next (T-37), les graphiques en lecture seule y
+restent tant que rien ne pousse à les déplacer. Préalables : T-34, T-35, T-36.
+
+### T-37 · Les écrans de saisie de Dash passent à Next
+- **Type**: idea
+- **Status**: blocked — waiting for T-12
+- **Opened**: 2026-10-30
+- **Effort**: L · **Owner**: — · **Due**: —
+- **Origin**: revue de l'architecture
+
+Recenser les vues Dash qui écrivent (`app5_module_enseignant_edit.py`, par exemple) et les migrer
+une à une. Réécrire les graphiques en React coûterait cher pour peu de gain : ils restent en Dash.
+
+### T-38 · Le RAG hors de l'image Dash
+- **Type**: improvement
+- **Status**: todo
+- **Opened**: 2026-10-30
+- **Effort**: M · **Owner**: — · **Due**: —
+- **Origin**: revue de l'architecture
+
+`dashboards/apc_dash/polytech_rag/` embarque `sentence-transformers` et `faiss-cpu` dans l'image
+de tous les tableaux de bord. Le sortir dans son propre conteneur, appelé par `apc20_chatbot`, en
+respectant [AI-FEATURES].
