@@ -1,11 +1,13 @@
+import os
+from datetime import UTC, datetime, timedelta
+from pathlib import Path
+
+import dotenv
 from cryptography import x509
-from cryptography.x509.oid import NameOID
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
-from datetime import datetime, timedelta, timezone
-from pathlib import Path
-import os
-import dotenv
+from cryptography.x509.oid import NameOID
+
 
 def generate_self_signed_cert(
     common_name: str,
@@ -33,17 +35,20 @@ def generate_self_signed_cert(
     )
 
     # 2. Construction du sujet/émetteur (auto-signé => sujet = émetteur)
-    subject = issuer = x509.Name([
-        x509.NameAttribute(NameOID.COMMON_NAME, common_name),
-    ])
+    subject = issuer = x509.Name(
+        [
+            x509.NameAttribute(NameOID.COMMON_NAME, common_name),
+        ]
+    )
 
     # 3. Construction du SAN (Subject Alternative Names)
     import ipaddress
+
     san_entries = [x509.DNSName(name) for name in san_dns_names]
     san_entries += [x509.IPAddress(ipaddress.ip_address(ip)) for ip in san_ip_addresses]
 
     # 4. Construction du certificat
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     cert = (
         x509.CertificateBuilder()
         .subject_name(subject)
@@ -53,9 +58,7 @@ def generate_self_signed_cert(
         .not_valid_before(now)
         .not_valid_after(now + timedelta(days=days_valid))
         .add_extension(x509.SubjectAlternativeName(san_entries), critical=False)
-        .add_extension(
-            x509.BasicConstraints(ca=True, path_length=None), critical=True
-        )
+        .add_extension(x509.BasicConstraints(ca=True, path_length=None), critical=True)
         .sign(private_key, hashes.SHA256())
     )
 
@@ -115,7 +118,7 @@ def generate_external_cert(
             domain,
             "localhost",
             os.environ["BACKEND_PYTHON_DOCKER_URL"],
-            f"backend_python_{os.environ["INSTANCE_NAME"]}",
+            f"backend_python_{os.environ['INSTANCE_NAME']}",
         ],
         san_ip_addresses=san_ips,
         output_dir=output_dir,

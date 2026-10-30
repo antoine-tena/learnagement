@@ -1,519 +1,187 @@
-# coding=utf-8
-import glob
+"""Les commandes du lanceur : `python Learnagement.py <commande>`."""
+
+import asyncio
 import logging
 import os
-import sys
 import shutil
+import signal
 import subprocess
-import datetime
-
-import dotenv
-import asyncio
-import click
-from click_default_group import DefaultGroup
-#from dotenv import load_dotenv
-from launcher.env import __load_env_file, save_env_file, __set_env, __generate_base_env, propagate_env
-from pwdlib import PasswordHash
-from pwdlib.hashers.bcrypt import BcryptHasher
+import sys
+from datetime import UTC, datetime
 from pathlib import Path
+from types import FrameType
 
-from launcher.config import RED, GREEN, YELLOW, NC, containers_system, containers_prod, containers_dev, envs
+import click
+import dotenv
+from click_default_group import DefaultGroup
 
-logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+from launcher import db, docker
+from launcher.config import (
+    GREEN,
+    NC,
+    RED,
+    YELLOW,
+    containers_dev,
+    containers_prod,
+    containers_system,
+    envs,
+)
+from launcher.env import (
+    apply_env_file,
+    generate_base_env,
+    load_env_file,
+    propagate_env,
+    save_env_file,
+)
+
+logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+ENV_CHOICES = click.Choice(sorted(envs))
+ENV_HELP = "Environment to use: " + ", ".join(sorted(envs))
+CONFIRM_RESET = (
+    "Are you sure (YES/NO)? NO INITIAL DATA OR CUSTOMIZED CONFIGURATION CAN BE RECOVERED! "
+)
+CONFIRM_RESET_AGAIN = "Are you realy sure(YES/NO)? don't cry if you've lost anything! "
 
 
-ALGORITHM = "HS256"
-MIN_KEY_BYTES = 32   # RFC 7518 §3.2 pour HS256
-DEFAULT_SESSION_TIMEOUT = 300
-MAX_SESSION_TIMEOUT = 60 * 60 * 24 * 1   # 1 jours
-
-#############################################################
-# Lernagement security
-
-def __get_git_branch():
+def _git_branch() -> str | None:
     try:
-        branch = subprocess.check_output(
+        return subprocess.check_output(
             ["git", "rev-parse", "--abbrev-ref", "HEAD"],
-            stderr=subprocess.DEVNULL
-        ).decode("utf-8").strip()
-        return branch
-    except Exception:
+            stderr=subprocess.DEVNULL,
+            text=True,
+        ).strip()
+    except (subprocess.CalledProcessError, FileNotFoundError):
         return None
 
-def __check_certificates():
-    dotenv.load_dotenv()
-    if os.environ["ENV"] != "prod" and (not os.path.exists(os.environ["SSL_INTERNAL_DIR"] + "cert.pem")
-                                        or  not os.path.exists(os.environ["SSL_INTERNAL_DIR"] + "key.pem")
-                                        or not os.path.exists(os.environ["SSL_EXTERNAL_DIR"] + "cert.pem")
-                                        or  not os.path.exists(os.environ["SSL_EXTERNAL_DIR"] + "key.pem")):
-        logging.error("Certificate not found. Please run learnagement.py first.")
+
+def _security_check() -> None:
+    branch = _git_branch()
+    env = os.environ["ENV"]
+    if branch == "main" and env != "prod":
+        logger.error(
+            "%sSECURITY ALERT: App run from main branch without 'ENV' "
+            "environment variable set as 'prod'%s",
+            RED,
+            NC,
+        )
         sys.exit(1)
-
-def __security_check():
-    dotenv.load_dotenv()
-    git_branch = __get_git_branch()
-    if git_branch == "main" :
-        if os.environ["ENV"] !="prod" :
-            logging.error(f"{RED}SECURITY ALERT: App run from main branch without 'ENV' environment variable set as 'prod'{NC}")
-            exit(1)
-
-    elif git_branch == "prerelease":
-        if os.environ["ENV"] != "prod":
-            logging.warning(f"{YELLOW}SECURITY WARNING: App run from prerelease branch without 'ENV' environment variable set as 'prod'{NC}")
-
+    if branch == "prerelease" and env != "prod":
+        logger.warning(
+            "%sSECURITY WARNING: App run from prerelease branch without 'ENV' "
+            "environment variable set as 'prod'%s",
+            YELLOW,
+            NC,
+        )
     else:
-        logging.info(f"{GREEN}App run from '{git_branch}' branch with '{os.environ['ENV']}' environment{NC}")
+        logger.info("%sApp run from '%s' branch with '%s' environment%s", GREEN, branch, env, NC)
 
 
+def _generate_env(env: str = "dev") -> None:
+    if not Path(".env").exists():
+        for name in ("dev", "prod"):
+            if not Path(f".env_{name}.env").exists():
+                shutil.copy(f"config/env.{name}", f".env_{name}.env")
+
+        logger.warning(
+            "%senv file doesn't exist, generate it with '%s' environnement %s", YELLOW, env, NC
+        )
+        env_vars = generate_base_env()
+        if not Path(f".env_{env}.env").exists():
+            logger.error("%sSpecific env file '.env_%s.env' doesn't exist%s", RED, env, NC)
+            sys.exit(1)
+        save_env_file(apply_env_file(env_vars, f".env_{env}.env"), ".env")
+
+    propagate_env()
+    dotenv.load_dotenv()
 
 
-#############################################################
-# Lernagement BD
-
-password_hash = PasswordHash((BcryptHasher(),))
-
-def __set_lnm_administrator__():
-    admin_passwd = os.environ["LEARNAGEMENT_ADMINISTRATOR_PASSWORD"]
-    hashed_passwd = password_hash.hash(admin_passwd)
-
-    request = f"""INSERT INTO `LNM_administratif`(`id_administratif`, `nom`, `prenom`, `mail`, `login`, `password`, `password_updated`)
-                VALUES(NULL, 'Administrator', 'Administrator', 'administrator@lnm.fr', NULL, '{hashed_passwd}', '0')"""
-
-    container_name = "learnagement_mysql_" + os.environ["INSTANCE_NAME"]
-    db_user = os.environ["MYSQL_USER_LOGIN"]
-    db_password = os.environ["MYSQL_USER_PASSWORD"]
-    db_name = os.environ["MYSQL_DB"]
-
-    cmd = os.environ["DOCKER_COMMAND"].split(" ") + [
-        "exec", "-i", container_name,
-        "mysql", "-u", db_user, f"-p{db_password}", db_name,
-        "-e", request
-    ]
-
-    result = subprocess.run(cmd, capture_output=True, text=True)
-
-    if result.returncode != 0:
-        stderr = result.stderr.strip()
-
-        # Code MySQL 1062 = Duplicate entry -> l'administrateur existe déjà, ce n'est pas une erreur
-        if "1062" in stderr or "Duplicate entry" in stderr:
-            print("L'administrateur existe déjà, aucune action nécessaire.")
-            return None
-
-        raise RuntimeError(result.stderr.strip())
-
-    return result.stdout
+def _switch_env(env: str) -> None:
+    """Applique un environnement à l'instance et oublie le compose qui en dépendait."""
+    _generate_env()
+    logger.info("%sSwitch to env: %s%s", GREEN, env, NC)
+    docker.COMPOSE_FILE.unlink(missing_ok=True)
+    env_file = ".env_prod.env" if env == "prod" else ".env_dev.env"
+    save_env_file(apply_env_file(load_env_file(".env"), env_file), ".env")
+    propagate_env()
 
 
-async def __wait_for_mysql_healthy__(container_name: str, timeout: int = 300, poll_interval: int = 2):
-    """Attend que le conteneur MySQL soit 'healthy' selon son healthcheck Docker."""
-    elapsed = 0
-    while elapsed < timeout:
-        cmd = os.environ["DOCKER_COMMAND"].split(" ") + [
-            "inspect", "--format={{.State.Health.Status}}", container_name
-        ]
-        result = subprocess.run(cmd, capture_output=True, text=True)
-        status = result.stdout.strip()
+def _reset_instance() -> None:
+    dotenv.load_dotenv()
+    project = os.environ["COMPOSE_PROJECT_NAME"]
+    if docker.is_compose_running(project):
+        logger.warning("%sInstance running, it cannot be reset from scratch%s", YELLOW, NC)
+        return
 
-        if status == "healthy":
-            return True
-        elif status == "unhealthy":
-            raise RuntimeError(f"Le conteneur {container_name} est en état 'unhealthy'")
+    logger.warning("%sClean up App from scratch%s", RED, NC)
+    logger.warning("%sThe application must be stopped%s", RED, NC)
+    if input(CONFIRM_RESET) != "YES" or input(CONFIRM_RESET_AGAIN) != "YES":
+        return
 
-        await asyncio.sleep(poll_interval)
-        elapsed += poll_interval
+    volume = f"{project}_learnagement_persistent_db_{os.environ['INSTANCE_NAME']}"
+    try:
+        subprocess.run([*docker.docker_command(), "volume", "rm", volume], check=True)
+    except subprocess.CalledProcessError:
+        logger.exception("Volume %s not removed", volume)
 
-    raise TimeoutError(f"Timeout : {container_name} n'est pas devenu 'healthy' après {timeout}s")
+    shutil.rmtree(db.DATA_DIR, ignore_errors=True)
+    shutil.rmtree(db.INIT_DIR, ignore_errors=True)
+    generated = [docker.COMPOSE_FILE, Path(".env"), Path(".env_dev.env"), Path(".env_prod.env")]
+    containers = containers_system + containers_dev + containers_prod
+    for path in [*generated, *(Path(container) / ".env" for container in containers)]:
+        path.unlink(missing_ok=True)
+    logger.info("%sThe application was reset to its initial state.%s", GREEN, NC)
 
 
-async def __set_lnm_administrator_with_retry__(max_retries: int = 10, retry_delay: int = 3):
-    """Insère l'administrateur, avec retry en cas d'erreur SQL transitoire
-    (ex: table pas encore créée par un script d'init concurrent)."""
-    last_error = None
-
-    for attempt in range(1, max_retries + 1):
-        print("Tentative d'ajout de l'Administrateur")
-        try:
-            result = await asyncio.to_thread(__set_lnm_administrator__)
-            return result
-        except RuntimeError as e:
-            last_error = e
-            error_msg = str(e).lower()
-
-            # Erreurs transitoires connues : table absente, connexion pas encore prête
-            transient_errors = ["doesn't exist", "unknown database", "can't connect", "access denied"]
-            is_transient = any(err in error_msg for err in transient_errors)
-
-            if not is_transient:
-                # Erreur non transitoire (ex: doublon si déjà inséré) -> on arrête direct
-                raise
-
-            if attempt < max_retries:
-                await asyncio.sleep(retry_delay)
-
-    raise RuntimeError(
-        f"Échec de l'insertion de l'administrateur après {max_retries} tentatives. "
-        f"Dernière erreur : {last_error}"
+async def _setup_administrator() -> None:
+    await db.wait_for_mysql_healthy()
+    await db.create_administrator_with_retry()
+    logger.info("%sWeb Apps will run on: %s%s", GREEN, os.environ["INSTANCE_URL"], NC)
+    logger.info(
+        "%sPHPMyAdmin will run on: http://127.0.0.1:%s%s",
+        GREEN,
+        os.environ["PHPMYADMIN_PORT"],
+        NC,
     )
 
 
-# async def __setup_administrator_when_ready__(docker_option):
-#     task = asyncio.create_task(__run_dockers__(docker_option))
-#     await task
-#
-#     container_name = "learnagement_mysql_" + os.environ["INSTANCE_NAME"]
-#     await __wait_for_mysql_healthy__(container_name)
-#
-#     await __set_lnm_administrator_with_retry__()
+async def _run_instance(options: list[str]) -> None:
+    """Lance compose et prépare l'administrateur en parallèle : `up` peut rester au premier plan."""
+    up = asyncio.create_task(asyncio.to_thread(docker.compose_up, options))
+    setup = asyncio.create_task(_setup_administrator())
+    await asyncio.wait({up, setup}, return_when=asyncio.FIRST_EXCEPTION)
+    for task in (up, setup):
+        if task.done() and task.exception() is not None:
+            setup.cancel()
+            raise task.exception()
+    await asyncio.gather(up, setup)
 
 
-def __dbConfiguration__():
-
-    init_db_folder = os.path.join("db", "docker-entrypoint-initdb.d")
-    try:
-        os.makedirs(init_db_folder, exist_ok=False) # if it exists, an exception is thrown
-
-        sql_folder = os.path.join("db", "sql")
-        for filename in os.listdir(sql_folder):
-             source_path = os.path.join(sql_folder, filename)
-             target_path = os.path.join(init_db_folder, filename)
-
-             # Vérifie si l'élément est un fichier (et non un dossier)
-             if os.path.isfile(source_path):
-                 # Copie le fichier
-                 shutil.copy(source_path, target_path)
-
-    except OSError as error:
-        logging.info(f"{GREEN}DB already exist initialized!{NC}")
-
-def __dbData_configuration__():
-
-    ##########
-    # Création du répertoire de données initiales
-    logging.info(f"{GREEN}Configure the initial data folder{NC}")
-
-    # Création du répertoire de données initiales s'il n'existe pas
-    data_folder = os.path.join("db", "data")
-    try:
-        os.makedirs(data_folder, exist_ok=False) # if it exists, an exception is thrown
-        # Dossiers source et cible
-        #free_data_folder = "db/freeData"
-
-        # Vérifie si le dossier cible existe, sinon le crée
-        #os.makedirs(data_folder, exist_ok=True)
-
-        print("If you want an initial data set, put it into 'db/data' folder with name matches with [0-9]*.sql.")
-        print("Free data samples are available at 'db/freeData' folder.")
-        input("Then press enter")
-        # if "y" == input("Do you want to start with free data (y/n)? "):
-        #     # Parcourt tous les fichiers dans le dossier source
-        #     for filename in os.listdir(free_data_folder):
-        #         source_path = os.path.join(free_data_folder, filename)
-        #         target_path = os.path.join(data_folder, filename)
-        #
-        #         # Vérifie si l'élément est un fichier (et non un dossier)
-        #         if os.path.isfile(source_path):
-        #             # Copie le fichier
-        #             shutil.copy(source_path, target_path)
-        #             print(f"Copied: {source_path} -> {target_path}")
-
-    except OSError as error:
-        logging.info(f"{GREEN}Data already exist in 'db/data'!{NC}")
-
-    # # Chemin vers le fichier db/data/README
-    # readme_path = os.path.join(data_folder, "README")
-    # # Texte à ajouter
-    # text_to_append = "This folder contains data inserted into DB when the system is launch at the first time.  If it doesn't exist it will contans free data"
-    # # Ouvrir le fichier en mode ajout et écrire le texte
-    # with open(readme_path, "a") as file:
-    #     file.write(text_to_append)
-    #     file.write("\n")  # Ajoute une nouvelle ligne, comme `echo` le ferait
-
-    os.chdir("db")
-    subprocess.run([sys.executable, "insertPrivateData.py"], check=True)
-    os.chdir("..")
-
-
-
-#############################################################
-# Lernagement Dockers
-
-def __docker_configuration__():
-
-    ##########
-    # Docker configuration
-    logging.info(f"{GREEN}Docker configuration{NC}")
-
-    os.chdir("docker")
-
-    if not os.path.exists("docker-compose.yml"):
-        shutil.copy("docker-compose.yml.skeleton", "docker-compose.yml")
-        __searchReplaceInFile__("docker-compose.yml", "${INSTANCE_PROTOCOL}", os.environ["INSTANCE_PROTOCOL"])
-        __searchReplaceInFile__("docker-compose.yml", "${INSTANCE_NAME}", os.environ["INSTANCE_NAME"])
-        __searchReplaceInFile__("docker-compose.yml", "${ENV}", str(os.environ["ENV"]))
-        __searchReplaceInFile__("docker-compose.yml", "${PHPMYADMIN_PORT}", str(os.environ["PHPMYADMIN_PORT"]))
-        __searchReplaceInFile__("docker-compose.yml", "${PHPMYADMIN_DOCKER_PORT}", str(os.environ["PHPMYADMIN_DOCKER_PORT"]))
-        __searchReplaceInFile__("docker-compose.yml", "${BACKEND_PYTHON_PORT}", str(os.environ["BACKEND_PYTHON_PORT"]))
-        __searchReplaceInFile__("docker-compose.yml", "${BACKEND_PYTHON_DOCKER_PORT}", str(os.environ["BACKEND_PYTHON_DOCKER_PORT"]))
-        __searchReplaceInFile__("docker-compose.yml", "${FRONT_PHP_PORT}", str(os.environ["FRONT_PHP_PORT"]))
-        __searchReplaceInFile__("docker-compose.yml", "${FRONT_PHP_DOCKER_PORT}", str(os.environ["FRONT_PHP_DOCKER_PORT"]))
-        __searchReplaceInFile__("docker-compose.yml", "${FRONT_DASH_PORT}", str(os.environ["FRONT_DASH_PORT"]))
-        __searchReplaceInFile__("docker-compose.yml", "${FRONT_DASH_DOCKER_PORT}", str(os.environ["FRONT_DASH_DOCKER_PORT"]))
-        __searchReplaceInFile__("docker-compose.yml", "${FRONT_NEXTAUTH_PORT}", str(os.environ["FRONT_NEXTAUTH_PORT"]))
-        __searchReplaceInFile__("docker-compose.yml", "${FRONT_NEXTAUTH_DOCKER_PORT}", str(os.environ["FRONT_NEXTAUTH_DOCKER_PORT"]))
-        __searchReplaceInFile__("docker-compose.yml", "${SSL_INTERNAL_DIR}", str(os.environ["SSL_INTERNAL_DIR"]))
-        __searchReplaceInFile__("docker-compose.yml", "${SSL_EXTERNAL_DIR}", str(os.environ["SSL_EXTERNAL_DIR"]))
-        __searchReplaceInFile__("docker-compose.yml", "${DOCKER_SSL_INTERNAL_DIR}", str(os.environ["DOCKER_SSL_INTERNAL_DIR"]))
-        __searchReplaceInFile__("docker-compose.yml", "${DOCKER_SSL_EXTERNAL_DIR}", str(os.environ["DOCKER_SSL_EXTERNAL_DIR"]))
-    elif(os.path.getmtime("docker-compose.yml.skeleton") > os.path.getmtime("docker-compose.yml")):
-        logging.warning(f"{YELLOW}docker-compose.yml.skeleton has been updated, your docker-compose.yml can be deprecated{NC}")
-
-    os.chdir("..")
-
-
-
-async def __run_dockers__(docker_option):
-
-    ##########
-    # Run Docker
-    logging.info(f"{GREEN}Run Docker{NC}")
-
-    os.chdir("docker")
-
-    if os.name == 'nt':
-        #prog = subprocess.Popen(['runas', '/noprofile', '/user:Administrator', 'docker-compose up'],stdin=subprocess.PIPE)
-        #prog.stdin.write(b'password')
-        prog = subprocess.Popen(['docker', 'compose', 'up'] + docker_option)
-        prog.communicate()
-    else:
-        subprocess.run(os.environ["DOCKER_COMPOSE_COMMAND"].split(" ") + ["up"] + docker_option, check=True)
-
-    # Pause pour laisser Docker démarrer
-    # time.sleep(5)
-    #
-    # if os.name == 'nt':
-    #     #prog = subprocess.Popen(['runas', '/noprofile', '/user:Administrator', 'docker-compose ps'],stdin=subprocess.PIPE)
-    #     #prog.stdin.write(b'password')
-    #     prog = subprocess.Popen(['docker', 'compose', 'ps'])
-    #     #prog.stdin.write(b'password')
-    #     prog.communicate()
-    # else:
-    #     subprocess.run(os.environ["DOCKER_COMPOSE_COMMAND"].split(" ") + ["ps"], check=True)
-
-    os.chdir("..")
-    return "done"
-
-
-def __is_compose_running(project_name: str, docker_compose_command: str = "docker compose") -> bool:
-    """
-    Vérifie si un docker compose est en cours d'exécution.
-
-    Args:
-        project_name: Nom du projet docker compose (COMPOSE_PROJECT_NAME)
-        docker_compose_command: Commande docker compose à utiliser
-
-    Returns:
-        True si au moins un container du projet est en cours d'exécution
-    """
-    try:
-        result = subprocess.run(
-            [*docker_compose_command.split(), "ls", "--filter", f"name={project_name}", "--format", "json"],
-            capture_output=True,
-            text=True,
-            check=True
-        )
-
-        import json
-        projects = json.loads(result.stdout)
-
-        return any(
-            p["Name"] == project_name and p["Status"].startswith("running")
-            for p in projects
-        )
-
-    except subprocess.CalledProcessError:
-        return False
-
-def __validate_env__(ctx, param, value):
-    if not value in envs:
-        logging.error(f"{RED}env must be :" + ", ".join(envs) + "{NC}")
-        raise click.BadParameter("env must be :" + ", ".join(envs))
-    return value
-
-
-#############################################################
-# Lernagement command options
-
-def __generate_env__(env="dev"):
-    if not os.path.exists(".env"):
-
-        if not os.path.exists(".env_dev.env"):
-            shutil.copy("config/env.dev", ".env_dev.env")
-        if not os.path.exists(".env_prod.env"):
-            shutil.copy("config/env.prod", ".env_prod.env")
-
-        logging.warning(f"{YELLOW}env file doesn't exist, generate it with '{env}' environnement {NC}")
-
-        env_vars = __generate_base_env()
-
-        #env_vars = __set_env(env_vars, "env_default.env")
-
-        # if(env == "dev"):
-        #     env_vars = __set_env(env_vars, "env_dev.env")
-        # elif(env == "prod"):
-        #     env_vars = __set_env(env_vars, "env_prod.env")
-
-        if not os.path.exists(f".env_{env}.env"):
-            logging.error(f"{RED}Specific env file '.env_{env}.env' doesn't exist{NC}")
-            exit()
-        env_vars = __set_env(env_vars, f".env_{env}.env")
-
-        save_env_file(env_vars, ".env")
-
-    propagate_env()
+def _start(options: list[str]) -> None:
     dotenv.load_dotenv()
-
-def __from_env__(env=None):
-    __generate_env__()
-    if env:
-
-        logging.info(f"{GREEN}Switch to env: {env}{NC}")
-
-        # remove configuration files that depends on .env
-        try:
-            os.remove(os.path.join("docker", "docker-compose.yml"))
-        except FileNotFoundError as e:
-            logging.exception(e)
-
-        env_vars = __load_env_file(".env")
-        if env == "prod":
-            env_vars = __set_env(env_vars, ".env_prod.env")
-
-        else:
-            env_vars = __set_env(env_vars, ".env_dev.env")
-
-        save_env_file(env_vars, ".env")
-
-    # Update .env for each sub-app
-    propagate_env()
-
-def __from_scratch__():
-    dotenv.load_dotenv()
-
-    if __is_compose_running(os.environ["COMPOSE_PROJECT_NAME"], os.environ["DOCKER_COMPOSE_COMMAND"]):
-        logging.warning(f"{YELLOW}Instance running, it cannot be reset from scratch{NC}")
+    project = os.environ.get("COMPOSE_PROJECT_NAME")
+    if project and docker.is_compose_running(project):
+        logger.warning("%sInstance already running%s", YELLOW, NC)
         return
 
-    ##########
-    # Clean up App from scratch
-    logging.warning(f"{RED}Clean up App from scratch{NC}")
-    logging.warning(f"{RED}The application must be stopped{NC}")
-
-    # ToDo Check if app runs
-
-    if "YES" == input(
-            "Are you sure (YES/NO)? NO INITIAL DATA OR CUSTOMIZED CONFIGURATION CAN BE RECOVERED! ") and "YES" == input(
-            "Are you realy sure(YES/NO)? don't cry if you've lost anything! "):
-        try:
-            if os.name == 'nt':
-                prog = subprocess.Popen(os.environ["DOCKER_COMMAND"].split(" ") + ['volume', 'rm', os.environ[
-                    "COMPOSE_PROJECT_NAME"] + '_learnagement_persistent_db_' + os.environ["INSTANCE_NAME"]])
-                prog.communicate()
-            else:
-                subprocess.run(os.environ["DOCKER_COMMAND"].split(" ") + ["volume", "rm", os.environ[
-                    "COMPOSE_PROJECT_NAME"] + "_learnagement_persistent_db_" + os.environ["INSTANCE_NAME"]], check=True)
-        except subprocess.CalledProcessError as e:
-            logging.exception(e.output)
-
-        try:
-            shutil.rmtree(os.path.join("db", "data"), ignore_errors=True)
-            shutil.rmtree(os.path.join("db", "docker-entrypoint-initdb.d"), ignore_errors=True)
-            os.remove(os.path.join("docker", "docker-compose.yml"))
-        except FileNotFoundError as e:
-            logging.exception(e)
-        try:
-            os.remove(".env")
-            os.remove(".env_dev.env")
-            os.remove(".env_prod.env")
-        except FileNotFoundError as e:
-            logging.exception(e)
-
-        for container in containers_system + containers_dev + containers_prod:
-            try:
-                target_path = os.path.join(container, ".env")
-                os.remove(target_path)
-            except FileNotFoundError as e:
-                logging.exception(e)
-
-        logging.info(f"{GREEN}The application was reset to its initial state.{NC}")
+    _generate_env()
+    db.prepare_init_files()
+    db.prepare_initial_data()
+    docker.write_compose_file()
+    _security_check()
+    asyncio.run(_run_instance(options))
 
 
-async def __start__(docker_option=None):
-    dotenv.load_dotenv()
+@click.group(cls=DefaultGroup, default="start", default_if_no_args=True)
+def cli() -> None:
+    pass
 
-    # Check if instance is not already running
-    if "COMPOSE_PROJECT_NAME" in os.environ.keys() and __is_compose_running(os.environ["COMPOSE_PROJECT_NAME"],
-                                                                            os.environ["DOCKER_COMPOSE_COMMAND"]):
-        logging.warning(f"{YELLOW}Instance already running{NC}")
-        return
 
-    if not docker_option:
-        docker_option = []
-    # __mainConfiguration__()
-    __generate_env__()
-
-    dotenv.load_dotenv()
-
-    __dbConfiguration__()
-    __dbData_configuration__()
-
-    __docker_configuration__()
-    __security_check()
-    task = asyncio.create_task(__run_dockers__(docker_option))
-
-    await task
-
-    container_name = "learnagement_mysql_" + os.environ["INSTANCE_NAME"]
-    await __wait_for_mysql_healthy__(container_name)
-
-    await __set_lnm_administrator_with_retry__()
-
-    logging.info(f"{GREEN}Web Apps will run on: {os.environ['INSTANCE_URL']}{NC}")
-    logging.info(f"{GREEN}PHPMyAdmin will run on: http://127.0.0.1:{os.environ['PHPMYADMIN_PORT']}{NC}")
-
-    await task
-
-def __stop__():
-    dotenv.load_dotenv()
-    ##########
-    # Stop App
-    logging.info(f"{GREEN}Stop App{NC}")
-
-    os.chdir("docker")
-
-    if os.name == 'nt':
-        # prog = subprocess.Popen(['runas', '/noprofile', '/user:Administrator', 'docker-compose up'],stdin=subprocess.PIPE)
-        # prog.stdin.write(b'password')
-        prog = subprocess.Popen(os.environ["DOCKER_COMPOSE_COMMAND"].split(" ") + ['down'])
-        prog.communicate()
-    else:
-        subprocess.run(os.environ["DOCKER_COMPOSE_COMMAND"].split(" ") + ["down"], check=True)
-
-    os.chdir("..")
-
-    logging.info(f"{GREEN}App stopped{NC}")
-
-############################################
-# Lernagement commands
-
-@click.group(cls=DefaultGroup, default='start', default_if_no_args=True)
-def cli(): pass
-
-# Generate default .env for dev environment
 @cli.command(help="Generate environment without starting the application")
-@click.option("--env", type=click.Choice(envs), default="dev", help="Environment to use: " + ", ".join(envs))
-def generate_env(env="dev"):
-    __generate_env__(env)
+@click.option("--env", type=ENV_CHOICES, default="dev", help=ENV_HELP)
+def generate_env(env: str) -> None:
+    _generate_env(env)
 
 
 @cli.command(help="Start the application")
@@ -521,195 +189,112 @@ def generate_env(env="dev"):
 @click.option("--restart", is_flag=True, help="Restart the application")
 @click.option("--rebuild", is_flag=True, help="Rebuild Docker images")
 @click.option("--test", is_flag=True, help="Test options without starting the application")
-@click.option("--from_scratch", is_flag=True, help="Reset the application to its initial state (IRREVERSIBLE)")
-@click.option("--env", type=click.Choice(envs), default=None, help="Environment to use, (use previously used if not set)")
-def start(docker_option=None, restart:bool=False, rebuild:bool=False, test:bool=False, from_scratch:bool=False, env=None):
-
-    logging.info(f"{GREEN}Starting application with: {locals()} {NC}")
-
-    if not docker_option:
-        docker_option = []
+@click.option(
+    "--from_scratch", is_flag=True, help="Reset the application to its initial state (IRREVERSIBLE)"
+)
+@click.option(
+    "--env",
+    type=ENV_CHOICES,
+    default=None,
+    help="Environment to use, (use previously used if not set)",
+)
+def start(
+    docker_option: str | None,
+    restart: bool,
+    rebuild: bool,
+    test: bool,
+    from_scratch: bool,
+    env: str | None,
+) -> None:
+    options = docker.parse_docker_options(docker_option)
     if restart:
         if test:
-            logging.warning(f"{YELLOW}You cannot test restart.{NC}")
+            logger.warning("%sYou cannot test restart.%s", YELLOW, NC)
             return
-        #ToDo check restart with switch env
-        logging.warning(f"{YELLOW}Restart sometimes unstable.{NC}")
-        __stop__()
-
+        logger.warning("%sRestart sometimes unstable.%s", YELLOW, NC)
+        dotenv.load_dotenv()
+        docker.compose_down()
 
     if from_scratch:
-        __from_scratch__()
+        _reset_instance()
 
     if env:
-        __from_env__(env)
+        _switch_env(env)
         rebuild = True
 
-    if rebuild and not test:
-        asyncio.run(__start__(docker_option=["--build"] + docker_option))
+    if test:
         return
-    if not test:
-        asyncio.run(__start__(docker_option))
+    _start(["--build", *options] if rebuild else options)
 
 
-def __filecmp__(file1, file2):
-    """Compare deux fichiers pour vérifier s'ils sont identiques."""
-    with open(file1, "r") as f1, open(file2, "r") as f2:
-        return f1.read() == f2.read()
-
-def __searchReplaceInFile__(fileName, patern, value):
-    # Read in the file
-    with open(fileName, 'r') as file:
-        filedata = file.read()
-
-    # Replace the target string
-    filedata = filedata.replace(patern, value)
-
-    # Write the file out again
-    with open(fileName, 'w') as file:
-        file.write(filedata)
-
-@cli.command(help="Backup the database (structure, data and triggers)")
-@click.option("--backup_folder", default="db/backup")
-def backupDB(backup_folder="db/backup"):
-
-    """
-SELECT table_name FROM information_schema.tables WHERE TABLE_SCHEMA = "learnagement" AND TABLE_TYPE = "BASE TABLE"
-    """
+@cli.command(name="backupdb", help="Backup the database (structure, data and triggers)")
+@click.option("--backup_folder", default="db/backup", type=click.Path(path_type=Path))
+def backup_db(backup_folder: Path) -> None:
     dotenv.load_dotenv()
+    db.backup(backup_folder)
 
-    ##########
-    # Backup DB
-    logging.info(f"{GREEN}BackUp DB{NC}")
 
-    now = datetime.datetime.now().strftime('%Y%m%d%H%M%S%f')
-
-    if os.name == 'nt':
-        logging.warning(f"{YELLOW}Not yet implemented for Windows.{NC}")
-    else:
-        # Création du répertoire de données initiales s'il n'existe pas
-        #backup_folder = "db/backup"
-        try:
-            os.makedirs(backup_folder, exist_ok=False)  # if it exists, an exception is thrown
-        except OSError as error:
-            pass
-
-        # display MySQL server version
-        cmd = os.environ["DOCKER_COMMAND"].split(" ") + ["exec", "-it", "learnagement_mysql_" + os.environ["INSTANCE_NAME"], "mysqld", "--version"]
-        os.system(" ".join(cmd))
-
-        # get Learnagement db schemas
-        structureFile = os.path.join(backup_folder,"0_struct_" + now + ".sql")
-        cmd = os.environ["DOCKER_COMMAND"].split(" ") + ["exec", "-it", "learnagement_mysql_"+os.environ["INSTANCE_NAME"], "mysqldump", "-u", os.environ["MYSQL_USER_LOGIN"], "-p" + os.environ["MYSQL_USER_PASSWORD"], "--no-data", "--ignore-views", "--skip-triggers", "--skip-comments", "--skip-extended-insert", "--no-tablespaces", "learnagement", ">", structureFile]
-        #print(" ".join(cmd))
-        #print("Enter MySQL password:")
-        os.system(" ".join(cmd))
-
-        # get Learnagement DB data
-        dataFile = os.path.join(backup_folder,"5_data_" + now + ".sql")
-        cmd = os.environ["DOCKER_COMMAND"].split(" ") + ["exec", "-it", "learnagement_mysql_"+os.environ["INSTANCE_NAME"], "mysqldump", "-u", os.environ["MYSQL_USER_LOGIN"], "-p" + os.environ["MYSQL_USER_PASSWORD"], "--no-create-info", "--ignore-views", "--skip-triggers", "--skip-comments", "--skip-extended-insert", "--no-tablespaces", "learnagement", ">", dataFile]
-        #print(" ".join(cmd))
-        #print("Enter MySQL password:")
-        os.system(" ".join(cmd))
-
-        # get Learnagement db triggers
-        triggerFile = os.path.join(backup_folder,"99_trigger_" + now + ".sql")
-        cmd = os.environ["DOCKER_COMMAND"].split(" ") + ["exec", "-it", "learnagement_mysql_"+os.environ["INSTANCE_NAME"], "mysqldump", "-u", os.environ["MYSQL_USER_LOGIN"], "-p" + os.environ["MYSQL_USER_PASSWORD"], "--no-create-info", "--ignore-views", "--no-data", "--skip-comments", "--skip-extended-insert", "--no-tablespaces", "learnagement", ">", triggerFile]
-        #print(" ".join(cmd))
-        #print("Enter MySQL password:")
-        os.system(" ".join(cmd))
-
-        # Bidouille
-        with open(structureFile, 'r') as fin:
-            data = fin.read().splitlines(True)
-        with open(structureFile, 'w') as fout:
-            fout.writelines(data[1:])
-
-        with open(dataFile, 'r') as fin:
-            data = fin.read().splitlines(True)
-        with open(dataFile, 'w') as fout:
-            fout.writelines(data[1:])
-
-        with open(triggerFile, 'r') as fin:
-            data = fin.read().splitlines(True)
-        with open(triggerFile, 'w') as fout:
-            fout.writelines(data[1:])
-
-@cli.command(help="Export the current instance as a zip archive")
-def exportInstance():
+@cli.command(name="exportinstance", help="Export the current instance as a zip archive")
+def export_instance() -> None:
     dotenv.load_dotenv()
-    now = datetime.datetime.now().strftime('%Y%m%d%H%M%S%f')
-    export_dir_path = 'Learnagement_'+ os.environ["INSTANCE_NAME"] + '_' + now
-
+    stamp = datetime.now(UTC).strftime("%Y%m%d%H%M%S%f")
+    export_dir = Path(f"Learnagement_{os.environ['INSTANCE_NAME']}_{stamp}")
+    export_dir.mkdir()
     try:
-        # Build export directory
-        os.mkdir(export_dir_path)
-        # Export BD (backup struct, data and triggers) and move them into export directory
-        export_dir_path_sql = os.path.join(export_dir_path, "sql")
-        os.mkdir(export_dir_path_sql)
-        backupDB(export_dir_path_sql)
-        # Copi .env into export directory
-        shutil.copy(os.path.join("docker", "docker-compose.yml"), export_dir_path)
-        # Copy docker-compose into export directory
-        shutil.copy(".env", os.path.join(export_dir_path, "env"))
-        # Build archive from export directory
-        archive_name = export_dir_path
-        shutil.make_archive(archive_name, 'zip', '.', export_dir_path)
-        # Remove export directory
-        shutil.rmtree(export_dir_path)
-    except OSError as error:
-        logging.exception(error)
+        db.backup(export_dir / "sql")
+        shutil.copy(docker.COMPOSE_FILE, export_dir)
+        shutil.copy(".env", export_dir / "env")
+        shutil.make_archive(str(export_dir), "zip", ".", str(export_dir))
+    finally:
+        shutil.rmtree(export_dir)
+
 
 @cli.command(help="Import an instance from a zip archive")
-@click.option("--file", required=True)
-def import_instance(instanceArchive):
-
+@click.option("--file", "archive", required=True, type=click.Path(exists=True, path_type=Path))
+def import_instance(archive: Path) -> None:
     dotenv.load_dotenv()
-
-    # Check if instance is not already running
-    if __is_compose_running(os.environ["COMPOSE_PROJECT_NAME"], os.environ["DOCKER_COMPOSE_COMMAND"]):
-        logging.warning(f"{YELLOW}Instance running, you cannot import new instance{NC}")
+    project = os.environ.get("COMPOSE_PROJECT_NAME")
+    if project and docker.is_compose_running(project):
+        logger.warning("%sInstance running, you cannot import new instance%s", YELLOW, NC)
         return
 
-    # ToDo
-    # If no instance running
-    import_dir_path = Path(instanceArchive).stem
-    # Unarchive instance archive
-    shutil.unpack_archive(instanceArchive)
-    # Move .env from import directory to .
-    shutil.copy(os.path.join(import_dir_path, "env"), ".env")
+    import_dir = Path(archive.stem)
+    shutil.unpack_archive(archive)
+    shutil.copy(import_dir / "env", ".env")
     propagate_env()
-    # Copy docker-compose to docker directory
-    shutil.copy(os.path.join(import_dir_path, "docker-compose.yml"), "docker")
-    # Move BD files into the appropriate directories
-    os.mkdir(os.path.join("db","data")) # So that Learnagement does not ask for free data
-    sql_instance_path = os.path.join("db", "sql")
-    files = glob.glob(os.path.join(sql_instance_path,'*'))
-    for f in files:
-        os.remove(f)
-    shutil.copytree(os.path.join(import_dir_path, "sql"), sql_instance_path, dirs_exist_ok=True)
-    # Remove import directory
-    shutil.rmtree(import_dir_path)
-    # Run instance
-    # ToDo
+    shutil.copy(import_dir / "docker-compose.yml", docker.DOCKER_DIR)
+    db.DATA_DIR.mkdir(exist_ok=True)  # So that Learnagement does not ask for free data
+    for sql_file in db.SQL_DIR.iterdir():
+        sql_file.unlink()
+    shutil.copytree(import_dir / "sql", db.SQL_DIR, dirs_exist_ok=True)
+    shutil.rmtree(import_dir)
+
 
 @cli.command(help="Stop application")
-def stop():
-    __stop__()
+def stop() -> None:
+    dotenv.load_dotenv()
+    docker.compose_down()
+
 
 @cli.command()
-def gui():
+def gui() -> None:
     """Lance l'interface graphique click-gui-runner pour explorer cette application."""
-    from click_gui_runner.__main__ import main
-    path = os.path.abspath("Learnagement.py")
-    main(caller=path)
+    try:
+        from click_gui_runner.__main__ import main as gui_main
+    except ImportError as error:
+        raise click.ClickException(
+            "click-gui-runner n'est pas installé : il n'est pas publié sur PyPI."
+        ) from error
+    gui_main(caller=str(Path("Learnagement.py").resolve()))
 
-import signal
 
-def handle_signal(signum, _frame):
-    stop()
+def handle_signal(_signum: int, _frame: FrameType | None) -> None:
+    dotenv.load_dotenv()
+    docker.compose_down()
+    sys.exit(0)
 
-def main():
+
+def main() -> None:
     signal.signal(signal.SIGTERM, handle_signal)
     signal.signal(signal.SIGINT, handle_signal)
     cli()

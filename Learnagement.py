@@ -1,4 +1,4 @@
-"""Point d'entrée du lanceur : `python Learnagement.py <commande>` ; le code est dans `launcher/`."""
+"""Point d'entrée du lanceur : `python Learnagement.py <commande>`, codé dans `launcher/`."""
 
 from launcher.cli import main
 

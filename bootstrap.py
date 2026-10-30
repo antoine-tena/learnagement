@@ -10,6 +10,7 @@ Ce script :
 Usage:
     python bootstrap.py [args...]
 """
+
 import shutil
 import subprocess
 import sys
