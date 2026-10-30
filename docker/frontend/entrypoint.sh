@@ -1,5 +1,5 @@
 #!/bin/sh
 
-npm install
+pnpm install --frozen-lockfile
 
-npm run dev
+pnpm dev
