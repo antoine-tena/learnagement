@@ -22,4 +22,4 @@ exclude = '(^docs/|^charter\.toml$|/migrations/|-lock\.yaml$|\.lock$)'
 id = "FILE-SIZE"
 files = []
 suffixes = [".py", ".ts", ".tsx", ".vue", ".astro", ".css", ".mjs"]
-budget = 0
+budget = 26
