@@ -81,7 +81,7 @@ services:
     "backend_python": f"""
     backend_python_${INSTANCE_NAME}:
         container_name: learnagement_backend_python_${INSTANCE_NAME}
-        build: ./backend_python/
+        build: ./backend/
         restart: no
         networks:
             - learnagement_back_${INSTANCE_NAME}
@@ -92,7 +92,7 @@ services:
             - INSTANCE_NAME=${INSTANCE_NAME}
             - ENV=${ENV}
         volumes:
-            - ../backend_python/:/app/
+            - ../backend/:/app/
             - ../${SSL_INTERNAL_DIR}:${DOCKER_SSL_INTERNAL_DIR}:ro
         depends_on:
             mysql_${INSTANCE_NAME}:
@@ -107,7 +107,7 @@ services:
     "front_php": f"""
     front_php_${INSTANCE_NAME}:
         container_name: learnagement_php_${INSTANCE_NAME}
-        build: ./front_PHP/
+        build: ./web/
         restart: always
         networks:
               - learnagement_front_${INSTANCE_NAME}
@@ -117,9 +117,9 @@ services:
             - INSTANCE_NAME=${INSTANCE_NAME}
             - ENV=${ENV}
         volumes:
-            - ../front_PHP:/var/www/html
+            - ../web:/var/www/html
             - ./log/php:/var/log/apache2
-            - ./front_PHP/lnm-php.ini:/usr/local/etc/php/conf.d/lnm-php.ini
+            - ./web/lnm-php.ini:/usr/local/etc/php/conf.d/lnm-php.ini
             - ../${SSL_INTERNAL_DIR}:${DOCKER_SSL_INTERNAL_DIR}:ro
             - ../${SSL_EXTERNAL_DIR}:${DOCKER_SSL_EXTERNAL_DIR}:ro
         depends_on:
@@ -129,7 +129,7 @@ services:
     "front_nextjs": f"""
     front_nextjs_${INSTANCE_NAME}:
         container_name: learnagement_nextjs_${INSTANCE_NAME}
-        build: ./front_NextJS
+        build: ./frontend
         restart: always
         networks:
               - learnagement_front_${INSTANCE_NAME}
@@ -139,8 +139,8 @@ services:
             - INSTANCE_NAME=${INSTANCE_NAME}
             - ENV=${ENV}
         volumes:
-            - ../front_NextJS:/app
-            - ../front_NextJS/node_modules:/app/node_modules
+            - ../frontend:/app
+            - ../frontend/node_modules:/app/node_modules
             - ../${SSL_INTERNAL_DIR}:${DOCKER_SSL_INTERNAL_DIR}:ro
             - ../${SSL_EXTERNAL_DIR}:${DOCKER_SSL_EXTERNAL_DIR}:ro
         depends_on:
@@ -150,7 +150,7 @@ services:
     "front_dashplotly": f"""
     front_dashplotly_${INSTANCE_NAME}:
         container_name: learnagement_python_web_server_${INSTANCE_NAME}
-        build: ./front_DashPlotly/
+        build: ./dashboards/
         restart: always
         networks:
               - learnagement_front_${INSTANCE_NAME}
@@ -160,8 +160,8 @@ services:
             - INSTANCE_NAME=${INSTANCE_NAME}
             - ENV=${ENV}
         volumes:
-            - ../front_DashPlotly/:/app/
-            - ../front_DashPlotly/data/:/data/
+            - ../dashboards/:/app/
+            - ../dashboards/data/:/data/
             - ../${SSL_INTERNAL_DIR}:${DOCKER_SSL_INTERNAL_DIR}:ro
             - ../${SSL_EXTERNAL_DIR}:${DOCKER_SSL_EXTERNAL_DIR}:ro
         depends_on:
@@ -182,7 +182,7 @@ networks:
     learnagement_back_${INSTANCE_NAME}:
         name: learnagement_back_${INSTANCE_NAME}
         driver: bridge
-    
+
     """,
     }
     os.chdir("docker")

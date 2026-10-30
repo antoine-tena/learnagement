@@ -31,7 +31,9 @@ matching files.
 
 ## Size and structure
 
-- **[FILE-SIZE]** 300 lines at most per file (ratchet).
+- **[FILE-SIZE]** 300 lines at most per file (ratchet). A React component that grows becomes a
+  directory (an entry point and sub-components). A Python module that grows becomes a package whose `__init__.py`
+  re-exports the public API.
   Exempt: generated files, those `.gitattributes` marks `linguist-generated`, its only list.
 - **[FUNCTION-SIZE]** One function, one responsibility, 30 lines at most (outside component
   templates and docstrings); a test may reach 40 when splitting it would hide the scenario.
@@ -45,19 +47,19 @@ matching files.
   `station_coordinates`). Only exception: a parameter imposed by a framework's signature.
 - **[VOCABULARY]** The code speaks English, in the words of its domain; texts users read follow
   the project's language. Page addresses are public URLs and need not follow the code.
-- **[BOOLEANS]** A boolean is prefixed: `is_`, `has_`, `should_`, `can_` in Python (`is_active`).
-- **[CASE]** Classes in PascalCase; constants in `UPPER_SNAKE_CASE`;
+- **[BOOLEANS]** A boolean is prefixed: `is`, `has`, `should`, `can` in TypeScript (`isLoading`); `is_`, `has_`, `should_`, `can_` in Python (`is_active`). Fields already published by the API stay as they are ([FROZEN-CONTRACT]).
+- **[CASE]** Classes in PascalCase; constants in `UPPER_SNAKE_CASE`; Python functions and variables in snake_case; components in PascalCase prefixed by their domain (`ChartLegend`, `MapTooltip`);
   files follow their language's convention.
 
 ## Values
 
 - **[NO-MAGIC-VALUES]** No business literal in the code (status, role, threshold, delay, price,
-  colour, repeated column name): `enum.StrEnum` or a named constant at the top of the module in Python.
+  colour, repeated column name): constants in `lib/constants.ts` or TypeScript enums for the front; `enum.StrEnum` or a named constant at the top of the module in Python.
   Not magic: `0`, `1`, `-1`, `""`, `None`, indexes and literals in tests.
 - **[MONEY]** Every amount is an integer in minor units (`*_cents`), in the database, the API and
   the front; never a float for money, converted only for display.
 - **[TIME-ZONE]** Store instants in UTC. Every calendar notion (today, a day, a month, the bounds
-  of a period) is computed in `Europe/Paris`, never with `.date()` on a UTC instant.
+  of a period) is computed in `Europe/Paris` (`ZoneInfo("Europe/Paris")`), never with `.date()` on a UTC instant.
 
 ## Personal data and secrets
 
@@ -65,7 +67,7 @@ matching files.
   messages, URLs, cache keys or figures: log the identifier (`user_id`), not the person. Any new personal data stored is covered, in the same change, by the data
   export and the anonymisation the law of the users asks for (GDPR in Europe).
 - **[SECRETS]** No secret in the code nor in the repository: everything goes through the
-  environment ().
+  environment (`pydantic-settings` for the backend, server variables for the front (never `NEXT_PUBLIC_` for a secret)).
   A secret committed by mistake is compromised: it gets changed.
 
 ## Errors, inputs and comments
@@ -84,7 +86,7 @@ matching files.
 - **[UV-PODMAN]** Python goes through uv (`uv add`, `uv run`, `uv tool install`): never pip, pipx
   nor `requirements.txt`. Containers go through podman (`Containerfile`, `compose.yaml`,
   `podman-compose`): never docker, `Dockerfile` nor `docker-compose.yml` (checked).
-- **[LOCKED-DEPENDENCIES]** Every dependency is resolved by a committed lockfile; CI installs it frozen and
+- **[LOCKED-DEPENDENCIES]** Every dependency is resolved by a committed lockfile (`uv.lock`, `pnpm-lock.yaml`); CI installs it frozen and
   fails when it drifts.
 - **[NEW-DEPENDENCY]** A new dependency is justified in its commit: maintained (a release less
   than a year old), compatible licence, no equivalent already there, no name close to a known
@@ -101,5 +103,5 @@ matching files.
   rule badly written, to be rephrased where it lives (`/kiln:report` for kiln's rules).
 - **[AI-CONFIDENTIALITY]** No secret and no real personal data is pasted into a conversation with
   an agent; work on test or public data.
-- **[AI-FEATURES]** A feature that calls a language model goes through a queue, caps its cost per call, logs the model and the tokens used,
+- **[AI-FEATURES]** A feature that calls a language model goes through a queue ([OUT-OF-REQUEST]), caps its cost per call, logs the model and the tokens used,
   and never lets generated text trigger an action without validation (prompt injection).

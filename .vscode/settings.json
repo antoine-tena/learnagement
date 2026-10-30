@@ -9,6 +9,9 @@
   },
   "git.detectWorktrees": true,
   "scm.alwaysShowRepositories": true,
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff"
+  },
   "[markdown]": {
     "files.trimTrailingWhitespace": false
   }

@@ -14,26 +14,29 @@ guess about this project, and keep it under 200 lines: every session reads it. -
 À lire avant d'ouvrir des fichiers ; à mettre à jour dans le commit qui ajoute, déplace ou
 supprime un dossier, un domaine ou un point d'entrée.
 
-- `Learnagement.py` : le lanceur (click) : `start`, `stop`, `generate-env`, `backupdb`,
-  `exportinstance`… ; il s'appuie sur `env.py` (génération et propagation des `.env`),
-  `config.py` (conteneurs, environnements), `tools.py`, `bootstrap.py`, `docker-compose.py` et
-  `Learnagement_Security.py` (certificats).
-- `docker/` : un dossier par conteneur (Dockerfile, entrypoint) et
-  `docker-compose.yml.skeleton`, d'où le lanceur produit `docker/docker-compose.yml` (ignoré).
-- `backend_python/` : l'API FastAPI (`app.py`) ; `api/` (routes, `dependencies.py`), `auth/`
-  (LNM et CAS), `access_control/` (règles, prédicats, responsabilités), `user/` (requêtes
-  métier par domaine : `LNM_university.py`, `MAQUETTE_module.py`…), `models/`, `db/`
-  (connexion SQLAlchemy), `tests/` (pytest).
-- `front_PHP/` : le front principal (Apache) ; `index.php` + `utils/router.php`, `views/`
-  (pages), `components/`, `utils/apiProxy.php` (appels à l'API Python), `theme/`, `assets/`.
-- `front_DashPlotly/` : les tableaux de bord Dash (`main.py`, une app `appNN_*` par vue et son
+- `Learnagement.py` : point d'entrée du lanceur (`python Learnagement.py start`, `stop`,
+  `generate-env`, `backupdb`…), dont le code est dans `launcher/` : `cli.py` (les commandes
+  click), `env.py` (génération et propagation des `.env`), `config.py` (conteneurs,
+  environnements), `security.py` (certificats : `python -m launcher.security`), `tools.py`,
+  `compose.py` (générateur de compose, pas encore branché). `bootstrap.py` crée le venv et
+  lance `Learnagement.py`.
+- `docker/` : un dossier par conteneur (`backend/`, `web/`, `frontend/`, `dashboards/`,
+  `phpmyadmin/` : Dockerfile, entrypoint) et `docker-compose.yml.skeleton`, d'où le lanceur
+  produit `docker/docker-compose.yml` (ignoré).
+- `backend/` : l'API FastAPI (`app.py`) ; `api/` (routes, `dependencies.py`), `auth/` (LNM et
+  CAS), `access_control/` (règles, prédicats, responsabilités), `user/` (requêtes métier par
+  domaine : `LNM_university.py`, `MAQUETTE_module.py`…), `models/`, `db/` (connexion
+  SQLAlchemy), `tests/` (pytest).
+- `web/` : le front principal, en PHP (Apache) ; `index.php` + `utils/router.php`, `views/`
+  (pages), `components/`, `utils/apiProxy.php` (appels à l'API), `theme/`, `assets/`.
+- `dashboards/` : les tableaux de bord Dash (`main.py`, une app `appNN_*` par vue et son
   `_tools.py`), `apc_dash/` (approche par compétences).
-- `front_NextJS/` : le front Next.js en cours de refonte (`app/`, proxy vers l'API Python).
-- `archive/` : le code mort gardé pour mémoire (ancien backend PHP…), hors des règles ; son
-  `README.md` dit ce que chaque chose était.
+- `frontend/` : le front Next.js en cours de refonte (`app/`, proxy vers l'API).
+- `scraping/` : scripts d'import (notes, agenda, stages, étudiants…).
 - `db/` : `sql/` (schéma, migrations versionnées `VX.Y.Z__*.sql`), `freeData/` (jeux de données
   libres), `tools/`, `update/` ; `db/data/` et `db/backup/` sont privés et ignorés.
-- `scrapping/` : scripts d'import (notes, agenda, stages, étudiants…).
+- `archive/` : le code mort gardé pour mémoire (ancien backend PHP…), hors des règles ; son
+  `README.md` dit ce que chaque chose était.
 - `Doc/`, `ToDo/` : documentation et listes de tâches historiques.
 - `docs/backlog/` : le travail à faire ; `charter.toml` : les règles vérifiées ;
   `.claude/rules/kiln/` : les règles de kiln pour Claude.

@@ -15,6 +15,6 @@
 
 ## [DB](db/doc.md)
 
-## [Front NextJS](front_NextJS/doc.md)
+## [Front NextJS](frontend/doc.md)
 
 [Back](../README.md)

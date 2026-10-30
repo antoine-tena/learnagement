@@ -5,12 +5,18 @@ Project rules go in CLAUDE.md or in .claude/rules/ outside kiln/. -->
 Outil d'intégration des données de l'enseignement : le pont entre étudiants, enseignants et administratifs de l'USMB.
 
 Size: **Medium**, an app in production, real users, several contributors (`kiln set size=…` changes it).
-No stack of kiln here: its common part only (CI, hooks, rules, charter).
+Backend FastAPI in `backend/`, frontend Next.js 16 + React 19 in `frontend/`.
 The repo is generated and kept current by [kiln](https://github.com/antoine-tena/kiln).
 
 ## Commands
-- `kiln check`: `charter`, the rules of `charter.toml`.
+- `kiln dev`: start the dev servers (API on http://localhost:8000/api/, docs on `/api/docs`; front on http://localhost:3000).
+  From a Claude session, `kiln dev` (in the background, nothing asked; never `--foreground`, it
+  would hold the session), then `kiln dev logs [service]` to read the servers, `kiln dev status`, `kiln dev stop`. A worker or
+  a background task goes in its folder's `Procfile.dev`, one `name: command` line.
+- `kiln check`: every check of the stack (ruff, mypy, pytest, ESLint, type checks), then `charter`.
   Run it before saying a change is done.
+- A Python dependency: `uv add <package>` in its directory (`--dev` for a tool); never pip.
+- A JavaScript dependency: `pnpm add <package>` in `frontend/` (`-D` for a tool); never npm.
 - `kiln update`: kiln's improvements and compatible dependency upgrades, on a branch, checks
   included; `kiln set key=value` changes a setting of the project (stack, team, podman…).
 
@@ -48,7 +54,8 @@ The repo is generated and kept current by [kiln](https://github.com/antoine-tena
 - **[COMMITS]** Small and atomic: 10 files at most, a title of 50
   characters at most, prefixed by its type with an optional scope (`feat:`, `fix:`,
   `refactor:`, `style:`, `docs:`, `perf:`, `test:`, `build:`, `ci:`, `chore:`, `revert:`;
-  `fix(map): …`). Whether a commit says Claude helped (`Co-Authored-By: Claude`)
+  `fix(map): …`); a migration commit never mixes schema
+  and business logic. Whether a commit says Claude helped (`Co-Authored-By: Claude`)
   is each machine's choice (`kiln set ai_trailers=disclose|never`, kiln's branch guard enforces
   it); never a `Claude-Session:` line, never `--author`: the author stays the one of
   `git config`.

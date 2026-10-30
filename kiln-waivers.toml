@@ -1,0 +1,21 @@
+# This repo's waivers of kiln's rules ([WAIVERS]), checked by `charter`.
+# kiln never rewrites this file; `kiln waive` adds or renews an entry.
+# Duration at most: 7, 30, 90 then 182 days, next tier at each renewal.
+
+[[waiver]]
+rule = "UV-PODMAN"
+paths = ["**/requirements*.txt", "requirements*.txt", "docker/**", "Learnagement.py", "launcher/**", "__env_skeleton.env", "bootstrap.py"]
+reason = "Dette d'avant kiln : pip et docker remplacés par uv (T-05) et podman (T-06)"
+by = "antoine-tena"
+since = 2026-10-30
+until = 2026-11-06
+renewals = 0
+
+[[waiver]]
+rule = "LOGGING"
+paths = ["backend/**"]
+reason = "Dette d'avant kiln : logging et print remplacés par structlog (T-13)"
+by = "antoine-tena"
+since = 2026-10-30
+until = 2026-11-06
+renewals = 0
