@@ -3,7 +3,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from api.dependencies import db_request, get_current_active_user
+from api.dependencies import Rows, db_request, get_current_active_user
 from models.request import SQLRequest
 from models.user import User
 
@@ -16,11 +16,12 @@ router = APIRouter()
     tags=["apc"],
     summary="Get AC, semester and competence by metier",
     description="Return the list of AC, semester and competence for a metier",
+    response_model=None,
 )
 def get_metier_ac(
     id_metier: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": f"""
             SELECT DISTINCT
@@ -58,10 +59,11 @@ def get_metier_ac(
     tags=["apc"],
     summary="Students",
     description="Return the list of situation_professionnelle ",
+    response_model=None,
 )
 def get_metier(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
                     SELECT metier.id_situation_professionnelle,metier.libelle_situation
@@ -72,10 +74,16 @@ def get_metier(
     return db_request(current_user, SQLRequest(**request))
 
 
-@router.get("/acp_kpi", tags=["apc"], summary="nb competence", description="nombre de competence:")
+@router.get(
+    "/acp_kpi",
+    tags=["apc"],
+    summary="nb competence",
+    description="nombre de competence:",
+    response_model=None,
+)
 def get_competence(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> object:
     request_com = {
         "request": """
     SELECT COUNT(DISTINCT id_competence) AS nb_competences

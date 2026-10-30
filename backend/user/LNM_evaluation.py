@@ -4,7 +4,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from access_control.predicates import is_current_user_module_participant
-from api.dependencies import db_request, get_current_active_user
+from api.dependencies import Rows, db_request, get_current_active_user
 from models.request import SQLRequest
 from models.user import User
 
@@ -18,10 +18,11 @@ router = APIRouter()
     tags=["competence"],
     summary="Universities",
     description="Return the list of partner universities",
+    response_model=None,
 )
 def tree_competence(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
                         SELECT APC_competence.code_competence,
@@ -59,10 +60,11 @@ def tree_competence(
     tags=["competence"],
     summary="Universities",
     description="Return the list of partner universities",
+    response_model=None,
 )
 def tree_competence(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
                    SELECT APC_competence.code_competence,
@@ -122,11 +124,12 @@ def tree_competence(
     tags=["student"],
     summary="Universities",
     description="Return the list of partner universities",
+    response_model=None,
 )
 def get_apc_etudiant_evaluation(
     id_etudiant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
                    SELECT eval.id_etudiant,
@@ -161,11 +164,12 @@ def get_apc_etudiant_evaluation(
     tags=["student"],
     summary="Universities",
     description="Return the list of partner universities",
+    response_model=None,
 )
 def get_classical_etudiant_evaluation(
     id_etudiant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
                    SELECT CAST(evaluation AS FLOAT) AS evaluation,
@@ -195,11 +199,12 @@ def get_classical_etudiant_evaluation(
     tags=["student"],
     summary="Universities",
     description="Return the list of partner universities",
+    response_model=None,
 )
 def get_classical_module_evaluation(
     id_module: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
                    SELECT CAST(evaluation AS FLOAT) AS evaluation,
@@ -227,11 +232,12 @@ def get_classical_module_evaluation(
     tags=["student"],
     summary="Universities",
     description="Return the list of partner universities",
+    response_model=None,
 )
 def get_classical_module_evaluation_average(
     id_module: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
                    SELECT CAST(AVG(evaluation) AS FLOAT)  AS 'evaluation'
@@ -258,11 +264,12 @@ def get_classical_module_evaluation_average(
     tags=["enseignant"],
     summary="Universities",
     description="Return the list of partner universities",
+    response_model=None,
 )
 def tree_competence(
     id_enseignant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
                    SELECT ETU_classical_evaluation.evaluation,

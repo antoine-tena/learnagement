@@ -43,8 +43,10 @@ async def cas_login(
     return await authenticate_cas.authenticate_cas(data)
 
 
-@router.post("/logout", tags=["Auth"], summary="User logout", description="...")
-def logout():
+@router.post(
+    "/logout", tags=["Auth"], summary="User logout", description="...", response_model=None
+)
+def logout() -> object:
     return authenticate_lnm.logout()
 
 

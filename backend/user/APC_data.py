@@ -3,7 +3,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from api.dependencies import db_request, get_current_active_user
+from api.dependencies import Rows, db_request, get_current_active_user
 from models.request import SQLRequest
 from models.user import User
 
@@ -17,10 +17,11 @@ router = APIRouter()
     tags=["apc"],
     summary="APC Compétences",
     description="Retourne la liste des compétences APC",
+    response_model=None,
 )
 def get_competences(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
             SELECT id_competence, libelle_competence, code_competence, description
@@ -36,10 +37,11 @@ def get_competences(
     tags=["apc"],
     summary="APC Niveaux",
     description="Retourne la liste des niveaux de compétences",
+    response_model=None,
 )
 def get_niveaux(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
             SELECT id_niveau, id_competence, niveau, libelle_niveau
@@ -55,10 +57,11 @@ def get_niveaux(
     tags=["apc"],
     summary="APC Apprentissages critiques",
     description="Retourne la liste des apprentissages critiques",
+    response_model=None,
 )
 def get_apprentissages(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
             SELECT id_apprentissage_critique, id_niveau, libelle_apprentissage
@@ -74,10 +77,11 @@ def get_apprentissages(
     tags=["apc"],
     summary="APC AC-Modules",
     description="Retourne les associations apprentissages critiques / modules",
+    response_model=None,
 )
 def get_ac_modules(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
             SELECT id_apprentissage_critique, id_module, type_lien
@@ -93,10 +97,11 @@ def get_ac_modules(
     tags=["apc"],
     summary="APC Modules",
     description="Retourne la liste des modules de la maquette",
+    response_model=None,
 )
 def get_apc_modules(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
             SELECT id_module, code_module, nom, ECTS, id_discipline, id_semestre,
@@ -113,10 +118,11 @@ def get_apc_modules(
     tags=["apc"],
     summary="APC Composantes essentielles",
     description="Retourne la liste des composantes essentielles",
+    response_model=None,
 )
 def get_composantes(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
             SELECT id_composante_essentielle, id_competence, libelle_composante_essentielle
@@ -132,10 +138,11 @@ def get_composantes(
     tags=["apc"],
     summary="APC Situations professionnelles",
     description="Retourne la liste des situations professionnelles / métiers",
+    response_model=None,
 )
 def get_situations(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
             SELECT id_situation_professionnelle, id_competence, libelle_situation

@@ -8,7 +8,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
-from api.dependencies import db_request, get_current_active_user
+from api.dependencies import Rows, db_request, get_current_active_user
 from db.connection import get_connection
 from models.request import SQLRequest
 from models.user import User
@@ -107,10 +107,11 @@ def _sync_university_places(
     tags=["mobility"],
     summary="Universities",
     description="Return the list of partner universities",
+    response_model=None,
 )
 def list_universities(
     # current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
                         SELECT * FROM MOB_partner_university
@@ -126,11 +127,12 @@ def list_universities(
     tags=["mobility"],
     summary="Universities for student",
     description="Return the list of partner universities with the number of places for the student",
+    response_model=None,
 )
 def list_universities_etudiant(
     id_etudiant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
 
     request = {
         "request": """
@@ -173,11 +175,12 @@ def list_universities_etudiant(
     tags=["mobility"],
     summary="Statut de la campagne pour l'étudiant",
     description="Indique si la campagne de mobilité est ouverte pour cet étudiant",
+    response_model=None,
 )
 def get_campaign_status(
     id_etudiant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> object:
     request = {
         "request": """
                     SELECT mobility_z_score
@@ -204,11 +207,12 @@ def get_campaign_status(
     tags=["mobility"],
     summary="Wishes for student",
     description="Return the student's current mobility wishes",
+    response_model=None,
 )
 def list_university_wishes_etudiant(
     id_etudiant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     if current_user.id != id_etudiant:
         raise HTTPException(status_code=403, detail="Unauthorized access")
 
@@ -240,13 +244,14 @@ def list_university_wishes_etudiant(
     tags=["mobility"],
     summary="Add university to wishes",
     description="Add a partner university to the student's mobility wishes",
+    response_model=None,
 )
 def add_university_to_wishes(
     id_etudiant: int,
     id_partner_university: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
     payload: dict = Body(default={}),
-):
+) -> Rows:
     if current_user.id != id_etudiant:
         raise HTTPException(status_code=403, detail="Unauthorized access")
 
@@ -356,13 +361,14 @@ def add_university_to_wishes(
     tags=["mobility"],
     summary="Delete university from wishes",
     description="Delete a partner university from the student's mobility wishes",
+    response_model=None,
 )
 def delete_university_from_wishes(
     id_etudiant: int,
     id_partner_university: int,
     id_semestre: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> object:
     if current_user.id != id_etudiant:
         raise HTTPException(status_code=403, detail="Unauthorized access")
     allowed = {
@@ -448,6 +454,7 @@ def delete_university_from_wishes(
     tags=["mobility"],
     summary="Move university wish",
     description="Move a wish up or down in the student's priority list",
+    response_model=None,
 )
 def move_university_wish(
     id_etudiant: int,
@@ -455,7 +462,7 @@ def move_university_wish(
     id_semestre: int,
     direction: str,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> object:
     # if current_user.id != id_etudiant:
     #     raise HTTPException(status_code=403, detail="Unauthorized access")
     allowed = {
@@ -591,11 +598,12 @@ def move_university_wish(
     tags=["mobility"],
     summary="Submit university wishes",
     description="Submit the student's mobility wishes for processing",
+    response_model=None,
 )
 def submit_university_wishes(
     id_etudiant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> object:
     if current_user.id != id_etudiant:
         raise HTTPException(status_code=403, detail="Unauthorized access")
 
@@ -659,10 +667,11 @@ def submit_university_wishes(
     description=(
         "Force the submission of all existing student wishes that have not been submitted yet."
     ),
+    response_model=None,
 )
 def force_submit_wishes(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> object:
     update_request = {
         "request": """
                         UPDATE MOB_wishes
@@ -683,10 +692,11 @@ def force_submit_wishes(
     description=(
         "Return all student wishes (submitted and in progress) for International Relations admins"
     ),
+    response_model=None,
 )
 def list_all_wishes_ri(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
                         SELECT
@@ -728,10 +738,11 @@ def list_all_wishes_ri(
         "Return partner universities enriched with their available filieres for "
         "International Relations admins"
     ),
+    response_model=None,
 )
 def list_university_catalog_ri(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> object:
     request_catalog = {
         "request": """
                         SELECT
@@ -778,11 +789,12 @@ def list_university_catalog_ri(
         "Create a partner university and its places by filiere/semester for International "
         "Relations admins"
     ),
+    response_model=None,
 )
 def create_university_ri(
     payload: UniversityAdminPayload,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> object:
     name = payload.name.strip()
     country = payload.country.strip()
     if not name:
@@ -877,12 +889,13 @@ def create_university_ri(
         "Update a partner university and its places by filiere/semester for International "
         "Relations admins"
     ),
+    response_model=None,
 )
 def update_university_ri(
     id_partner_university: int,
     payload: UniversityAdminPayload,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> object:
     allowed = ["relations_internationales"]
 
     exists_request = {
@@ -967,8 +980,9 @@ def update_university_ri(
     "/university/admin/wishes/export",
     tags=["admin", "mobility"],
     summary="Export student mobility wishes to Excel",
+    response_model=None,
 )
-def export_admin_wishes(current_user: Annotated[User, Depends(get_current_active_user)]):
+def export_admin_wishes(current_user: Annotated[User, Depends(get_current_active_user)]) -> object:
     sql_request = SQLRequest(
         request="""
             SELECT
@@ -1054,8 +1068,11 @@ def export_admin_wishes(current_user: Annotated[User, Depends(get_current_active
     "/university/admin/assignments/export",
     tags=["admin", "mobility"],
     summary="Export student mobility assignments to Excel",
+    response_model=None,
 )
-def export_admin_assignments(current_user: Annotated[User, Depends(get_current_active_user)]):
+def export_admin_assignments(
+    current_user: Annotated[User, Depends(get_current_active_user)],
+) -> object:
     sql_request = SQLRequest(
         request="""
             SELECT
@@ -1159,8 +1176,11 @@ def export_admin_assignments(current_user: Annotated[User, Depends(get_current_a
     "/university/admin/mobility/submitted-students",
     tags=["admin", "mobility"],
     summary="Get list of students who have submitted wishes",
+    response_model=None,
 )
-def get_submitted_students(current_user: Annotated[User, Depends(get_current_active_user)]):
+def get_submitted_students(
+    current_user: Annotated[User, Depends(get_current_active_user)],
+) -> object:
     sql_request = SQLRequest(
         request="""
             SELECT e.id_etudiant, e.nom, e.prenom, e.mail, f.nom_filiere
@@ -1186,10 +1206,11 @@ def get_submitted_students(current_user: Annotated[User, Depends(get_current_act
     "/university/admin/mobility/reset-wishes/{id_etudiant}",
     tags=["admin", "mobility"],
     summary="Reset submission date for a student's wishes",
+    response_model=None,
 )
 def reset_student_wishes(
     id_etudiant: int, current_user: Annotated[User, Depends(get_current_active_user)]
-):
+) -> object:
     check_request = SQLRequest(
         request="""
             SELECT 1 FROM LNM_etudiant e
@@ -1224,8 +1245,11 @@ class UpdateAssignmentStatusPayload(BaseModel):
     "/university/admin/mobility/assigned-students",
     tags=["admin", "mobility"],
     summary="Get list of students who have an assignment",
+    response_model=None,
 )
-def get_assigned_students(current_user: Annotated[User, Depends(get_current_active_user)]):
+def get_assigned_students(
+    current_user: Annotated[User, Depends(get_current_active_user)],
+) -> object:
     sql_request = SQLRequest(
         request="""
             SELECT a.id_assignment, a.id_etudiant, a.status, e.nom, e.prenom, e.mail,
@@ -1249,10 +1273,11 @@ def get_assigned_students(current_user: Annotated[User, Depends(get_current_acti
     "/university/admin/mobility/assigned-students/export/{status}",
     tags=["admin", "mobility"],
     summary="Export assigned students by status",
+    response_model=None,
 )
 def export_assigned_students_status(
     status: str, current_user: Annotated[User, Depends(get_current_active_user)]
-):
+) -> object:
     if status not in ["accepted", "pending", "declined"]:
         raise HTTPException(status_code=400, detail="Invalid status")
 
@@ -1331,8 +1356,11 @@ def export_assigned_students_status(
     "/university/admin/mobility/unassigned-students/export",
     tags=["admin", "mobility"],
     summary="Export students with submitted wishes but no assignments",
+    response_model=None,
 )
-def export_unassigned_students(current_user: Annotated[User, Depends(get_current_active_user)]):
+def export_unassigned_students(
+    current_user: Annotated[User, Depends(get_current_active_user)],
+) -> object:
     sql_request = SQLRequest(
         request="""
             SELECT DISTINCT e.id_etudiant, e.nom, e.prenom, e.mail, e.mobility_z_score,
@@ -1407,11 +1435,12 @@ def export_unassigned_students(current_user: Annotated[User, Depends(get_current
     "/university/admin/mobility/update-assignment-status",
     tags=["admin", "mobility"],
     summary="Update assignment status",
+    response_model=None,
 )
 def update_assignment_status(
     payload: UpdateAssignmentStatusPayload,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> object:
     if payload.new_status not in ["pending", "accepted", "declined"]:
         raise HTTPException(status_code=400, detail="Invalid status")
 
@@ -1428,8 +1457,11 @@ def update_assignment_status(
     "/university/admin/mobility/diagnostics",
     tags=["admin", "mobility"],
     summary="Get statistics and diagnostics for mobility procedure",
+    response_model=None,
 )
-def get_mobility_diagnostics(current_user: Annotated[User, Depends(get_current_active_user)]):
+def get_mobility_diagnostics(
+    current_user: Annotated[User, Depends(get_current_active_user)],
+) -> object:
     sql_request = SQLRequest(
         request="""
             SELECT
@@ -1501,10 +1533,11 @@ def get_mobility_diagnostics(current_user: Annotated[User, Depends(get_current_a
     "/university/admin/mobility/diagnostics/export/{category}",
     tags=["admin", "mobility"],
     summary="Export specific diagnostic category to Excel",
+    response_model=None,
 )
 def export_mobility_diagnostics(
     category: str, current_user: Annotated[User, Depends(get_current_active_user)]
-):
+) -> object:
     sql_request = SQLRequest(
         request="""
             SELECT
@@ -1608,7 +1641,7 @@ def export_mobility_diagnostics(
     )
 
 
-def sync_db_remaining_places(current_user, conn=None):
+def sync_db_remaining_places(current_user, conn=None) -> None:
     """
     Recalculates the remaining places for all universities and specialties based
     strictly on the number of 'accepted' assignments.
@@ -1674,8 +1707,9 @@ def sync_db_remaining_places(current_user, conn=None):
     "/university/admin/places/export",
     tags=["admin", "mobility"],
     summary="Export partner university places status to Excel",
+    response_model=None,
 )
-def export_admin_places(current_user: Annotated[User, Depends(get_current_active_user)]):
+def export_admin_places(current_user: Annotated[User, Depends(get_current_active_user)]) -> object:
     sync_db_remaining_places(current_user)
 
     # Requête pour récupérer les universités, leurs places globales (S8/S9) et le détail par
@@ -1842,10 +1876,11 @@ class StudentDecisionPayload(BaseModel):
     "/university/etudiant/{id_etudiant}/assignment",
     tags=["etudiant", "mobility"],
     summary="Get the assigned university for a student",
+    response_model=None,
 )
 def get_student_assignment(
     id_etudiant: int, current_user: Annotated[User, Depends(get_current_active_user)]
-):
+) -> object:
     request = {
         "request": """
             SELECT a.id_assignment, a.status, u.id_partner_university, u.name, u.code, u.country,
@@ -1875,12 +1910,13 @@ def get_student_assignment(
     "/university/etudiant/{id_etudiant}/assignment/decision",
     tags=["etudiant", "mobility"],
     summary="Submit student decision for assignment",
+    response_model=None,
 )
 def submit_student_decision(
     id_etudiant: int,
     payload: StudentDecisionPayload,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> object:
     if current_user.id != id_etudiant:
         raise HTTPException(status_code=403, detail="Unauthorized access")
 
@@ -1939,8 +1975,11 @@ def submit_student_decision(
     "/university/admin/mobility/assignment/close",
     tags=["admin", "mobility"],
     summary="Decline all pending assignments to close the acceptance phase",
+    response_model=None,
 )
-def close_assignment_phase(current_user: Annotated[User, Depends(get_current_active_user)]):
+def close_assignment_phase(
+    current_user: Annotated[User, Depends(get_current_active_user)],
+) -> object:
     with get_connection() as conn:
         sql_request = SQLRequest(
             request="UPDATE MOB_assignment SET status = 'declined' WHERE status = 'pending'",
@@ -1956,11 +1995,12 @@ def close_assignment_phase(current_user: Annotated[User, Depends(get_current_act
     "/university/admin/campaign/launch",
     tags=["admin", "mobility"],
     summary="Lancer la campagne et calculer les Z-scores",
+    response_model=None,
 )
 def launch_mobility_campaign(
     payload: CampaignLaunchRequestPayload,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> object:
     with get_connection() as conn:
         # 1. Update doublants
         doublant_ids = []
@@ -2079,10 +2119,11 @@ def launch_mobility_campaign(
     "/university/admin/campaign/doublant/{id_etudiant:int}",
     tags=["admin", "mobility"],
     summary="Vérifier un étudiant doublant avant l'ajout",
+    response_model=None,
 )
 def verify_doublant(
     id_etudiant: int, current_user: Annotated[User, Depends(get_current_active_user)]
-):
+) -> object:
     query = """
         SELECT e.id_etudiant, e.nom, e.prenom, f.nom_filiere, p.annee
         FROM LNM_etudiant e

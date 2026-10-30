@@ -4,7 +4,7 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Depends, HTTPException
 
 from access_control.predicates import is_current_user_module_responsible
-from api.dependencies import db_request, get_current_active_user
+from api.dependencies import Rows, db_request, get_current_active_user
 from models.request import SQLRequest
 from models.user import User
 
@@ -68,10 +68,11 @@ router = APIRouter()
     tags=["module"],
     summary="M2c3",
     description="Return maquette et modalités de contrôle de connaissances et compétences",
+    response_model=None,
 )
 def get_m2c3(
     current_user: Annotated[User, Depends(get_current_active_user)], id_filiere: int, id_statut: int
-):
+) -> Rows:
     request = {
         # ToDo convert parameters to be SQLAlchemy Core compatible when it is up
         "request": """SELECT MAQUETTE_module.id_module,
@@ -118,10 +119,11 @@ def get_m2c3(
     tags=["module"],
     summary="Get responsibles",
     description="Get modules responsibles",
+    response_model=None,
 )
 def get_modules_responsables(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
                 SELECT
@@ -159,11 +161,12 @@ def get_modules_responsables(
     tags=["module"],
     summary="Get modules by responsible",
     description="Get all modules of a responsible",
+    response_model=None,
 )
 def get_modules_responsable(
     id_responsable: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
                 SELECT
@@ -207,10 +210,11 @@ def get_modules_responsable(
     tags=["module"],
     summary="Get modules by responsible",
     description="Get all modules of a responsible",
+    response_model=None,
 )
 def get_modules_intervenants(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
             SELECT
@@ -265,11 +269,12 @@ def get_modules_intervenants(
     tags=["module"],
     summary="Get modules by responsible",
     description="Get all modules of a responsible",
+    response_model=None,
 )
 def get_modules_intervenant(
     id_intervenant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
 
@@ -330,11 +335,12 @@ SELECT
     tags=["module"],
     summary="Get modules by responsible",
     description="Get all modules of a responsible",
+    response_model=None,
 )
 def get_modules_etudiant(
     id_etudiant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
             SELECT MAQUETTE_module.id_module,
@@ -363,11 +369,12 @@ def get_modules_etudiant(
     tags=["module"],
     summary="Get modules by responsible",
     description="Get all modules of a responsible",
+    response_model=None,
 )
 def get_sequencages_responsable(
     id_responsable: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
             SELECT  MAQUETTE_module_sequencage.`id_module_sequencage`,
@@ -405,11 +412,12 @@ def get_sequencages_responsable(
     tags=["module"],
     summary="Get modules by responsible",
     description="Get all modules of a responsible",
+    response_model=None,
 )
 def get_sequences_responsable(
     id_responsable: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
             SELECT  MAQUETTE_module_sequence.id_module_sequence AS id_sequence,
@@ -454,11 +462,12 @@ def get_sequences_responsable(
     tags=["module"],
     summary="Get modules by responsible",
     description="Get all modules of a responsible",
+    response_model=None,
 )
 def get_sessions_responsable(
     id_responsable: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
             SELECT
@@ -512,11 +521,12 @@ def get_sessions_responsable(
     tags=["module"],
     summary="Get modules dependencies",
     description="Get all modules dependencies",
+    response_model=None,
 )
 def get_module_dependencies(
     id_module: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
             SELECT `id_sequence_prev`, `id_sequence_next`
@@ -559,11 +569,12 @@ def get_module_dependencies(
     tags=["module"],
     summary="Get sequence dependencies",
     description="Get all modules sequence dependencies",
+    response_model=None,
 )
 def get_module_sequence_dependencies(
     id_module: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
             SELECT MAQUETTE_module_sequence.id_module_sequence,
@@ -627,11 +638,12 @@ def get_module_sequence_dependencies(
     tags=["module"],
     summary="Get sequence dependencies for Gantt",
     description="Get all modules sequence dependencies formatted for a Gantt chart",
+    response_model=None,
 )
 def get_data_gantt_endpoint(
     id_responsable: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
             SELECT
@@ -688,11 +700,12 @@ def get_data_gantt_endpoint(
     tags=["module"],
     summary="Get sequence dependencies for Gantt",
     description="Get all modules sequence dependencies formatted for a Gantt chart for an etudiant",
+    response_model=None,
 )
 def get_data_gantt_endpoint_etudiant(
     id_etudiant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
             SELECT
@@ -766,11 +779,15 @@ def get_data_gantt_endpoint_etudiant(
 
 
 @router.get(
-    "/disciplines", tags=["module"], summary="Get disciplines", description="Get disciplines"
+    "/disciplines",
+    tags=["module"],
+    summary="Get disciplines",
+    description="Get disciplines",
+    response_model=None,
 )
 def get_disciplines(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
                 SELECT
@@ -791,12 +808,13 @@ def get_disciplines(
     tags=["module"],
     summary="Update module",
     description="Update module according to parameters",
+    response_model=None,
 )
 def update_module(
     id_module: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
     data: dict[str, Any],
-):
+) -> Rows:
 
     if "id_responsable" not in data:
         raise HTTPException(status_code=422, detail="Champ manquant : id_responsable")
@@ -834,13 +852,14 @@ def update_module(
     tags=["module"],
     summary="Update sequencage",
     description="Update sequencage according to parameters",
+    response_model=None,
 )
 def update_sequencage(
     id_module: int,
     id_sequencage: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
     data: dict[str, Any],
-):
+) -> Rows:
 
     if "id_intervenant_principal" not in data:
         raise HTTPException(status_code=422, detail="Champ manquant : id_intervenant_principal")
@@ -874,13 +893,14 @@ def update_sequencage(
     tags=["module"],
     summary="Update sequencage",
     description="Update sequencage according to parameters",
+    response_model=None,
 )
 def update_sequence(
     id_module: int,
     id_sequence: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
     data: dict[str, Any],
-):
+) -> Rows:
 
     if "id_intervenant_principal" not in data:
         raise HTTPException(status_code=422, detail="Champ manquant : id_intervenant_principal")
@@ -919,13 +939,14 @@ def update_sequence(
     tags=["module"],
     summary="Update sequencage",
     description="Update sequencage according to parameters",
+    response_model=None,
 )
 def update_session(
     id_module: int,
     id_session: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
     data: dict[str, Any],
-):
+) -> Rows:
 
     if "id_enseignant" not in data:
         raise HTTPException(status_code=422, detail="Champ manquant : id_enseignant")
@@ -973,12 +994,13 @@ def update_session(
     tags=["module"],
     summary="Update module",
     description="Update module according to parameters",
+    response_model=None,
 )
 def add_sequencage(
     id_module: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
     data: dict[str, Any],
-):
+) -> Rows:
 
     required = ["nombre", "id_seance_type", "id_groupe_type", "duree_h"]
     missing = [f for f in required if f not in data or data[f] in (None, "")]
@@ -1060,11 +1082,12 @@ def add_sequencage(
     tags=["module"],
     summary="Create a new module",
     description="Create a module without sequencing",
+    response_model=None,
 )
 def create_module(
     current_user: Annotated[User, Depends(get_current_active_user)],
     data: dict[str, Any],
-):
+) -> Rows:
     required = ["code_module", "nom_module", "ECTS", "id_discipline", "semestre", "id_responsable"]
     missing = [f for f in required if f not in data or data[f] in (None, "")]
     if missing:
@@ -1122,12 +1145,13 @@ def create_module(
     tags=["module"],
     summary="Update module",
     description="Update module according to parameters",
+    response_model=None,
 )
 def add_dependencies(
     id_module: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
     data: dict[str, Any],
-):
+) -> Rows:
 
     if "id_sequence_prev" not in data:
         raise HTTPException(status_code=422, detail="Champ manquant : id_sequence_prev")
@@ -1176,12 +1200,13 @@ def add_dependencies(
     tags=["module"],
     summary="Update module",
     description="Update module according to parameters",
+    response_model=None,
 )
 def delete_sequencage(
     id_module: int,
     id_sequencage: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
 
     request = {
         # ToDo refactor next when SQLAlchemy Core is up
@@ -1210,13 +1235,14 @@ def delete_sequencage(
     tags=["module"],
     summary="Update module",
     description="Update module according to parameters",
+    response_model=None,
 )
 def delete_dependencies(
     id_module: int,
     id_sequence_prev: int,
     id_sequence_next: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
 
     request = {
         # ToDo refactor next when SQLAlchemy Core is up

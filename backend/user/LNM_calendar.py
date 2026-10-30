@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from api.dependencies import db_request, get_current_active_user
+from api.dependencies import Rows, db_request, get_current_active_user
 from models.request import SQLRequest
 from models.user import User
 
@@ -67,11 +67,12 @@ class CalendarUpdate(BaseModel):
     tags=["calendar"],
     summary="Get User Calendar URLs",
     description="Returns all ADE iCal URLs for the currently logged-in user",
+    response_model=None,
 )
 def get_user_calendar_urls(
     id: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     # 1. On récupère le bon ID et la bonne colonne via notre Helper
     # role_id, role_col, _ = get_user_role_and_id(current_user)
     fields = f"id_{current_user.main_role}"
@@ -113,12 +114,13 @@ def get_user_calendar_urls(
     tags=["calendar"],
     summary="Update User Calendar URL",
     description="Saves a specific iCal URL",
+    response_model=None,
 )
 def add_user_calendar_url(
     id: int,
     data: CalendarUpdate,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     fields = f"id_{current_user.main_role}"
 
     request = {
@@ -146,13 +148,14 @@ def add_user_calendar_url(
     tags=["calendar"],
     summary="Update User Calendar URL",
     description="Updates a specific iCal URL",
+    response_model=None,
 )
 def update_user_calendar_url(
     id: int,
     id_calendar: int,
     data: CalendarUpdate,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     fields = f"id_{current_user.main_role}"
 
     request = {

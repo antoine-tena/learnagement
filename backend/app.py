@@ -80,8 +80,8 @@ app.include_router(LNM_mobility_assignment.router)
 
 
 # Classical health
-@app.get("/health")
-def health():
+@app.get("/health", response_model=None)
+def health() -> object:
     return {"status": "ok"}
 
 
@@ -99,8 +99,8 @@ async def silence_health_logs(request: Request, call_next):
     return await call_next(request)
 
 
-@app.get("/")
-async def root():
+@app.get("/", response_model=None)
+async def root() -> object:
     return {"message": "Hello, I'm Learnagement BackEnd!"}
 
 

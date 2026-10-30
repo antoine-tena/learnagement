@@ -4,7 +4,7 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, model_validator
 
-from api.dependencies import db_request, get_current_active_user
+from api.dependencies import Rows, db_request, get_current_active_user
 from models.request import SQLRequest
 from models.user import User
 
@@ -21,11 +21,15 @@ router = APIRouter()
 
 
 @router.get(
-    "/etudiants", tags=["student"], summary="Students", description="Return the list of students"
+    "/etudiants",
+    tags=["student"],
+    summary="Students",
+    description="Return the list of students",
+    response_model=None,
 )
 def get_etudiants(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
                         SELECT
@@ -64,13 +68,14 @@ class AbsencesFilters(BaseModel):
     tags=["student", "administratif"],
     summary="Students",
     description="Return the list of students",
+    response_model=None,
 )
 def get_etudiants_absences(
     current_user: Annotated[User, Depends(get_current_active_user)],
     # id_responsable: int = -1,
     # id_enseignant: int = -1,
     filters: Annotated[AbsencesFilters, Depends()],
-):
+) -> Rows:
     request = {
         "request": """SELECT ExplicitSecondaryKs_LNM_etudiant.ExplicitSecondaryK as etudiant,
                               ExplicitSecondaryKs_LNM_promo.ExplicitSecondaryK as promo,
@@ -132,10 +137,11 @@ def get_etudiants_absences(
     ],
     summary="Students",
     description="Return the list of students",
+    response_model=None,
 )
 def get_etudiants_stages(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
             SELECT
@@ -181,10 +187,11 @@ def get_etudiants_stages(
     tags=["administratif", "student", "internship"],
     summary="Students",
     description="Return the list of students",
+    response_model=None,
 )
 def get_etudiants_stages(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
             SELECT `LNM_etudiant`.`id_etudiant`,
@@ -214,11 +221,12 @@ def get_etudiants_stages(
     tags=["student"],
     summary="Students",
     description="Return the list of students",
+    response_model=None,
 )
 def get_etudiant(
     id_etudiant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
                         SELECT
@@ -259,11 +267,12 @@ def get_etudiant(
     ],
     summary="Students",
     description="Return the list of students",
+    response_model=None,
 )
 def get_etudiant_absences(
     id_etudiant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     # ToDo convert parameters to be SQLAlchemy Core compatible when it will be up
     request = {
         "request": """SELECT MAQUETTE_module.code_module,
@@ -305,11 +314,12 @@ def get_etudiant_absences(
     ],
     summary="Students",
     description="Return the list of students",
+    response_model=None,
 )
 def get_etudiant_load(
     id_etudiant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     # ToDo convert parameters to be SQLAlchemy Core compatible when it will be up
     request = {
         "request": """
@@ -349,11 +359,12 @@ def get_etudiant_load(
     ],
     summary="Students",
     description="Return the list of students",
+    response_model=None,
 )
 def get_etudiant_edt(
     id_etudiant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     # ToDo convert parameters to be SQLAlchemy Core compatible when it will be up
     request = {
         "request": """
@@ -397,11 +408,12 @@ def get_etudiant_edt(
     ],
     summary="Students",
     description="Return the list of students",
+    response_model=None,
 )
 def get_etudiant_pastedt(
     id_etudiant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     # ToDo convert parameters to be SQLAlchemy Core compatible when it will be up
     request = {
         "request": """
@@ -443,11 +455,12 @@ def get_etudiant_pastedt(
     ],
     summary="Students",
     description="Return the list of students",
+    response_model=None,
 )
 def get_etudiant_pastedt(
     id_etudiant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     # ToDo convert parameters to be SQLAlchemy Core compatible when it will be up
     request = {
         "request": """
@@ -475,11 +488,12 @@ def get_etudiant_pastedt(
     ],
     summary="Students",
     description="Return the list of students",
+    response_model=None,
 )
 def get_etudiant_pastedt(
     id_etudiant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     # ToDo convert parameters to be SQLAlchemy Core compatible when it will be up
     request = {
         "request": """
@@ -519,11 +533,12 @@ def get_etudiant_pastedt(
     ],
     summary="Students",
     description="Return the list of students",
+    response_model=None,
 )
 def get_etudiants_stages(
     id_etudiant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
             SELECT LNM_stage.`id_stage`,
@@ -579,12 +594,13 @@ def get_etudiants_stages(
     ],
     summary="Students",
     description="Return the list of students",
+    response_model=None,
 )
 def post_etudiant_stage(
     id_etudiant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
     data: dict[str, Any],
-):
+) -> Rows:
     # ToDo convert parameters to be SQLAlchemy Core compatible when it will be up
     if "id_enseignant" not in data or not data["id_enseignant"]:
         data["id_enseignant"] = "null"
@@ -641,13 +657,14 @@ def post_etudiant_stage(
     ],
     summary="Students",
     description="Return the list of students",
+    response_model=None,
 )
 def patch_etudiant_stage(
     id_etudiant: int,
     id_stage: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
     data: dict[str, Any],
-):
+) -> Rows:
     # ToDo il pourrait être intéressant de vérifier que le stage est bien à l'étudiant
     # ToDo convert parameters to be SQLAlchemy Core compatible when it will be up
     request = {
@@ -681,12 +698,13 @@ def patch_etudiant_stage(
     ],
     summary="Students",
     description="Return the list of students",
+    response_model=None,
 )
 def delete_etudiant_stage(
     id_etudiant: int,
     id_stage: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     # ToDo il pourrait être intéressant de vérifier que le stage est bien à l'étudiant
     # ToDo convert parameters to be SQLAlchemy Core compatible when it will be up
     request = {

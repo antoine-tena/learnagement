@@ -1,5 +1,5 @@
 import re
-from typing import Annotated
+from typing import Annotated, Any
 
 import dotenv
 from fastapi import Depends, Header, HTTPException, status
@@ -23,12 +23,12 @@ from models.user import User, UserInDB
 dotenv.load_dotenv("../.env")
 
 
-async def get_token_header(x_token: Annotated[str, Header()]):
+async def get_token_header(x_token: Annotated[str, Header()]) -> None:
     if x_token != "fake-super-secret-token":
         raise HTTPException(status_code=400, detail="X-Token header invalid")
 
 
-async def get_query_token(token: str):
+async def get_query_token(token: str) -> None:
     if token != "jessica":
         raise HTTPException(status_code=400, detail="No Jessica token provided")
 
@@ -321,7 +321,7 @@ def _fetch_etudiant(conn: Connection, user_login: str) -> UserInDB | None:
     return UserInDB(**user_dict)
 
 
-def get_user(user_login: str):
+def get_user(user_login: str) -> UserInDB | None:
     # fetchers = [get_administratif, get_enseignant, get_etudiant]
     user = None
     fetchers = (_fetch_administratif, _fetch_enseignant, _fetch_etudiant)
@@ -338,10 +338,10 @@ def get_user(user_login: str):
                     break
     except SQLAlchemyError as e:
         logger.exception(e)
-        raise HTTPException(status_code=503, detail="Database unavailable")
+        raise HTTPException(status_code=503, detail="Database unavailable") from e
     except Exception as e:
         logger.exception(e)
-        raise HTTPException(status_code=500, detail="Undefined Get User Error")
+        raise HTTPException(status_code=500, detail="Undefined Get User Error") from e
 
     if user is not None:
         logger.info(f"User {user_login} logged")
@@ -399,7 +399,7 @@ def load_enseignant_responsibilities(rows: list[dict]) -> list[dict]:
 # "timeout".
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> UserInDB:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -418,7 +418,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         # print("token_data", token_data, flush=True)
     except InvalidTokenError as e:
         logger.error(f"Invalid token : {e}")
-        raise credentials_exception
+        raise credentials_exception from e
     user = get_user(token_data.login)
     if user is None:
         logger.error(f"Login error with payload: {payload}")
@@ -428,7 +428,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
 
 async def get_current_active_user(
     current_user: Annotated[User, Depends(get_current_user)],
-):
+) -> User:
     # if current_user.disabled:
     #    raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
@@ -488,12 +488,16 @@ def _to_named(sql: str) -> str:
     return _PYFORMAT.sub(r":\1", sql)
 
 
-def _execute(conn: Connection, request: SQLRequest) -> list[dict]:
+# Rows of a SQL result, as db_request returns them and the routes send them back.
+type Rows = list[dict[str, Any]]
+
+
+def _execute(conn: Connection, request: SQLRequest) -> Rows:
     result = conn.execute(text(_to_named(request.request)), request.params or {})
     return [dict(r) for r in result.mappings()] if result.returns_rows else []
 
 
-def db_request(requester: User, request: SQLRequest, conn: Connection | None = None):
+def db_request(requester: User, request: SQLRequest, conn: Connection | None = None) -> Rows:
     """
     Sans `conn` : une connexion et une transaction pour cette seule requête (comportement actuel).
     Avec `conn` : la requête s'exécute dans la transaction de l'appelant, sans commit ici.
@@ -515,18 +519,18 @@ def db_request(requester: User, request: SQLRequest, conn: Connection | None = N
         with get_connection() as conn:
             result = conn.execute(text(_to_named(request.request)), request.params or {})
             rows = [dict(r) for r in result.mappings()] if result.returns_rows else []
-    except PoolTimeout:
-        raise HTTPException(status_code=503, detail="Database busy, retry later")
+    except PoolTimeout as e:
+        raise HTTPException(status_code=503, detail="Database busy, retry later") from e
     except Exception as e:
         logger.exception(e)
-        raise HTTPException(status_code=500, detail="Database request failed")
+        raise HTTPException(status_code=500, detail="Database request failed") from e
     return rows
 
 
 ###################################
 
 
-def main():
+def main() -> bool:
     return True
 
 

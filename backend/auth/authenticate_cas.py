@@ -25,7 +25,7 @@ class CasUserProvision(BaseModel):
 
 
 # --- Vérification du token de service CAS ---
-def verify_cas_service_token(x_cas_token: Annotated[str | None, Header()] = None):
+def verify_cas_service_token(x_cas_token: Annotated[str | None, Header()] = None) -> None:
     expected = os.getenv("CAS_SERVICE_TOKEN")
 
     if not expected:

@@ -21,10 +21,11 @@ router = APIRouter()
     tags=["check", "table"],
     summary="Teacher without session",
     description="Check teacher without session.",
+    response_model=None,
 )
 def get_access_auth(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> object:
 
     if "administratif" in current_user.roles:
         all_requests = get_all_requests(package_name="user") | get_all_local_requests()
@@ -173,10 +174,11 @@ def build_tree(config: dict) -> dict:
     tags=["check", "tree"],
     summary="Teacher without session",
     description="Check teacher without session.",
+    response_model=None,
 )
 def get_access_auth_tree(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> object:
     response = {
         "success": None,
         "meta": {
@@ -436,10 +438,11 @@ def build_lineage_tree(config: dict) -> dict:
     tags=["check", "tree"],
     summary="Teacher without session",
     description="Check teacher without session.",
+    response_model=None,
 )
 def get_access_auth_tree_sqlglot(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> object:
     response = {
         "success": None,
         "meta": {

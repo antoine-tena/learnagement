@@ -4,7 +4,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from api.dependencies import db_request, get_current_active_user
+from api.dependencies import Rows, db_request, get_current_active_user
 from models.request import SQLRequest
 from models.user import User
 
@@ -287,10 +287,11 @@ requests = {
     tags=["check"],
     summary="Teacher without session",
     description="Check teacher without session.",
+    response_model=None,
 )
 def checkLNM_enseignant_sans_cours(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = requests["get_" + inspect.currentframe().f_code.co_name]
     return db_request(current_user, SQLRequest(**request))
 
@@ -303,10 +304,11 @@ def checkLNM_enseignant_sans_cours(
     tags=["check"],
     summary="Module without learning unit",
     description="Check module not link to a learning unit.",
+    response_model=None,
 )
 def checkMAQUETTE_moduleWithoutLearningUnit(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = requests["get_" + inspect.currentframe().f_code.co_name]
     return db_request(current_user, SQLRequest(**request))
 
@@ -316,10 +318,11 @@ def checkMAQUETTE_moduleWithoutLearningUnit(
     tags=["check"],
     summary="Module without apprentissage critique",
     description="Check module without apprentissage critique.",
+    response_model=None,
 )
 def module_sans_apprentissage_critique(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = requests["get_" + inspect.currentframe().f_code.co_name]
     return db_request(current_user, SQLRequest(**request))
 
@@ -329,10 +332,11 @@ def module_sans_apprentissage_critique(
     tags=["check"],
     summary="ECTs weight",
     description="Check ratio hours ECTs.",
+    response_model=None,
 )
 def module_detail_ects(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = requests["get_" + inspect.currentframe().f_code.co_name]
     return db_request(current_user, SQLRequest(**request))
 
@@ -347,10 +351,11 @@ def module_detail_ects(
     tags=["check"],
     summary="Session without teacher",
     description="Check session without teacher.",
+    response_model=None,
 )
 def session_sans_intervenant(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = requests["get_" + inspect.currentframe().f_code.co_name]
     return db_request(current_user, SQLRequest(**request))
 
@@ -360,10 +365,11 @@ def session_sans_intervenant(
     tags=["check"],
     summary="Session foreign K coruption",
     description="Check session not linked to module.",
+    response_model=None,
 )
 def session_reference_corruption(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = requests["get_" + inspect.currentframe().f_code.co_name]
     return db_request(current_user, SQLRequest(**request))
 
@@ -374,10 +380,11 @@ def session_reference_corruption(
     tags=["check"],
     summary="Session hours Vs Program",
     description="Check whether the number of sequencage hours corresponds to the program.",
+    response_model=None,
 )
 def maquette_vs_sequencage(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = requests["get_" + inspect.currentframe().f_code.co_name]
     return db_request(current_user, SQLRequest(**request))
 
@@ -387,11 +394,12 @@ def maquette_vs_sequencage(
     tags=["check"],
     summary="Session hours Vs Program",
     description="Check whether the number of sequencage hours corresponds to the program.",
+    response_model=None,
 )
 def maquette_vs_sequencage_by_idResp(
     id_responsable: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = requests["get_" + inspect.currentframe().f_code.co_name]
     request["params"] = (
         request["params"](id_responsable) if callable(request["params"]) else request["params"]

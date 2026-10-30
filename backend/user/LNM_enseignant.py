@@ -3,7 +3,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from api.dependencies import db_request, get_current_active_user
+from api.dependencies import Rows, db_request, get_current_active_user
 from models.request import SQLRequest
 from models.user import User
 
@@ -23,10 +23,11 @@ router = APIRouter()
     tags=["enseignant"],
     summary="Teachers",
     description="Return the list of teachers",
+    response_model=None,
 )
 def enseignants(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
                         SELECT LNM_enseignant.`id_enseignant`,
@@ -51,10 +52,11 @@ def enseignants(
     tags=["enseignant"],
     summary="Teachers responsibilities",
     description="Return the list of teachers' responsibilities",
+    response_model=None,
 )
 def enseignants_responsabilities(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
                         SELECT
@@ -76,10 +78,11 @@ def enseignants_responsabilities(
     tags=["administratif", "enseignant"],
     summary="Teachers load",
     description="Return the list of teachers load",
+    response_model=None,
 )
 def enseignants_load(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
                         SELECT LNM_enseignant.prenom, LNM_enseignant.nom,
@@ -112,11 +115,12 @@ def enseignants_load(
     tags=["administratif", "enseignant"],
     summary="Teachers load",
     description="Return the list of teachers load",
+    response_model=None,
 )
 def enseignants_load(
     id_enseignant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         # ToDo convert parameters to be SQLAlchemy Core compatible when it is up
         "request": """SELECT
@@ -160,11 +164,12 @@ def enseignants_load(
     ],
     summary="Students",
     description="Return the list of students",
+    response_model=None,
 )
 def get_etudiants_stages(
     id_enseignant: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
             SELECT LNM_stage.`id_stage`,

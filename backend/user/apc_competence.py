@@ -3,7 +3,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from api.dependencies import db_request, get_current_active_user
+from api.dependencies import Rows, db_request, get_current_active_user
 from models.request import SQLRequest
 from models.user import User
 
@@ -17,10 +17,11 @@ router = APIRouter()
     tags=["apc"],
     summary="Students",
     description="Return the list of competences and apprentissages for the students",
+    response_model=None,
 )
 def get_competence_ac(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
                     SELECT
@@ -39,10 +40,11 @@ def get_competence_ac(
     tags=["apc"],
     summary="Students",
     description="Return the list of competences and essentiel composant",
+    response_model=None,
 )
 def get_competence_ce(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     request = {
         "request": """
                      SELECT

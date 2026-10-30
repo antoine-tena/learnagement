@@ -3,7 +3,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from api.dependencies import db_request, get_current_active_user
+from api.dependencies import Rows, db_request, get_current_active_user
 from api.route_factory import register_auto_routes
 from models.request import SQLRequest
 from models.user import User
@@ -72,10 +72,11 @@ register_auto_routes(router, __requests)
     tags=["filiere", "internship"],
     summary="Filiere",
     description="Return the list of filieres",
+    response_model=None,
 )
 def stages(
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     # request = requests("get_" + inspect.currentframe().f_code.co_name)
     request = requests("get_stages")
 

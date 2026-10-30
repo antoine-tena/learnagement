@@ -4,6 +4,7 @@ from typing import Annotated, Any
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 
+from api.dependencies import Rows
 from db.connection import get_connection
 
 # FixMe global variable that store app data must be store in data area (BD or other) not in API
@@ -414,14 +415,15 @@ def save_assignments(assignments: list[dict], final_places: dict, current_user: 
     "/university/admin/assignment/status",
     tags=["admin", "mobility"],
     summary="Get assignment progress",
+    response_model=None,
 )
 def get_assignment_status(
     current_user: Annotated[User, Depends(get_current_active_user)],  # to require connected user
-):
+) -> object:
     return assignment_progress
 
 
-def execute_assignment_task(payload: AssignmentRunPayload, current_user: User):
+def execute_assignment_task(payload: AssignmentRunPayload, current_user: User) -> None:
     global assignment_progress
     assignment_progress = {"is_running": True, "progress": 0, "step": "Démarrage...", "error": None}
     try:
@@ -474,12 +476,13 @@ def execute_assignment_task(payload: AssignmentRunPayload, current_user: User):
     tags=["admin", "mobility"],
     summary="Run assignment algorithm",
     description="Lancer l'algorithme d'affectation automatique pour la mobilité internationale",
+    response_model=None,
 )
 def run_mobility_assignment(
     payload: AssignmentRunPayload,
     background_tasks: BackgroundTasks,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> object:
     """
     Route principale de l'algorithme (asynchrone).
     Seuls les administrateurs RI pourront lancer cette route.
@@ -501,11 +504,12 @@ class MobilityQuotasUpdatePayload(BaseModel):
     tags=["admin", "mobility"],
     summary="Get mobility quotas",
     description="Récupérer les quotas de mobilité par filière",
+    response_model=None,
 )
 def get_mobility_quotas(
     annee_scolaire: str,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> Rows:
     query = """
         SELECT id_filiere, id_semestre, places
         FROM MOB_filiere_quotas
@@ -524,11 +528,12 @@ def get_mobility_quotas(
     tags=["admin", "mobility"],
     summary="Save mobility quotas",
     description="Sauvegarder les quotas de mobilité par filière",
+    response_model=None,
 )
 def save_mobility_quotas(
     payload: MobilityQuotasUpdatePayload,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> object:
     allowed = ["relations_internationales"]
     with get_connection() as conn:
         # D'abord, supprimer les anciens quotas pour cette année
@@ -568,12 +573,13 @@ def save_mobility_quotas(
     tags=["etudiant", "mobility"],
     summary="Get student mobility quota",
     description="Récupérer les quotas disponibles pour la filière d'un étudiant",
+    response_model=None,
 )
 def get_student_quota(
     id_etudiant: int,
     annee_scolaire: str,
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> object:
     # Récupérer la filière de l'étudiant
     # Note : allowedRolesRequester contient "connected_user" pour permettre à l'étudiant de
     # l'appeler.
