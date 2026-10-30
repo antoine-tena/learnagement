@@ -7,7 +7,7 @@ n'est ouvert.**
 
 North star: **Learnagement in service**.
 
-**Next free: T-13.**
+**Next free: T-17.**
 
 ---
 
@@ -36,21 +36,21 @@ test par requête.
 MySQL en direct : deux chemins vers les données, deux contrôles d'accès. Les faire passer par
 `utils/apiProxy.php` et une route de l'API.
 
+### T-14 · Next.js à jour : la faille du middleware corrigée
+- **Type**: bug
+- **Status**: todo
+- **Opened**: 2026-10-30
+- **Effort**: S · **Owner**: — · **Due**: —
+- **Origin**: `kiln set frontend=next` (pnpm signale next@15.1.2 obsolète)
+
+`frontend/` est en Next 15.1.2, touché par CVE-2025-29927 : un en-tête
+`x-middleware-subrequest` contourne le middleware, donc l'authentification de `middleware.ts`
+(`withAuth`). Passer en Next 16 (la version de kiln), ESLint 9 et `eslint-config-next`
+installés, `middleware.ts` → `proxy.ts`.
+
 ## 🟠 Important
 
 
-### T-04 · L'arborescence suit kiln : `backend/`, `frontend/`
-- **Type**: improvement
-- **Status**: todo
-- **Opened**: 2026-10-30
-- **Effort**: M · **Owner**: — · **Due**: —
-- **Origin**: `kiln adopt` (« no stack of kiln found »)
-
-kiln reconnaît une pile dans `backend/` et `frontend/` : `backend_python/` → `backend/`
-(FastAPI), `front_NextJS/` → `frontend/` (Next), puis `kiln set backend=fastapi
-frontend=next`. Les autres composants prennent des noms simples : `front_PHP/` → `web/`,
-`front_DashPlotly/` → `dashboards/`, `scrapping/` → `scraping/`, le lanceur dans `launcher/`.
-Chemins mis à jour dans le lanceur, `docker/`, le README.
 
 ### T-05 · uv partout : `pyproject.toml` et `uv.lock`
 - **Type**: improvement
@@ -124,6 +124,41 @@ plus en argument de `mysqldump`.
 `LNM_university.py` (1 868 lignes), `MAQUETTE_module.py` (1 067), `mobility-admin.php`
 (2 953), les deux cartes de mobilité presque identiques (`mobility-map.php`,
 `mobility-map_open.php`). Un module par domaine, tests d'abord (`/kiln:modernize`).
+
+### T-13 · Logs de l'API en structlog
+- **Type**: improvement
+- **Status**: todo
+- **Opened**: 2026-10-30
+- **Effort**: S · **Owner**: — · **Due**: —
+- **Origin**: charte LOGGING (exception temporaire dans `kiln-waivers.toml`)
+
+`logging.getLogger` dans 15 modules de `backend/` et `print()` dans `app.py`, `init.py`,
+`system/access_auth.py` : un `structlog` configuré dans `core/logging.py`, des événements
+`domaine.evenement` avec leurs champs. Retirer l'exception LOGGING à la fin.
+
+### T-15 · Intitulés de modules abîmés dans les jeux de données
+- **Type**: bug
+- **Status**: todo
+- **Opened**: 2026-10-30
+- **Effort**: XS · **Owner**: — · **Due**: —
+- **Origin**: renommage des dossiers (grep de `front_DashPlotly`)
+
+`db/freeData/small_set/V0.0.5__data_small.sql` (l. 2999-3000) et
+`db/freeData/Polytech_Annecy_Chambery/V0.3.8__data_Polytech_Annecy_Chambery.sql` (l. 569-570) :
+« Analyse et front_DashPlotly de données », trace d'un rechercher-remplacer ; sans doute
+« Analyse et visualisation de données ». Vérifier avec Flavien, corriger par une migration de
+données.
+
+### T-16 · Le mot de passe n'est plus haché dans le navigateur
+- **Type**: bug
+- **Status**: todo
+- **Opened**: 2026-10-30
+- **Effort**: XS · **Owner**: — · **Due**: —
+- **Origin**: lecture de `frontend/app/activateAccount/page.tsx`
+
+La page d'activation hache le mot de passe avec `bcryptjs` côté client puis envoie le hash : le
+hash devient le secret, et le serveur ne contrôle ni le coût ni le sel. Envoyer le mot de passe
+en HTTPS, hacher dans l'API (`pwdlib`).
 
 ## ⚪ Background — long-running work, debt and ideas
 
