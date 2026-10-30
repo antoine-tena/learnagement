@@ -16,6 +16,7 @@ export const useInfosModuleStore = create<Module>()((set) => ({
         id_responsable: -1,
         id_etat_module: -1,
         commentaire: "",
+        has_learning_unit: false,
         modifiable: -1},
     setModule: (moduleInfos: ModuleInfos) => set({module: moduleInfos}), /* Mise à jour des infos du module */
     // setLoggedin: (bool: boolean) => set((state) => ({user: {...state.user, loggedin:bool}}))
