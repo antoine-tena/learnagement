@@ -29,7 +29,8 @@ supprime un dossier, un domaine ou un point d'entrée.
 - `front_DashPlotly/` : les tableaux de bord Dash (`main.py`, une app `appNN_*` par vue et son
   `_tools.py`), `apc_dash/` (approche par compétences).
 - `front_NextJS/` : le front Next.js en cours de refonte (`app/`, proxy vers l'API Python).
-- `phpbackend/` : l'ancien backend PHP, remplacé par `backend_python/`, plus lancé.
+- `archive/` : le code mort gardé pour mémoire (ancien backend PHP…), hors des règles ; son
+  `README.md` dit ce que chaque chose était.
 - `db/` : `sql/` (schéma, migrations versionnées `VX.Y.Z__*.sql`), `freeData/` (jeux de données
   libres), `tools/`, `update/` ; `db/data/` et `db/backup/` sont privés et ignorés.
 - `scrapping/` : scripts d'import (notes, agenda, stages, étudiants…).
