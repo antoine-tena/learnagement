@@ -161,16 +161,6 @@ en HTTPS, hacher dans l'API (`pwdlib`).
 Regrouper routes, requêtes et modèles d'un même domaine (mobilité, maquette, auth…) au lieu de
 couches séparées (`api/`, `domains/`, `models/`, `repositories/`). À mener avec T-11.
 
-### T-30 · `scraping/` en vrai paquet testé
-- **Type**: improvement
-- **Status**: todo
-- **Opened**: 2026-10-30
-- **Effort**: M · **Owner**: — · **Due**: —
-- **Origin**: revue de l'arborescence
-
-Les scripts font `import lien_db` et dépendent du dossier d'où on les lance : un paquet, une
-commande par import, des tests sans réseau.
-
 ### T-31 · Des noms parlants pour les tableaux de bord
 - **Type**: improvement
 - **Status**: todo

@@ -47,3 +47,6 @@ Thumbs.db
 *:Zone.Identifier
 .env_*
 .next/
+
+# scraping exports: personal data
+scraping/out/
