@@ -46,3 +46,4 @@ logs/
 .DS_Store
 Thumbs.db
 *:Zone.Identifier
+.env_*
