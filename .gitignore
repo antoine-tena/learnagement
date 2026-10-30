@@ -6,7 +6,7 @@
 **/tmp/*
 *.lock
 
-# data and backup directories store private data, NEVER PUT IN ON GIT 
+# data and backup directories store private data, NEVER PUT IN ON GIT
 **/data
 **/backup
 db/docker-entrypoint-initdb.d
@@ -47,3 +47,4 @@ logs/
 Thumbs.db
 *:Zone.Identifier
 .env_*
+.next/
