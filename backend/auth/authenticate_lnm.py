@@ -8,15 +8,16 @@ from pwdlib.hashers.bcrypt import BcryptHasher
 from api.dependencies import get_user, logger
 from auth.authenticate_tools import create_access_token
 from models.token import Token
+from models.user import UserInDB
 
 password_hash = PasswordHash((BcryptHasher(),))
 
 
-def verify_password(plain_password, hashed_password):
+def verify_password(plain_password: str, hashed_password: str) -> bool:
     return password_hash.verify(plain_password, hashed_password)
 
 
-def __authenticate_user_lnm(user_login: str, password: str):
+def __authenticate_user_lnm(user_login: str, password: str) -> UserInDB | None:
     user = get_user(user_login)
     if not user:
         logger.info(f"User {user_login} does not exist")
@@ -53,5 +54,5 @@ async def login_for_access_token(
     return Token(access_token=access_token, token_type="bearer")
 
 
-def logout():
+def logout() -> dict[str, str]:
     return {"message": "Logout page in construction"}

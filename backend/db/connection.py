@@ -1,12 +1,13 @@
 import os
+from collections.abc import Iterator
 from contextlib import contextmanager
 
-from sqlalchemy import URL, create_engine
+from sqlalchemy import URL, Connection, Engine, create_engine
 
-_engine = None
+_engine: Engine | None = None
 
 
-def get_engine():
+def get_engine() -> Engine:
     global _engine
     if _engine is None:
         url = URL.create(  # gère les caractères spéciaux du mot de passe
@@ -29,14 +30,14 @@ def get_engine():
 
 
 @contextmanager
-def get_connection():
+def get_connection() -> Iterator[Connection]:
     """Connexion + transaction : commit à la sortie, rollback sur exception."""
     with get_engine().begin() as conn:
         yield conn
 
 
 @contextmanager
-def get_read_connection():
+def get_read_connection() -> Iterator[Connection]:
     with get_engine().connect() as conn:
         yield conn  # fermeture = rollback implicite, retour au pool
 

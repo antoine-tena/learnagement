@@ -7,7 +7,7 @@ import mysql.connector
 from mysql.connector.abstracts import MySQLConnectionAbstract
 from mysql.connector.pooling import PooledMySQLConnection
 
-from core.config import bcolors
+from core.config import TermColors
 
 dotenv.load_dotenv(".env")
 
@@ -366,12 +366,16 @@ def init() -> None:
     print("##############################################################", flush=True)
     tables = request(requests["check"]["table_without_secondary_K"])
     for table in tables:
-        print(bcolors.WARNING + "Warning: " + table + " has no secondary key!" + bcolors.ENDC)
+        print(TermColors.WARNING + "Warning: " + table + " has no secondary key!" + TermColors.ENDC)
 
     tables = request(requests["check"]["primaryK_namming_error"])
     for table in tables:
         print(
-            bcolors.WARNING + "Warning: " + table + " has wrong primary key naming!" + bcolors.ENDC
+            TermColors.WARNING
+            + "Warning: "
+            + table
+            + " has wrong primary key naming!"
+            + TermColors.ENDC
         )
 
     linked_tables = request(requests["struct"]["linked_table"])
@@ -397,9 +401,9 @@ def init() -> None:
 
     conn.close()
     print(
-        bcolors.OKGREEN
+        TermColors.OKGREEN
         + "Init BD Framework requirement done (Check previous Warning)!"
-        + bcolors.ENDC
+        + TermColors.ENDC
     )
 
 

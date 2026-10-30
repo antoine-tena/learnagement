@@ -1,5 +1,6 @@
 # import auth.authenticate_ldap
 # import auth.authenticate_proxy_cas
+from collections.abc import Callable
 from typing import Annotated
 
 import dotenv
@@ -51,15 +52,15 @@ def logout() -> object:
 
 
 # ToDo check usefully => comment or remove
-def permission(func):
-    def wrapper(*args, **kwargs):
+def permission[**P, R](func: Callable[P, R]) -> Callable[P, R]:
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
         return func(*args, **kwargs)
 
     return wrapper
 
 
 # ToDo check usefully => comment or remove
-def main():
+def main() -> dict[str, str]:
     return {"message": "authenticate module"}
 
 

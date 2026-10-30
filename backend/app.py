@@ -1,12 +1,15 @@
 import logging
 import os
+from collections.abc import Awaitable, Callable
+from typing import override
 
 import uvicorn
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 import init
 from auth import authenticate
+from core.config import TermColors
 from system import access_auth, check
 from user import (
     apc_competence,
@@ -22,24 +25,12 @@ from user import (
     maquette_module,
 )
 
-
-class bcolors:
-    HEADER = "\033[95m"
-    OKBLUE = "\033[94m"
-    OKCYAN = "\033[96m"
-    OKGREEN = "\033[92m"
-    WARNING = "\033[93m"
-    FAIL = "\033[91m"
-    ENDC = "\033[0m"
-    BOLD = "\033[1m"
-    UNDERLINE = "\033[4m"
-
-
 access_logger = logging.getLogger("uvicorn.access")
 
 
 class HealthFilter(logging.Filter):
-    def filter(self, record):
+    @override
+    def filter(self, record: logging.LogRecord) -> bool:
         return "/health" not in record.getMessage()
 
 
@@ -87,7 +78,9 @@ def health() -> object:
 
 # make health silent (without log)
 @app.middleware("http")
-async def silence_health_logs(request: Request, call_next):
+async def silence_health_logs(
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
+) -> Response:
     if request.url.path == "/health":
         previous_state = access_logger.disabled
         access_logger.disabled = True
@@ -105,9 +98,9 @@ async def root() -> object:
 
 
 if __name__ == "__main__":
-    print(bcolors.OKGREEN + "Init BD framework..." + bcolors.ENDC)
+    print(TermColors.OKGREEN + "Init BD framework..." + TermColors.ENDC)
     init.init()
-    print(bcolors.OKGREEN + "Start backend Python..." + bcolors.ENDC)
+    print(TermColors.OKGREEN + "Start backend Python..." + TermColors.ENDC)
 
     is_prod = os.getenv("ENV", "dev") == "prod"
     ssl_dir = os.getenv("DOCKER_SSL_INTERNAL_DIR")

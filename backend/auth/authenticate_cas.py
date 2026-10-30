@@ -53,7 +53,7 @@ def verify_cas_service_token(x_cas_token: Annotated[str | None, Header()] = None
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid CAS service token",
-        )
+        ) from None
 
 
 async def authenticate_cas(data: CasUserProvision) -> Token:
