@@ -5,7 +5,7 @@
 # and raise, and its own rules can be added here.
 
 size = "medium"
-exclude = ["/migrations/", "/notebooks/"]
+exclude = ["/migrations/", "/notebooks/", "archive/"]
 unverified_rules = "scripts/ci/unverified-rules.txt"
 
 [bans.forbidden-tools]

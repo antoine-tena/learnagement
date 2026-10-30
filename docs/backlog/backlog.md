@@ -38,16 +38,6 @@ MySQL en direct : deux chemins vers les données, deux contrôles d'accès. Les 
 
 ## 🟠 Important
 
-### T-03 · Le code mort rangé dans `archive/`
-- **Type**: task
-- **Status**: todo
-- **Opened**: 2026-10-30
-- **Effort**: XS · **Owner**: — · **Due**: —
-- **Origin**: lecture du code
-
-`phpbackend/` (plus lancé depuis février 2026, remplacé par `backend_python/`), les exemples et
-doublons (`front_DashPlotly/multi_page_integration_example.py`, `scrapping/testIcal.py`…) vont
-dans `archive/`, hors des règles de kiln, sans être supprimés.
 
 ### T-04 · L'arborescence suit kiln : `backend/`, `frontend/`
 - **Type**: improvement
