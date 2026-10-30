@@ -233,13 +233,13 @@ def get_modules_intervenants(
                 LNM_seance_type.type,
                 LNM_semestre.semestre
             FROM CLASS_session
-            	LEFT JOIN LNM_groupe ON LNM_groupe.id_groupe = CLASS_session.id_groupe
+                LEFT JOIN LNM_groupe ON LNM_groupe.id_groupe = CLASS_session.id_groupe
                 LEFT JOIN LNM_promo ON LNM_promo.id_promo = LNM_groupe.id_promo
                 LEFT JOIN ExplicitSecondaryKs_LNM_promo
                     ON ExplicitSecondaryKs_LNM_promo.id_promo = LNM_promo.id_promo
-            	LEFT JOIN MAQUETTE_module_sequence
+                LEFT JOIN MAQUETTE_module_sequence
                  ON MAQUETTE_module_sequence.id_module_sequence = CLASS_session.id_module_sequence
-            	LEFT JOIN MAQUETTE_module_sequencage
+                LEFT JOIN MAQUETTE_module_sequencage
                  ON MAQUETTE_module_sequencage.id_module_sequencage
                      = MAQUETTE_module_sequence.id_module_sequencage
                 LEFT JOIN MAQUETTE_module
@@ -294,13 +294,13 @@ SELECT
                 LNM_seance_type.type,
                 LNM_semestre.semestre
             FROM CLASS_session
-            	LEFT JOIN LNM_groupe ON LNM_groupe.id_groupe = CLASS_session.id_groupe
+                LEFT JOIN LNM_groupe ON LNM_groupe.id_groupe = CLASS_session.id_groupe
                 LEFT JOIN LNM_promo ON LNM_promo.id_promo = LNM_groupe.id_promo
                 LEFT JOIN ExplicitSecondaryKs_LNM_promo
                     ON ExplicitSecondaryKs_LNM_promo.id_promo = LNM_promo.id_promo
-            	LEFT JOIN MAQUETTE_module_sequence
+                LEFT JOIN MAQUETTE_module_sequence
                  ON MAQUETTE_module_sequence.id_module_sequence = CLASS_session.id_module_sequence
-            	LEFT JOIN MAQUETTE_module_sequencage
+                LEFT JOIN MAQUETTE_module_sequencage
                  ON MAQUETTE_module_sequencage.id_module_sequencage
                      = MAQUETTE_module_sequence.id_module_sequencage
                 LEFT JOIN MAQUETTE_module
@@ -433,7 +433,7 @@ def get_sequences_responsable(
                     LNM_groupe_type.groupe_type,
                     ExplicitSecondaryKs_LNM_enseignant.ExplicitSecondaryK as intervenant_principal
             FROM MAQUETTE_module_sequence
-            	LEFT JOIN MAQUETTE_module_sequencage
+                LEFT JOIN MAQUETTE_module_sequencage
                  ON MAQUETTE_module_sequencage.id_module_sequencage
                      = MAQUETTE_module_sequence.id_module_sequencage
                 LEFT JOIN MAQUETTE_module
@@ -471,7 +471,7 @@ def get_sessions_responsable(
     request = {
         "request": """
             SELECT
-	            CLASS_session.id_session,
+                        CLASS_session.id_session,
                 CLASS_session.id_groupe,
                 LNM_groupe.nom_groupe,
                 LNM_promo.id_promo,
@@ -485,14 +485,14 @@ def get_sessions_responsable(
                 MAQUETTE_module.code_module,
                 LNM_seance_type.type,
                 ExplicitSecondaryKs_LNM_enseignant.ExplicitSecondaryK as intervenant
-			FROM CLASS_session
-            	LEFT JOIN LNM_groupe ON LNM_groupe.id_groupe = CLASS_session.id_groupe
+                    FROM CLASS_session
+                LEFT JOIN LNM_groupe ON LNM_groupe.id_groupe = CLASS_session.id_groupe
                 LEFT JOIN LNM_promo ON LNM_promo.id_promo = LNM_groupe.id_promo
                 LEFT JOIN ExplicitSecondaryKs_LNM_promo
                     ON ExplicitSecondaryKs_LNM_promo.id_promo = LNM_promo.id_promo
-            	LEFT JOIN MAQUETTE_module_sequence
+                LEFT JOIN MAQUETTE_module_sequence
                  ON MAQUETTE_module_sequence.id_module_sequence = CLASS_session.id_module_sequence
-            	LEFT JOIN MAQUETTE_module_sequencage
+                LEFT JOIN MAQUETTE_module_sequencage
                  ON MAQUETTE_module_sequencage.id_module_sequencage
                      = MAQUETTE_module_sequence.id_module_sequencage
                 LEFT JOIN MAQUETTE_module
@@ -581,7 +581,7 @@ def get_module_sequence_dependencies(
                 MAQUETTE_module_sequence.numero_ordre, LNM_seance_type.type,
                 MAQUETTE_module.code_module, MAQUETTE_module.nom,
                 MAQUETTE_module_sequence.commentaire
-			FROM MAQUETTE_module_sequence
+                    FROM MAQUETTE_module_sequence
                 JOIN MAQUETTE_module_sequencage
                     ON MAQUETTE_module_sequencage.id_module_sequencage
                         = MAQUETTE_module_sequence.id_module_sequencage
@@ -647,8 +647,8 @@ def get_data_gantt_endpoint(
     request = {
         "request": """
             SELECT
-	            pmms.id_module_sequence AS "prv_id",
-	            pmm.code_module AS "prv_code_module",
+                        pmms.id_module_sequence AS "prv_id",
+                        pmm.code_module AS "prv_code_module",
                 pmm.nom AS "prv_nom",
                 pmd.nom AS "prv_discipline",
                 pls.semestre AS "prv_semestre",

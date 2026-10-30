@@ -211,13 +211,13 @@ def get_access_auth_tree(
 # ─────────────────────────────────────────────
 
 
-def is_direct_wrapper(node) -> bool:
+def is_direct_wrapper(node: exp.Expression) -> bool:
     """
     Retourne True si le nœud est une simple transformation
     qui expose directement le champ sous-jacent :
     CAST, ROUND, FLOOR, CEIL, COALESCE à 1 arg, alias simple...
     """
-    DIRECT_WRAPPERS = {
+    direct_wrappers = {
         exp.Cast,
         exp.Round,
         exp.Floor,
@@ -228,10 +228,10 @@ def is_direct_wrapper(node) -> bool:
         exp.Coalesce,
         exp.TryCast,
     }
-    return type(node) in DIRECT_WRAPPERS
+    return type(node) in direct_wrappers
 
 
-def classify_column_in_expression(col: exp.Column, root_expr) -> str:
+def classify_column_in_expression(col: exp.Column, root_expr: exp.Expression) -> str:
     """
     Détermine si une colonne dans une expression est accédée
     de manière 'direct' ou 'indirect'.
@@ -261,7 +261,7 @@ def classify_column_in_expression(col: exp.Column, root_expr) -> str:
         return "direct"
 
     # Fonctions d'agrégation → indirect
-    AGGREGATE_FUNCTIONS = {
+    aggregate_functions = {
         exp.Sum,
         exp.Avg,
         exp.Max,
@@ -270,13 +270,10 @@ def classify_column_in_expression(col: exp.Column, root_expr) -> str:
         exp.StddevPop,
         exp.VariancePop,
     }
-    for ancestor in col.walk():
-        pass  # on va utiliser find_ancestor à la place
-
     # Remontée manuelle vers la racine
     node = col.parent
     while node is not None and node is not root_expr:
-        if type(node) in AGGREGATE_FUNCTIONS:
+        if type(node) in aggregate_functions:
             return "indirect"
         if isinstance(node, exp.Subquery):
             return "indirect"
@@ -284,7 +281,7 @@ def classify_column_in_expression(col: exp.Column, root_expr) -> str:
             return "indirect"
         if isinstance(node, exp.Anonymous):  # fonctions inconnues ex: IFNULL
             return "indirect"
-        if isinstance(node, exp.If) or isinstance(node, exp.Case):
+        if isinstance(node, exp.If | exp.Case):
             return "indirect"
         node = node.parent
 

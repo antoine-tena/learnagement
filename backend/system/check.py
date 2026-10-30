@@ -75,13 +75,13 @@ requests = {
                 LNM_seance_type.type,
                 LNM_semestre.semestre
             FROM CLASS_session
-            	LEFT JOIN LNM_groupe ON LNM_groupe.id_groupe = CLASS_session.id_groupe
+                LEFT JOIN LNM_groupe ON LNM_groupe.id_groupe = CLASS_session.id_groupe
                 LEFT JOIN LNM_promo ON LNM_promo.id_promo = LNM_groupe.id_promo
                 LEFT JOIN ExplicitSecondaryKs_LNM_promo
                     ON ExplicitSecondaryKs_LNM_promo.id_promo = LNM_promo.id_promo
-            	LEFT JOIN MAQUETTE_module_sequence
+                LEFT JOIN MAQUETTE_module_sequence
                  ON MAQUETTE_module_sequence.id_module_sequence = CLASS_session.id_module_sequence
-            	LEFT JOIN MAQUETTE_module_sequencage
+                LEFT JOIN MAQUETTE_module_sequencage
                  ON MAQUETTE_module_sequencage.id_module_sequencage
                      = MAQUETTE_module_sequence.id_module_sequencage
                 LEFT JOIN MAQUETTE_module
@@ -289,7 +289,7 @@ requests = {
     description="Check teacher without session.",
     response_model=None,
 )
-def checkLNM_enseignant_sans_cours(
+def check_lnm_enseignant_sans_cours(
     current_user: Annotated[User, Depends(get_current_active_user)],
 ) -> Rows:
     request = requests["get_" + inspect.currentframe().f_code.co_name]
@@ -306,7 +306,7 @@ def checkLNM_enseignant_sans_cours(
     description="Check module not link to a learning unit.",
     response_model=None,
 )
-def checkMAQUETTE_moduleWithoutLearningUnit(
+def check_maquette_module_without_learning_unit(
     current_user: Annotated[User, Depends(get_current_active_user)],
 ) -> Rows:
     request = requests["get_" + inspect.currentframe().f_code.co_name]
@@ -396,7 +396,7 @@ def maquette_vs_sequencage(
     description="Check whether the number of sequencage hours corresponds to the program.",
     response_model=None,
 )
-def maquette_vs_sequencage_by_idResp(
+def maquette_vs_sequencage_by_id_resp(
     id_responsable: int,
     current_user: Annotated[User, Depends(get_current_active_user)],
 ) -> Rows:
