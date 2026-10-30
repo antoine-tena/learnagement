@@ -4,12 +4,12 @@ CREATE TABLE IF NOT EXISTS `LNM_calendar` (
 
     -- Correction de la syntaxe pour la clé unique composée
     UNIQUE KEY `SECONDARY` (`url_name`, `id_etudiant`, `id_enseignant`, `id_administratif`),
-    
+
     -- Identifiants uniques individuels
     `id_etudiant` INT DEFAULT NULL UNIQUE,
     `id_enseignant` INT DEFAULT NULL UNIQUE,
     `id_administratif` INT DEFAULT NULL UNIQUE,
-    
+
     `url` TEXT NOT NULL,
 
     -- Contraintes de clés étrangères

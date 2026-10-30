@@ -9,9 +9,9 @@ from httpx import Response
 
 from access_control.checker import check_access
 from api.dependencies import Rows, get_current_active_user
+from domains import maquette_module
 from models.request import SQLRequest
 from models.user import User
-from user import maquette_module
 
 # ─────────────────────────────────────────────
 # Jeu de données : 2 modules, 2 responsables

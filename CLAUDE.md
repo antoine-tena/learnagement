@@ -17,14 +17,13 @@ supprime un dossier, un domaine ou un point d'entrée.
 - `Learnagement.py` : point d'entrée du lanceur (`python Learnagement.py start`, `stop`,
   `generate-env`, `backupdb`…), dont le code est dans `launcher/` : `cli.py` (les commandes
   click), `env.py` (génération et propagation des `.env`), `config.py` (conteneurs,
-  environnements), `security.py` (certificats : `python -m launcher.security`), `tools.py`,
-  `compose.py` (générateur de compose, pas encore branché). `bootstrap.py` crée le venv et
-  lance `Learnagement.py`.
+  environnements), `security.py` (certificats : `python -m launcher.security`), `tools.py`.
+  `bootstrap.py` crée le venv et lance `Learnagement.py`.
 - `docker/` : un dossier par conteneur (`backend/`, `web/`, `frontend/`, `dashboards/`,
   `phpmyadmin/` : Dockerfile, entrypoint) et `docker-compose.yml.skeleton`, d'où le lanceur
   produit `docker/docker-compose.yml` (ignoré).
 - `backend/` : l'API FastAPI (`app.py`) ; `api/` (routes, `dependencies.py`), `auth/` (LNM et
-  CAS), `access_control/` (règles, prédicats, responsabilités), `user/` (requêtes métier par
+  CAS), `access_control/` (règles, prédicats, responsabilités), `domains/` (requêtes métier par
   domaine : `lnm_university.py`, `maquette_module.py`…, en snake_case ; les tables SQL gardent leur casse), `models/`, `db/` (connexion
   SQLAlchemy), `tests/` (pytest).
 - `web/` : le front principal, en PHP (Apache) ; `index.php` + `utils/router.php`, `views/`
@@ -34,7 +33,7 @@ supprime un dossier, un domaine ou un point d'entrée.
 - `frontend/` : le front Next.js en cours de refonte (`app/`, proxy vers l'API).
 - `scraping/` : scripts d'import (notes, agenda, stages, étudiants…).
 - `db/` : `sql/` (schéma, migrations versionnées `VX.Y.Z__*.sql`), `freeData/` (jeux de données
-  libres), `tools/`, `update/` ; `db/data/` et `db/backup/` sont privés et ignorés.
+  libres), `tools/` ; `db/data/` et `db/backup/` sont privés et ignorés.
 - `archive/` : le code mort gardé pour mémoire (ancien backend PHP…), hors des règles ; son
   `README.md` dit ce que chaque chose était.
 - `docs/` : la documentation (`README.md` en est l'index), `docs/mobility/` pour le module de

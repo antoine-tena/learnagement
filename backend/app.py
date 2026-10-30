@@ -10,8 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import init
 from auth import authenticate
 from core.config import TermColors
-from system import access_auth, check
-from user import (
+from domains import (
     apc_competence,
     apc_data,
     apc_kpi_competence,
@@ -24,6 +23,7 @@ from user import (
     lnm_university,
     maquette_module,
 )
+from system import access_auth, check
 
 access_logger = logging.getLogger("uvicorn.access")
 
