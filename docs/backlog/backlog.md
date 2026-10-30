@@ -20,7 +20,7 @@ North star: **Learnagement in service**.
 - **Effort**: S · **Owner**: — · **Due**: —
 - **Origin**: `kiln score`, règle SQL-PARAMETERS
 
-`backend_python/api/dependencies.py` (l. 40 à 110) insère des valeurs dans le texte SQL :
+`backend/api/dependencies.py` (l. 40 à 110) insère des valeurs dans le texte SQL :
 injection possible. Passer par les paramètres liés de SQLAlchemy (`text(...)` + `:nom`), un
 test par requête.
 
@@ -31,7 +31,7 @@ test par requête.
 - **Effort**: S · **Owner**: — · **Due**: —
 - **Origin**: lecture du code
 
-`front_PHP/utils/connectDB.php`, `views/base/@post/inscription.php`,
+`web/utils/connectDB.php`, `views/base/@post/inscription.php`,
 `views/dashboard/@post/dependance_module.php`, `views/dashboard/create_stage.php` parlent à
 MySQL en direct : deux chemins vers les données, deux contrôles d'accès. Les faire passer par
 `utils/apiProxy.php` et une route de l'API.

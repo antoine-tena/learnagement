@@ -33,11 +33,11 @@ webApp/
 ### Structure des Dossiers
 
 ```
-front_NextJS/
+frontend/
 ├── app/               # Pages et composants Next.js
 ├── lib/               # Bibliothèques utilitaires
 ├── public/            # Assets statiques (icones, logos etc...)
-├── .env               # variables d'environnements (pour NextAuth.js : NEXTAUTH_URL=http://localhost:40080/, NEXTAUTH_SECRET=[à générer cf. NextAuth.js doc]) 
+├── .env               # variables d'environnements (pour NextAuth.js : NEXTAUTH_URL=http://localhost:40080/, NEXTAUTH_SECRET=[à générer cf. NextAuth.js doc])
 └── tailwind.config.ts # Fichier de configuration tailwind
 ```
 
@@ -61,7 +61,7 @@ Voici un schéma de la documentation officielle de NextAuth.js, qui montre comme
 
 **Utiliser la session côté client**
 
-Pour vérifier si un utilisateur est connecté pour effectué une redirection, il suffit d’utiliser `useSession` 
+Pour vérifier si un utilisateur est connecté pour effectué une redirection, il suffit d’utiliser `useSession`
 
 Exemple de redirection si l’utilisateur est connecté :
 
@@ -70,7 +70,7 @@ import {useSession} from "next-auth/react"
 
 export default function example(){
 	    const {data: session, status} = useSession()
-	    
+
 	    useEffect(() => {
         if (status == 'authenticated'){
             router.push('/homepage')
@@ -86,11 +86,11 @@ export default function example(){
     - Gère les requêtes GET et POST
     - Redirige vers le backend PHP
 2. **Fonctionnement**
-    
+
     ```tsx
     // Exemple de requête depuis le frontend axios.get('/api/proxy/get_filieres')
     ```
-    
+
     - Capture la requête
     - Récupère le chemin après `/api/proxy/`
     - Redirige vers le backend (`http://php/get_filieres.php`) php correspond au nom du service docker.
