@@ -84,7 +84,8 @@ modifie un de ces fichiers doit les corriger. À solder d'un coup.
 
 `start --docker_option=-d` plante (`TypeError: can only concatenate list (not "str") to
 list`). `Learnagement.py` (715 lignes) se découpe par commande ; les mots de passe ne passent
-plus en argument de `mysqldump`.
+plus en argument de `mysqldump`. `launcher/cli.py` et `launcher/env.py` ne passent pas ruff
+(58 erreurs, dont 37 `LOG015`, et le format) : le lanceur n'est pas encore dans le pre-commit.
 
 ### T-08 · Python : plus d'`except:` nu ni de date sans fuseau
 - **Type**: improvement
