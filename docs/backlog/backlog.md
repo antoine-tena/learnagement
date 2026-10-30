@@ -7,7 +7,7 @@ n'est ouvert.**
 
 North star: **Learnagement in service**.
 
-**Next free: T-21.**
+**Next free: T-29.**
 
 ---
 
@@ -84,7 +84,8 @@ modifie un de ces fichiers doit les corriger. À solder d'un coup.
 
 `start --docker_option=-d` plante (`TypeError: can only concatenate list (not "str") to
 list`). `Learnagement.py` (715 lignes) se découpe par commande ; les mots de passe ne passent
-plus en argument de `mysqldump`.
+plus en argument de `mysqldump`. `launcher/cli.py` et `launcher/env.py` ne passent pas ruff
+(58 erreurs, dont 37 `LOG015`, et le format) : le lanceur n'est pas encore dans le pre-commit.
 
 ### T-08 · Python : plus d'`except:` nu ni de date sans fuseau
 - **Type**: improvement
@@ -101,16 +102,6 @@ plus en argument de `mysqldump`.
 - **Opened**: 2026-10-30
 - **Effort**: S · **Owner**: — · **Due**: —
 - **Origin**: `kiln score`, règles JS-LINTER et NO-ANY
-
-### T-10 · La doc rangée dans `docs/`, les `.env` d'exemple nommés clairement
-- **Type**: task
-- **Status**: todo
-- **Opened**: 2026-10-30
-- **Effort**: XS · **Owner**: — · **Due**: —
-- **Origin**: lecture du repo
-
-`Doc/` → `docs/`, les six `ToDo.md` versés en tickets ici, `GIT.md`, `PERMISSIONS.md` dans
-`docs/`. README à jour (uv, podman, nouvelle arborescence).
 
 ### T-11 · Les fichiers géants découpés
 - **Type**: improvement
@@ -159,6 +150,79 @@ hash devient le secret, et le serveur ne contrôle ni le coût ni le sel. Envoye
 en HTTPS, hacher dans l'API (`pwdlib`).
 
 ## ⚪ Background — long-running work, debt and ideas
+
+### T-21 · Code, commentaires et doc en anglais
+- **Type**: idea
+- **Status**: todo
+- **Opened**: 2026-10-30
+- **Effort**: L · **Owner**: — · **Due**: —
+- **Origin**: ancien `ToDo/ToDo.md`
+
+Tout passer en anglais, sauf l'interface. À décider avec Flavien.
+
+### T-22 · Interface multilingue
+- **Type**: idea
+- **Status**: todo
+- **Opened**: 2026-10-30
+- **Effort**: L · **Owner**: — · **Due**: —
+- **Origin**: ancien `ToDo/ToDo.md`
+
+Une option de langue pour l'interface.
+
+### T-23 · Commande du lanceur pour extraire la structure de la base
+- **Type**: improvement
+- **Status**: todo
+- **Opened**: 2026-10-30
+- **Effort**: S · **Owner**: — · **Due**: —
+- **Origin**: ancien `ToDo/db/ToDo.md`
+
+Extraire la structure avec ses commentaires. `backupDB` existe, mais pas cette commande.
+
+### T-24 · Le rôle étudiant dans la base
+- **Type**: task
+- **Status**: to verify — `db/sql/`
+- **Opened**: 2026-10-30
+- **Effort**: XS · **Owner**: — · **Due**: —
+- **Origin**: ancien `ToDo/db/ToDo.md`
+
+L'ancienne liste demandait d'ajouter `etudiant` aux rôles : vérifier si c'est encore à faire.
+
+### T-25 · Un utilisateur dans une seule table de personnes
+- **Type**: improvement
+- **Status**: todo
+- **Opened**: 2026-10-30
+- **Effort**: S · **Owner**: — · **Due**: —
+- **Origin**: ancien `ToDo/db/ToDo.md`
+
+Vérifier qu'un utilisateur n'est présent qu'une fois parmi administratif, enseignant et étudiant.
+
+### T-26 · Commande du lanceur pour mettre à jour MySQL
+- **Type**: improvement
+- **Status**: todo
+- **Opened**: 2026-10-30
+- **Effort**: S · **Owner**: — · **Due**: —
+- **Origin**: ancien `ToDo/docker/mysql/ToDo.md`
+
+- [ ] Verrouiller l'accès à la base
+- [ ] Redémarrer Learnagement
+
+### T-27 · Nommage et structure des tableaux de bord
+- **Type**: improvement
+- **Status**: to verify — `dashboards/`
+- **Opened**: 2026-10-30
+- **Effort**: M · **Owner**: — · **Due**: —
+- **Origin**: ancien `ToDo/visualisation/ToDo.md`
+
+L'ancienne liste demandait de revoir le nommage : vérifier ce qu'il reste après T-04.
+
+### T-28 · Connexion des tableaux de bord au standard LNM
+- **Type**: improvement
+- **Status**: to verify — `dashboards/`
+- **Opened**: 2026-10-30
+- **Effort**: S · **Owner**: — · **Due**: —
+- **Origin**: ancien `ToDo/visualisation/visus/ToDo.md`
+
+Vérifier que la connexion à la base des tableaux de bord suit le standard LNM.
 
 ### T-12 · Un seul front à terme
 - **Type**: idea

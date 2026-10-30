@@ -9,7 +9,7 @@
             <?= $t->asset("Logo_Polytech_short.svg") ?>
         </a>
         <a href="https://www.univ-smb.fr/scem/formations/departement-dinformatique/" target="_blank" class="flex align-center gap-2 h-5">
-            <?= $t->asset("Logo_Université_Savoie_Mont_Blanc_2015.svg") ?>
+            <?= $t->asset("Logo_Universite_Savoie_Mont_Blanc_2015.svg") ?>
         </a>
     </div>
     <p class="lg:hidden">© <?= date("Y") ?> Polytech Annecy Chambery, All rights reserved.</p>

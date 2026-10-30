@@ -348,9 +348,9 @@ def __generate_env__(env="dev"):
     if not os.path.exists(".env"):
 
         if not os.path.exists(".env_dev.env"):
-            shutil.copy("__env_default_dev.env", ".env_dev.env")
+            shutil.copy("config/env.dev", ".env_dev.env")
         if not os.path.exists(".env_prod.env"):
-            shutil.copy("__env_default_prod.env", ".env_prod.env")
+            shutil.copy("config/env.prod", ".env_prod.env")
 
         logging.warning(f"{YELLOW}env file doesn't exist, generate it with '{env}' environnement {NC}")
 

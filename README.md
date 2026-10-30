@@ -129,4 +129,4 @@ cp /[INITIAL PATH TO LEARNAGEMENT]/db/backup/VX.X.X__data_XXX[CURENT DATE].sql .
 python Learnagement.py start
 ```
 
-[Doc](Doc/doc.md) - [ToDo Lists](./ToDo/ToDo.md) - [CRediT](./CREDITS.md) - [Licence](./LICENSE)
+[Doc](docs/README.md) - [Backlog](docs/backlog/backlog.md) - [CRediT](./CREDITS.md) - [Licence](./LICENSE)
