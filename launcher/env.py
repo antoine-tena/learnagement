@@ -5,8 +5,8 @@ import shutil
 from getpass import getpass
 
 import dotenv
-from tools import get_local_ip_and_hostname, __generate_secret__
-from config import GREEN, YELLOW, NC, containers_system, containers_prod, containers_dev, envs
+from launcher.tools import get_local_ip_and_hostname, __generate_secret__
+from launcher.config import GREEN, YELLOW, NC, containers_system, containers_prod, containers_dev, envs
 
 
 def __scan_envs(directory="."):

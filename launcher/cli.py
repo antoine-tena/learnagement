@@ -12,12 +12,12 @@ import asyncio
 import click
 from click_default_group import DefaultGroup
 #from dotenv import load_dotenv
-from env import __load_env_file, save_env_file, __set_env, __generate_base_env, propagate_env
+from launcher.env import __load_env_file, save_env_file, __set_env, __generate_base_env, propagate_env
 from pwdlib import PasswordHash
 from pwdlib.hashers.bcrypt import BcryptHasher
 from pathlib import Path
 
-from config import RED, GREEN, YELLOW, NC, containers_system, containers_prod, containers_dev, envs
+from launcher.config import RED, GREEN, YELLOW, NC, containers_system, containers_prod, containers_dev, envs
 
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
@@ -191,7 +191,7 @@ def __dbData_configuration__():
     ##########
     # Création du répertoire de données initiales
     logging.info(f"{GREEN}Configure the initial data folder{NC}")
-    
+
     # Création du répertoire de données initiales s'il n'existe pas
     data_folder = os.path.join("db", "data")
     try:
@@ -216,10 +216,10 @@ def __dbData_configuration__():
         #             # Copie le fichier
         #             shutil.copy(source_path, target_path)
         #             print(f"Copied: {source_path} -> {target_path}")
-            
+
     except OSError as error:
         logging.info(f"{GREEN}Data already exist in 'db/data'!{NC}")
-        
+
     # # Chemin vers le fichier db/data/README
     # readme_path = os.path.join(data_folder, "README")
     # # Texte à ajouter
@@ -239,13 +239,13 @@ def __dbData_configuration__():
 # Lernagement Dockers
 
 def __docker_configuration__():
-    
+
     ##########
     # Docker configuration
     logging.info(f"{GREEN}Docker configuration{NC}")
-    
+
     os.chdir("docker")
-    
+
     if not os.path.exists("docker-compose.yml"):
         shutil.copy("docker-compose.yml.skeleton", "docker-compose.yml")
         __searchReplaceInFile__("docker-compose.yml", "${INSTANCE_PROTOCOL}", os.environ["INSTANCE_PROTOCOL"])
@@ -273,19 +273,19 @@ def __docker_configuration__():
 
 
 async def __run_dockers__(docker_option):
-    
+
     ##########
     # Run Docker
     logging.info(f"{GREEN}Run Docker{NC}")
-    
+
     os.chdir("docker")
-    
+
     if os.name == 'nt':
         #prog = subprocess.Popen(['runas', '/noprofile', '/user:Administrator', 'docker-compose up'],stdin=subprocess.PIPE)
         #prog.stdin.write(b'password')
         prog = subprocess.Popen(['docker', 'compose', 'up'] + docker_option)
         prog.communicate()
-    else:    
+    else:
         subprocess.run(os.environ["DOCKER_COMPOSE_COMMAND"].split(" ") + ["up"] + docker_option, check=True)
 
     # Pause pour laisser Docker démarrer
@@ -299,7 +299,7 @@ async def __run_dockers__(docker_option):
     #     prog.communicate()
     # else:
     #     subprocess.run(os.environ["DOCKER_COMPOSE_COMMAND"].split(" ") + ["ps"], check=True)
-        
+
     os.chdir("..")
     return "done"
 
@@ -564,7 +564,7 @@ def __searchReplaceInFile__(fileName, patern, value):
 
     # Replace the target string
     filedata = filedata.replace(patern, value)
-    
+
     # Write the file out again
     with open(fileName, 'w') as file:
         file.write(filedata)
@@ -583,7 +583,7 @@ SELECT table_name FROM information_schema.tables WHERE TABLE_SCHEMA = "learnagem
     logging.info(f"{GREEN}BackUp DB{NC}")
 
     now = datetime.datetime.now().strftime('%Y%m%d%H%M%S%f')
-    
+
     if os.name == 'nt':
         logging.warning(f"{YELLOW}Not yet implemented for Windows.{NC}")
     else:
@@ -597,7 +597,7 @@ SELECT table_name FROM information_schema.tables WHERE TABLE_SCHEMA = "learnagem
         # display MySQL server version
         cmd = os.environ["DOCKER_COMMAND"].split(" ") + ["exec", "-it", "learnagement_mysql_" + os.environ["INSTANCE_NAME"], "mysqld", "--version"]
         os.system(" ".join(cmd))
-       
+
         # get Learnagement db schemas
         structureFile = os.path.join(backup_folder,"0_struct_" + now + ".sql")
         cmd = os.environ["DOCKER_COMMAND"].split(" ") + ["exec", "-it", "learnagement_mysql_"+os.environ["INSTANCE_NAME"], "mysqldump", "-u", os.environ["MYSQL_USER_LOGIN"], "-p" + os.environ["MYSQL_USER_PASSWORD"], "--no-data", "--ignore-views", "--skip-triggers", "--skip-comments", "--skip-extended-insert", "--no-tablespaces", "learnagement", ">", structureFile]
@@ -701,7 +701,7 @@ def stop():
 def gui():
     """Lance l'interface graphique click-gui-runner pour explorer cette application."""
     from click_gui_runner.__main__ import main
-    path = os.path.abspath(__file__)
+    path = os.path.abspath("Learnagement.py")
     main(caller=path)
 
 import signal
@@ -709,7 +709,7 @@ import signal
 def handle_signal(signum, _frame):
     stop()
 
-if __name__ == "__main__":
+def main():
     signal.signal(signal.SIGTERM, handle_signal)
     signal.signal(signal.SIGINT, handle_signal)
     cli()
