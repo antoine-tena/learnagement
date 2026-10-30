@@ -1,18 +1,19 @@
-import pytest
-from unittest.mock import patch, MagicMock
-from fastapi import HTTPException
-from auth.authenticate_cas import (
-    authenticate_cas,
-    _determine_role_from_cas_groups,
-    _determine_promo_from_cas_groups,
-    _create_cas_user,
-    CasUserProvision,
-)
+from unittest.mock import MagicMock, patch
 
+import pytest
+from fastapi import HTTPException
+
+from auth.authenticate_cas import (
+    CasUserProvision,
+    _determine_promo_from_cas_groups,
+    _determine_role_from_cas_groups,
+    authenticate_cas,
+)
 
 # ─────────────────────────────────────────────
 # Fixtures
 # ─────────────────────────────────────────────
+
 
 def make_cas_data(login="tartampion", role="enseignant") -> CasUserProvision:
     members_by_role = {
@@ -39,6 +40,7 @@ def make_cas_data(login="tartampion", role="enseignant") -> CasUserProvision:
         members=members_by_role[role],
     )
 
+
 def make_mock_user(data):
     user = MagicMock()
     user.id = 1
@@ -49,12 +51,13 @@ def make_mock_user(data):
     user.roles = ["connected_user", "enseignant"]
     return user
 
+
 # ─────────────────────────────────────────────
 # _determine_role_from_cas_groups
 # ─────────────────────────────────────────────
 
-class TestDetermineRole:
 
+class TestDetermineRole:
     @pytest.fixture(autouse=True)
     def set_env(self, monkeypatch):
         monkeypatch.setenv("CAS_ALLOWED_GROUPS_4_ADMINISTRATIF", "administratif")
@@ -103,6 +106,7 @@ class TestDetermineRole:
 # _determine_promo_from_cas_groups
 # ─────────────────────────────────────────────
 
+
 def patch_get_connection(scalar_value):
     """Simule `with get_connection() as conn: conn.execute(...).scalar()`."""
     conn = MagicMock()
@@ -113,14 +117,14 @@ def patch_get_connection(scalar_value):
     cm.__exit__.return_value = False  # important : ne pas avaler les exceptions
     return patch("auth.authenticate_cas.get_connection", return_value=cm)
 
-class TestDeterminePromo:
 
+class TestDeterminePromo:
     @pytest.fixture(autouse=True)
     def set_env(self, monkeypatch):
         monkeypatch.setenv(
             "CAS_ETUDIANTS_2_PROMO",
             '[{"groupe":"idu4-fise","promo":"IDU FISE 4 Annecy"},'
-            ' {"groupe":"SEA3-fise","promo":"SEA FISE 3 Annecy"}]'
+            ' {"groupe":"SEA3-fise","promo":"SEA FISE 3 Annecy"}]',
         )
 
     # def test_promo_trouvee(self):
@@ -172,8 +176,8 @@ class TestDeterminePromo:
 # authenticate_cas — flux complet mocké
 # ─────────────────────────────────────────────
 
-class TestAuthenticateCas:
 
+class TestAuthenticateCas:
     @pytest.fixture(autouse=True)
     def set_env(self, monkeypatch):
         monkeypatch.setenv("CAS_ALLOWED_GROUPS_4_ADMINISTRATIF", "")
@@ -208,8 +212,10 @@ class TestAuthenticateCas:
         # mock_user.id = 1
         mock_user = make_mock_user(data)
 
-        with patch("auth.authenticate_cas.get_user", side_effect=[None, mock_user]), \
-             patch("auth.authenticate_cas._create_cas_user", return_value=mock_user):
+        with (
+            patch("auth.authenticate_cas.get_user", side_effect=[None, mock_user]),
+            patch("auth.authenticate_cas._create_cas_user", return_value=mock_user),
+        ):
             token = await authenticate_cas(data)
             assert token.token_type == "bearer"
 
@@ -228,8 +234,10 @@ class TestAuthenticateCas:
         """Provisionnement échoue (DB KO) → 500."""
         data = make_cas_data(role="enseignant")
 
-        with patch("auth.authenticate_cas.get_user", return_value=None), \
-             patch("auth.authenticate_cas._create_cas_user", return_value=None):
+        with (
+            patch("auth.authenticate_cas.get_user", return_value=None),
+            patch("auth.authenticate_cas._create_cas_user", return_value=None),
+        ):
             with pytest.raises(HTTPException) as exc:
                 await authenticate_cas(data)
             assert exc.value.status_code == 500

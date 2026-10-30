@@ -1,23 +1,25 @@
 # tests/test_access_control.py
 
-import pytest
 from unittest.mock import MagicMock
-from access_control.types import Responsibility
+
+import pytest
+from fastapi import HTTPException
+
+from access_control.checker import check_access
 from access_control.responsibilities import (
     _responsibility_covers,
     has_all_responsibilities,
-    has_hierarchy_responsibilities,
     has_any_of_responsibilities,
+    has_hierarchy_responsibilities,
 )
 from access_control.rules import evaluate_rule
-from access_control.checker import check_access
+from access_control.types import Responsibility
 from models.request import SQLRequest
-from fastapi import HTTPException
-
 
 # ─────────────────────────────────────────────
 # Helpers
 # ─────────────────────────────────────────────
+
 
 def make_user(type_role: str = "enseignant", responsibilities: list[dict] = None):
     user = MagicMock()
@@ -40,8 +42,8 @@ def make_required(type_objet: str, **dims) -> Responsibility:
 # _responsabilite_covers
 # ─────────────────────────────────────────────
 
-class TestResponsibilityCovers:
 
+class TestResponsibilityCovers:
     def test_wildcard_vide(self):
         """
         {} en BD couvre un scope quelconque.
@@ -126,7 +128,12 @@ class TestResponsibilityCovers:
         """
         {"filiere":"IDU","niveau":"S8"} couvre {"filiere":"IDU","niveau":"any"}.
         """
-        stored = make_stored("stage", {"filiere": "IDU",})
+        stored = make_stored(
+            "stage",
+            {
+                "filiere": "IDU",
+            },
+        )
         required = make_required("stage", filiere="any", niveau="FI4")
         assert _responsibility_covers(stored, required) is True
 
@@ -146,86 +153,88 @@ class TestResponsibilityCovers:
         required = make_required("stage", filiere="any")
         assert _responsibility_covers(stored, required) is False
 
+
 # ─────────────────────────────────────────────
 # has_any_of_responsabilites
 # ─────────────────────────────────────────────
 
-class TestHasAnyOfResponsabilite:
 
+class TestHasAnyOfResponsabilite:
     def test_user_without_responsibility(self):
         user = make_user(responsibilities=[])
-        required = [
-            make_required("stage", filiere="IDU")
-        ]
+        required = [make_required("stage", filiere="IDU")]
 
         assert has_any_of_responsibilities(user, required) is False
 
     def test_user_with_responsibility_covering(self):
-        user = make_user(responsibilities=[
-            make_stored("stage", {"filiere": "IDU"})
-        ])
-        required = [
-            make_required("stage", filiere="IDU", niveau="FI4")
-        ]
+        user = make_user(responsibilities=[make_stored("stage", {"filiere": "IDU"})])
+        required = [make_required("stage", filiere="IDU", niveau="FI4")]
 
         assert has_any_of_responsibilities(user, required) is True
 
     def test_user_avec_plusieurs_dont_une_couvre(self):
-        user = make_user(responsibilities=[
-            make_stored("stage", {"filiere": "SEA"}),
-            make_stored("stage", {"filiere": "IDU"}),
-        ])
-        required = [
-            make_required("stage", filiere="IDU", niveau="FI4")
-        ]
+        user = make_user(
+            responsibilities=[
+                make_stored("stage", {"filiere": "SEA"}),
+                make_stored("stage", {"filiere": "IDU"}),
+            ]
+        )
+        required = [make_required("stage", filiere="IDU", niveau="FI4")]
 
         assert has_any_of_responsibilities(user, required) is True
 
     def test_user_with_responsibilities_without_covering(self):
-        user = make_user(responsibilities=[
-            make_stored("stage", {"filiere": "SEA"}),
-            make_stored("semestre", {"filiere": "IDU", "semestre": "S8"}),
-        ])
-        required = [
-            make_required("stage", filiere="IDU")
-        ]
+        user = make_user(
+            responsibilities=[
+                make_stored("stage", {"filiere": "SEA"}),
+                make_stored("semestre", {"filiere": "IDU", "semestre": "S8"}),
+            ]
+        )
+        required = [make_required("stage", filiere="IDU")]
 
         assert has_any_of_responsibilities(user, required) is False
 
     def test_user_couvre_au_moins_une_parmi_plusieurs_required(self):
-        user = make_user(responsibilities=[
-            make_stored("stage", {"filiere": "SEA"}),
-            make_stored("stage", {"filiere": "IDU"}),
-        ])
+        user = make_user(
+            responsibilities=[
+                make_stored("stage", {"filiere": "SEA"}),
+                make_stored("stage", {"filiere": "IDU"}),
+            ]
+        )
         required = [
             make_required("stage", filiere="IDU", niveau="FI4"),
             make_required("stage", filiere="MM", niveau="FI4"),
         ]
         assert has_any_of_responsibilities(user, required) is True
 
+
 # ─────────────────────────────────────────────
 # has_all_responsabilites
 # ─────────────────────────────────────────────
 
-class TestHasAllResponsabilites:
 
+class TestHasAllResponsabilites:
     def test_satisfait_toutes(self):
-        user = make_user(responsibilities=[
-            make_stored("filiere",  {"filiere": "IDU"}),
-            make_stored("semestre", {"filiere": "IDU", "semestre": "S8"}),
-        ])
+        user = make_user(
+            responsibilities=[
+                make_stored("filiere", {"filiere": "IDU"}),
+                make_stored("semestre", {"filiere": "IDU", "semestre": "S8"}),
+            ]
+        )
         required = [
-            make_required("filiere",  filiere="IDU"),
+            make_required("filiere", filiere="IDU"),
             make_required("semestre", filiere="IDU", semestre="S8"),
         ]
         assert has_all_responsibilities(user, required) is True
 
     def test_satisfait_une_seule(self):
-        user = make_user(responsibilities=[
-            make_stored("filiere", {"filiere": "IDU"}),
-        ])
+        user = make_user(
+            responsibilities=[
+                make_stored("filiere", {"filiere": "IDU"}),
+            ]
+        )
         required = [
-            make_required("filiere",  filiere="IDU"),
+            make_required("filiere", filiere="IDU"),
             make_required("semestre", filiere="IDU", semestre="S8"),
         ]
         assert has_all_responsibilities(user, required) is False
@@ -239,40 +248,48 @@ class TestHasAllResponsabilites:
 # has_hierarchy_responsabilites
 # ─────────────────────────────────────────────
 
-class TestHasHierarchyResponsabilites:
 
+class TestHasHierarchyResponsabilites:
     def setup_method(self):
         self.hierarchy = [
-            make_required("filiere",  filiere="IDU"),
+            make_required("filiere", filiere="IDU"),
             make_required("semestre", filiere="IDU", semestre="S8"),
-            make_required("module",   filiere="IDU", semestre="S8", niveau="FI4"),
+            make_required("module", filiere="IDU", semestre="S8", niveau="FI4"),
         ]
 
     def test_satisfait_premier_uniquement(self):
-        user = make_user(responsibilities=[
-            make_stored("filiere", {"filiere": "IDU"}),
-        ])
+        user = make_user(
+            responsibilities=[
+                make_stored("filiere", {"filiere": "IDU"}),
+            ]
+        )
         assert has_hierarchy_responsibilities(user, self.hierarchy) is True
 
     def test_satisfait_deux_premiers(self):
-        user = make_user(responsibilities=[
-            make_stored("filiere",  {"filiere": "IDU"}),
-            make_stored("semestre", {"filiere": "IDU", "semestre": "S8"}),
-        ])
+        user = make_user(
+            responsibilities=[
+                make_stored("filiere", {"filiere": "IDU"}),
+                make_stored("semestre", {"filiere": "IDU", "semestre": "S8"}),
+            ]
+        )
         assert has_hierarchy_responsibilities(user, self.hierarchy) is True
 
     def test_satisfait_toute_la_hierarchie(self):
-        user = make_user(responsibilities=[
-            make_stored("filiere",  {"filiere": "IDU"}),
-            make_stored("semestre", {"filiere": "IDU", "semestre": "S8"}),
-            make_stored("module",   {"filiere": "IDU", "semestre": "S8", "niveau": "FI4"}),
-        ])
+        user = make_user(
+            responsibilities=[
+                make_stored("filiere", {"filiere": "IDU"}),
+                make_stored("semestre", {"filiere": "IDU", "semestre": "S8"}),
+                make_stored("module", {"filiere": "IDU", "semestre": "S8", "niveau": "FI4"}),
+            ]
+        )
         assert has_hierarchy_responsibilities(user, self.hierarchy) is True
 
     def test_ne_satisfait_pas_le_premier(self):
-        user = make_user(responsibilities=[
-            make_stored("semestre", {"filiere": "IDU", "semestre": "S8"}),
-        ])
+        user = make_user(
+            responsibilities=[
+                make_stored("semestre", {"filiere": "IDU", "semestre": "S8"}),
+            ]
+        )
         assert has_hierarchy_responsibilities(user, self.hierarchy) is False
 
     def test_hierarchie_vide(self):
@@ -284,8 +301,8 @@ class TestHasHierarchyResponsabilites:
 # evaluate_rule
 # ─────────────────────────────────────────────
 
-class TestEvaluateRule:
 
+class TestEvaluateRule:
     def test_anonymous_autorise_toujours(self):
         assert evaluate_rule("anonymous", None, {}) is True
 
@@ -318,38 +335,38 @@ class TestEvaluateRule:
         assert evaluate_rule({"roles": ["administratif"]}, user, {}) is True
 
     def test_dict_any_satisfait(self):
-        user = make_user(responsibilities=[
-            make_stored("stage", {"filiere": "IDU"})
-        ])
+        user = make_user(responsibilities=[make_stored("stage", {"filiere": "IDU"})])
         rule = {"any": [{"type_objet": "stage", "filiere": "IDU"}]}
         assert evaluate_rule(rule, user, {}) is True
 
     def test_dict_any_non_satisfait(self):
-        user = make_user(responsibilities=[
-            make_stored("stage", {"filiere": "SEA"})
-        ])
+        user = make_user(responsibilities=[make_stored("stage", {"filiere": "SEA"})])
         rule = {"any": [{"type_objet": "stage", "filiere": "IDU"}]}
         assert evaluate_rule(rule, user, {}) is False
 
     def test_dict_all_satisfait(self):
-        user = make_user(responsibilities=[
-            make_stored("filiere",  {"filiere": "IDU"}),
-            make_stored("semestre", {"semestre": "S8"}),
-        ])
-        rule = {"all": [
-            {"type_objet": "filiere",  "filiere": "IDU"},
-            {"type_objet": "semestre", "semestre": "S8"},
-        ]}
+        user = make_user(
+            responsibilities=[
+                make_stored("filiere", {"filiere": "IDU"}),
+                make_stored("semestre", {"semestre": "S8"}),
+            ]
+        )
+        rule = {
+            "all": [
+                {"type_objet": "filiere", "filiere": "IDU"},
+                {"type_objet": "semestre", "semestre": "S8"},
+            ]
+        }
         assert evaluate_rule(rule, user, {}) is True
 
     def test_dict_au_moins_une_condition_suffit(self):
         """roles échoue mais one réussit → True"""
-        user = make_user(type_role="enseignant", responsibilities=[
-            make_stored("stage", {"filiere": "IDU"})
-        ])
+        user = make_user(
+            type_role="enseignant", responsibilities=[make_stored("stage", {"filiere": "IDU"})]
+        )
         rule = {
             "roles": ["administratif"],
-            "any":   [{"type_objet": "stage", "filiere": "IDU"}],
+            "any": [{"type_objet": "stage", "filiere": "IDU"}],
         }
         assert evaluate_rule(rule, user, {}) is True
 
@@ -369,7 +386,9 @@ class TestEvaluateRule:
     def test_lambda_utilise_params(self):
         user = make_user(type_role="etudiant")
         user.id = 42
-        rule = lambda params, u: "connected_user" if u.id == params.get("id_etudiant") else ["administratif"]
+        rule = lambda params, u: (
+            "connected_user" if u.id == params.get("id_etudiant") else ["administratif"]
+        )
         assert evaluate_rule(rule, user, {"id_etudiant": 42}) is True
         assert evaluate_rule(rule, user, {"id_etudiant": 99}) is False
 
@@ -378,8 +397,8 @@ class TestEvaluateRule:
 # check_access
 # ─────────────────────────────────────────────
 
-class TestCheckAccess:
 
+class TestCheckAccess:
     def setup_method(self):
         self.requests = {
             "get_public": {

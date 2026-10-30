@@ -3,13 +3,12 @@ import pytest
 from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
 
+from access_control.rules import evaluate_rule
 from api.dependencies import get_current_active_user
 from models.request import SQLRequest
 from models.user import User
 from user import LNM_university
 from user.LNM_university import StudentDecisionPayload
-
-from access_control.rules import evaluate_rule
 
 # ─────────────────────────────────────────────
 # Helpers
@@ -41,8 +40,7 @@ def recorded(monkeypatch):
         if "mobility_z_score" in sql:
             return [{"mobility_z_score": 1.0}]
         if "wishes_count" in sql:
-            return [{"wishes_count": 0, "max_priority": 0,
-                     "already_exists": 0, "is_submitted": 0}]
+            return [{"wishes_count": 0, "max_priority": 0, "already_exists": 0, "is_submitted": 0}]
         return [{"id_assignment": 1, "status": "pending"}]
 
     monkeypatch.setattr(LNM_university, "db_request", fake_db_request)
@@ -52,16 +50,22 @@ def recorded(monkeypatch):
 # Un appel par endpoint concerné, avec l'utilisateur courant en paramètre
 ENDPOINT_CALLS = {
     "get_campaign_status": lambda user: LNM_university.get_campaign_status(
-        id_etudiant=ID_ETUDIANT, current_user=user),
+        id_etudiant=ID_ETUDIANT, current_user=user
+    ),
     "add_university_to_wishes": lambda user: LNM_university.add_university_to_wishes(
-        id_etudiant=ID_ETUDIANT, id_partner_university=7,
-        current_user=user, payload={"id_semestre": 8}),
+        id_etudiant=ID_ETUDIANT,
+        id_partner_university=7,
+        current_user=user,
+        payload={"id_semestre": 8},
+    ),
     "get_student_assignment": lambda user: LNM_university.get_student_assignment(
-        id_etudiant=ID_ETUDIANT, current_user=user),
+        id_etudiant=ID_ETUDIANT, current_user=user
+    ),
     "submit_student_decision": lambda user: LNM_university.submit_student_decision(
         id_etudiant=ID_ETUDIANT,
         payload=StudentDecisionPayload(decision="accepted"),
-        current_user=user),
+        current_user=user,
+    ),
 }
 
 
@@ -69,8 +73,8 @@ ENDPOINT_CALLS = {
 # 0. Cause racine, isolée
 # ─────────────────────────────────────────────
 
-class TestRootCause:
 
+class TestRootCause:
     def test_sqlrequest_is_not_subscriptable(self):
         req = SQLRequest(request="SELECT 1", allowedRolesRequester=[])
         with pytest.raises(TypeError):
@@ -87,9 +91,9 @@ EXPECTED_OWNER_RULE = {
     "owner": {"role": "etudiant", "id": "id_etudiant"},
 }
 
+
 @pytest.mark.parametrize("endpoint", ENDPOINT_CALLS.keys())
 class TestLegitStudent:
-
     def test_no_type_error(self, endpoint, recorded):
         user = make_student(ID_ETUDIANT)
         try:
@@ -104,7 +108,6 @@ class TestLegitStudent:
         first = recorded[0]
         assert isinstance(first, SQLRequest)
         assert first.allowedRolesRequester == EXPECTED_OWNER_RULE
-
 
     def test_first_request_declares_owner_rule(self, endpoint, recorded):
         user = make_student(ID_ETUDIANT)
@@ -126,8 +129,8 @@ class TestLegitStudent:
 #    (PASSENT aujourd'hui)
 # ─────────────────────────────────────────────
 
-class TestOtherUserControl:
 
+class TestOtherUserControl:
     @pytest.mark.parametrize("endpoint", ["add_university_to_wishes", "submit_student_decision"])
     def test_other_user_gets_403_before_the_bug(self, endpoint, recorded):
         other = make_student(user_id=999)
@@ -140,7 +143,7 @@ class TestOtherUserControl:
         other = make_student(user_id=999)
         ENDPOINT_CALLS[endpoint](other)
         first = recorded[0]
-        assert first.params["id_etudiant"] == ID_ETUDIANT   # la ressource visée est celle de 42
+        assert first.params["id_etudiant"] == ID_ETUDIANT  # la ressource visée est celle de 42
         assert evaluate_rule(first.allowedRolesRequester, other, first.params) is False
 
 
@@ -149,8 +152,8 @@ class TestOtherUserControl:
 #    (ÉCHOUENT tant que le bug existe)
 # ─────────────────────────────────────────────
 
-class TestHttpLevel:
 
+class TestHttpLevel:
     @pytest.fixture
     def client(self, recorded):
         app = FastAPI()
@@ -168,11 +171,11 @@ class TestHttpLevel:
         assert r.status_code == 200, r.text
 
     def test_decision_returns_200(self, client):
-        r = client.post(f"/university/etudiant/{ID_ETUDIANT}/assignment/decision",
-                        json={"decision": "accepted"})
+        r = client.post(
+            f"/university/etudiant/{ID_ETUDIANT}/assignment/decision", json={"decision": "accepted"}
+        )
         assert r.status_code == 200, r.text
 
     def test_add_wish_returns_200(self, client):
-        r = client.post(f"/university/etudiant/{ID_ETUDIANT}/wish/7",
-                        json={"id_semestre": 8})
+        r = client.post(f"/university/etudiant/{ID_ETUDIANT}/wish/7", json={"id_semestre": 8})
         assert r.status_code == 200, r.text

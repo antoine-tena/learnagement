@@ -14,8 +14,9 @@ def R(sql, params=None):
 
 @pytest.fixture(autouse=True)
 def sqlite_engine(monkeypatch):
-    engine = create_engine("sqlite://", poolclass=StaticPool,
-                           connect_args={"check_same_thread": False})
+    engine = create_engine(
+        "sqlite://", poolclass=StaticPool, connect_args={"check_same_thread": False}
+    )
     monkeypatch.setattr(dbc, "_engine", engine)
     db_request(None, R("CREATE TABLE t(a INTEGER PRIMARY KEY, b INTEGER)"))
 
@@ -28,10 +29,9 @@ def test_commit_when_all_succeed():
 
 
 def test_rollback_when_one_fails():
-    with pytest.raises(HTTPException) as exc:
-        with dbc.get_connection() as conn:
-            db_request(None, R("INSERT INTO t VALUES (1, 1)"), conn=conn)
-            db_request(None, R("INSERT INTO t VALUES (1, 2)"), conn=conn)  # doublon PK
+    with pytest.raises(HTTPException) as exc, dbc.get_connection() as conn:
+        db_request(None, R("INSERT INTO t VALUES (1, 1)"), conn=conn)
+        db_request(None, R("INSERT INTO t VALUES (1, 2)"), conn=conn)  # doublon PK
     assert exc.value.status_code == 500
-    assert "UNIQUE" not in exc.value.detail   # pas de fuite SQL
+    assert "UNIQUE" not in exc.value.detail  # pas de fuite SQL
     assert db_request(None, R("SELECT * FROM t")) == []
