@@ -59,8 +59,8 @@ valeurs=soup.find_all('div', class_='value')
 # scraping des polypoints
 informations_polypoint=[]
 for point in valeurs :
-# grâce au print, on a vu que la class "value" contenait les polypoints et les stages effectués. 
-# il faut donc générer une exception quand on a pas les intitulés de classes qu'on recherche 
+# grâce au print, on a vu que la class "value" contenait les polypoints et les stages effectués.
+# il faut donc générer une exception quand on a pas les intitulés de classes qu'on recherche
     try :
         intitule=point.find('li', class_='intitule').text
         tache=point.find('li', class_='intitule_tache').text
@@ -74,10 +74,10 @@ for point in valeurs :
 # scraping des stages
 informations_stage=[]
 for point in valeurs :
-# grâce au print, on a vu que la class "value" contenait les polypoints et les stages effectués. 
-# il faut donc générer une exception quand on a pas les intitulés de classes qu'on recherche 
+# grâce au print, on a vu que la class "value" contenait les polypoints et les stages effectués.
+# il faut donc générer une exception quand on a pas les intitulés de classes qu'on recherche
     try :
-        #Le scrapping des stages ne fonctionne pas
+        #Le scraping des stages ne fonctionne pas
         entreprise_temp=point.find('li', class_='entreprise').text
         entreprise=entreprise_temp.split(' - ')[0]
         ville=entreprise_temp.split(' - ')[1]
@@ -102,9 +102,9 @@ for point in valeurs :
     except:
         # quand on a pas les informations liées aux polypoints, on ne fait rien
         pass
-    
+
 print(informations_stage)
-    
+
 driver.close()
 # enregistrement des informations dans la base de donnée
 

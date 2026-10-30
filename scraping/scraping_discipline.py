@@ -27,7 +27,7 @@ soup= bs(html, 'html.parser')
 username=driver.find_element(By.ID,'user')
 password=driver.find_element(By.NAME,'pass')
 
-#Récuperation information 
+#Récuperation information
 # partie où on demande de rentrer son identifiant et son mot de passe
 id=input("Entrez votre identifiant :")
 mdp=getpass.getpass("Entrez votre mot de passe (l'affichage est caché): ")
@@ -56,7 +56,7 @@ for elt in (recup_disciplines):
             disciplines.append(elt.get_text())
             #Mettre cette ligne pour csv
             #disciplines.append([elt.get_text()])
-            
+
 driver.close()
 
 # # Sauvegarde des données en csv
@@ -64,7 +64,7 @@ driver.close()
 #     writer = csv.writer(f,delimiter=',')
 #     for row in disciplines:
 #         writer.writerow(row)
-        
+
 #Sauvegarde des données dans la bd
 bd= lien_db.get_db()
 for elt in (disciplines):

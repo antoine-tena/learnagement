@@ -7,7 +7,7 @@ import chromedriver_autoinstaller
 import csv
 import json
 import lien_db
-    
+
 url='https://www.polytech.univ-smb.fr/intranet/accueil.html'
 
 #Ouverture de la page web
@@ -68,14 +68,14 @@ entete_ok=['Code','Matiere','Semestre','UE','Responsable','Mel','Nb heures TD','
 for i in range (len(liens_module)):
     soup =bs(driver.page_source, "lxml")
     driver.get(liens_module[i][1])
-    soup= bs(driver.page_source, 'html.parser') 
-       
+    soup= bs(driver.page_source, 'html.parser')
+
     recup_info=soup.find_all('div',class_='value')
     recup_entete=soup.find_all('div',class_='label')
-    
+
     info_module=[div.get_text(strip=True) for div in recup_info]
     entete=[div.get_text(strip=True) for div in recup_entete]
-    
+
     #Mise en forme des données pour csv
     data_csv.append(["Code","Matière"])
     for elt in (entete):
@@ -83,7 +83,7 @@ for i in range (len(liens_module)):
     data_csv.append([code_module[i].get_text()[9:-11],liens_module[i][0]])
     for elt in (info_module):
         data_csv[i*2+1].append(elt)
-    
+
     #Mise en forme des données pour bd
     data[f"'{i}'"]={'Code':code_module[i].get_text()[9:-11],'Matiere':liens_module[i][0]}
     for j in range (min(len(info_module),len(entete))):
@@ -99,11 +99,11 @@ with open("modules.csv", "wt+", newline="", encoding='utf8') as f:
     writer = csv.writer(f,delimiter=';')
     for row in data_csv:
         writer.writerow(row)
-        
+
 #Sauvegarde des données en json
 with open("modules.json", "w",encoding='utf8') as f:
     json.dump(data, f,indent=4,ensure_ascii=False)
-   
+
 #Sauvegarde des données dans la bd
 bd= lien_db.get_db()
 for i in range (len(data)):
@@ -121,7 +121,6 @@ for i in range (len(data)):
     if "Nb heures TP" in (data[key].keys()):
         query=f"UPDATE MAQUETTE_module SET hTP={data[key]['Nb heures TP']} WHERE code_module LIKE '{data[key]['Code']}'"
         lien_db.execute_query(bd, query)
-    
+
 print(lien_db.get_data(bd, "MAQUETTE_module"))
 lien_db.close_db(bd)
-

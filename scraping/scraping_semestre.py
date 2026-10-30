@@ -56,9 +56,9 @@ for elt in (recup_semestre):
         if elt.get_text()!='---':  #e,elevr les premier elt qui n'est pas une discipline (ne peut pas être fait avec un if and)
             #semestres_csv.append([elt.get_text()])
             semestres.append(elt.get_text())
- 
+
 driver.close()
-           
+
 # #Sauvegarde des données en csv
 # with open("semestres.csv", "wt+", newline="") as f:
 #     writer = csv.writer(f,delimiter=',')
@@ -74,4 +74,3 @@ for elt in (semestres):
 
 print(lien_db.get_data(bd, "LNM_semestre"))
 lien_db.close_db(bd)
-            

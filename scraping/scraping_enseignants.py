@@ -51,7 +51,7 @@ while not finished :
 
     try:
         soup = bs(driver.page_source, "lxml")
-        
+
         try:
             # Récupérer le lien de la page suivante pour continuer la récupération des données des enseignants
             explore_link =  soup.find("a",href=re.compile("nextPage"))["href"]
@@ -60,12 +60,12 @@ while not finished :
         except:
             finished = True
             print("exception pas de page suivante")
-        
+
         data = soup.find_all(class_="info")
-        
+
         for personne in data:
             # Récupérer les informations de chaque personne
-            nom_prenom = personne.find(class_="name").text         
+            nom_prenom = personne.find(class_="name").text
             telephones = personne.find(class_="telephones").text
             bureaux = personne.find(class_="bureaux").text
             email = personne.find(class_="email").text
@@ -91,7 +91,7 @@ while not finished :
 
     except Exception as e:
         print(f"Une exception s'est produite : {e}")
-        
+
 # Fermer le navigateur
 driver.quit()
 

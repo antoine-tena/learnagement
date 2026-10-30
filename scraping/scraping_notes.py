@@ -39,10 +39,10 @@ while index < len(table_rows)-1:
     if row[0].find("b"):
         if index != 1 : data.append(UE)
         UE = {"Epreuve":epreuve, "Note_dividende":row[1], "Note_diviseur":row[2], "Pts jury":row[3], "Année":row[4], "Session":row[5], "Résultat":row[6], "Crédit":row[7], "Classement":row[8], "Matières":[]}
-    
+
     else:
         UE["Matières"].append({"Epreuve":epreuve, "Note_dividende":row[1], "Note_diviseur":row[2], "Pts jury":row[3], "Année":row[4], "Session":row[5], "Résultat":row[6], "Crédit":row[7], "Classement":row[8]})
-    
+
     index+=1
 data.append(UE)
 

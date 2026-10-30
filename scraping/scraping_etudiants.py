@@ -85,7 +85,7 @@ while not finished :
 
     try:
         soup = BeautifulSoup(driver.page_source, "lxml")
-        
+
         #extraction lien page suivante
         try:
             #print("extraction lien page suivante")
@@ -98,11 +98,11 @@ while not finished :
             #pas de page suivante
             finished = True
             print("exception pas de page suivante")
-        
+
         #recup des donnees brutes:
         #recup tout les etudiants dans un tableau qui contient la classe etudiant
         data = soup.find_all(class_="etudiant")
-        
+
         #ensuite tu parcours ce tableau en extrayant la filière, l'annee et le nom et prenom dans un autre tableau data_final
         for etu in data:
             annee_filiere = etu.find(class_="statut").text[1:]
@@ -117,7 +117,7 @@ while not finished :
             data_json.append({"Année :":annee,"Filière :":filiere,"Nom :":nom,"Prénom :":prenom})
     except Exception as e:
         print(f"Une exception s'est produite : {e}")
-        
+
 # Fermer le navigateur
 driver.quit()
 
@@ -131,4 +131,3 @@ with open("liste_etudiants.csv", "w", encoding="utf-8", newline="") as f:
 # save data as JSON
 with open("liste_etudiants.json", "w", encoding="utf-8") as json_file:
     json.dump(data_json, json_file, ensure_ascii=False, indent=2)
-    
