@@ -1,6 +1,6 @@
 "use client"
 
-import {useEffect, useState} from "react";
+import {Suspense, useEffect, useState} from "react";
 import {useInfosModuleStore} from "@/app/store/useInfosModuleStore";
 import {useListModulesStore} from "@/app/store/useListModulesStore";
 import {useSearchParams} from "next/navigation";
@@ -14,7 +14,7 @@ interface apcOfModule{
     id_apprentissage_critique: number,
     libelle_apprentissage: string
 }
-export default function Page(){
+function ModulesContent() {
     const {module, setModule} = useInfosModuleStore()
     const {listModules} = useListModulesStore()
     const [listApc, setListApc] = useState<apcOfModule[]>([])
@@ -29,7 +29,7 @@ export default function Page(){
 
     useEffect(() => {
         if (id_module){
-            let form_data = new FormData()
+            const form_data = new FormData()
             form_data.append("id_module", id_module)
             axios.post('/api/proxy/list/listAPCbyIdModule',form_data,{withCredentials: true})
                 .then(response => {
@@ -68,8 +68,8 @@ export default function Page(){
                         </>
                         ):(
                             <div className={"w-fulll h-screen flex flex-col justify-center items-center gap-3"}>
-                                <p>Il semblerait qu'il y est une erreur !</p>
-                                <Link href={'/homepage'} className={"button"}>Retourner à l'acceuil</Link>
+                                <p>Il semblerait qu&apos;il y est une erreur !</p>
+                                <Link href={'/homepage'} className={"button"}>Retourner à l&apos;acceuil</Link>
                             </div>
                     )
                     }
@@ -77,5 +77,12 @@ export default function Page(){
             </div>
         </main>
 
+    )
+}
+export default function Page() {
+    return (
+        <Suspense>
+            <ModulesContent />
+        </Suspense>
     )
 }

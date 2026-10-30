@@ -4,7 +4,7 @@
 
 "use client"
 
-import React, {useEffect, useState} from "react";
+import React, {Suspense, useEffect, useState} from "react";
 import {useRouter, useSearchParams} from "next/navigation"
 import Image from "next/image";
 import {signIn, useSession} from "next-auth/react"
@@ -18,18 +18,18 @@ import leftArrow from "@/public/left-arrow.png"
 /**
  * Composant de connexion
  * Gère la page de connexion avec formulaire et gestion des erreurs
- * 
+ *
  * @returns {JSX.Element} Composant React
  */
-export default function Page() {
+function ConnectionForm() {
     const {data: session, status} = useSession()
     const router = useRouter();
     const searchParams = useSearchParams();
+    // L'URL porte l'erreur renvoyée par NextAuth après un échec de connexion
+    const hasCredentialsError = searchParams.get('error') === 'CredentialsSignin'
 
     const [login, setLogin] = useState('')
     const [mdp, setMdp] = useState('')
-    const [loggError, setLoggingError] = useState(false)
-    const [msgLoggErr, setMsgLoggErr] = useState<string | undefined>('')
     const [loginMsgError, setLoginMsgError] = useState<string | undefined>(undefined)
     const [mdpMsgError, setMdpMsgError] = useState<string | undefined>(undefined)
 
@@ -40,7 +40,7 @@ export default function Page() {
 
     // fonctions qui permettent d'afficher les messages d'erreurs en cas de mauvais remplissage des input
     // (handleValidation, handleLogin, handleMdp)
-    function handleValidation(formData: object, schema: z.Schema, fieldName: string, setErrorMsg: any) {
+    function handleValidation(formData: object, schema: z.Schema, fieldName: string, setErrorMsg: (message: string | undefined) => void) {
         const result = schema.safeParse(formData)
         if (!result.success) {
             const formatted = result.error.format() as unknown as { [key: string]: { _errors: string[] } }
@@ -53,14 +53,14 @@ export default function Page() {
     }
 
     function handleLogin() {
-        let formData = {
+        const formData = {
             email: login,
         };
         handleValidation(formData, schema, 'email', setLoginMsgError);
     }
 
     function handleMdp() {
-        let formData = {
+        const formData = {
             password: mdp
         };
         handleValidation(formData, schema, 'password', setMdpMsgError);
@@ -71,18 +71,12 @@ export default function Page() {
             router.push('/homepage')
         }
 
-        // Vérifier si l'URL contient un paramètre d'erreur
-        const error = searchParams.get('error')
-        if (error === 'CredentialsSignin') {
-            setLoggingError(true)
-            setMsgLoggErr('Identifiant ou mot de passe incorrect')
-        }
-    }, [session, router, searchParams]);
+    }, [session, router, status]);
 
 
     const credentialsAction = (formData: FormData) => {
-        let credentials = Object.fromEntries(formData.entries())
-        let formDataForZod = {
+        const credentials = Object.fromEntries(formData.entries())
+        const formDataForZod = {
             email: credentials.username,
             password: credentials.password
         }
@@ -110,12 +104,20 @@ export default function Page() {
                                onChange={e => setMdp(e.target.value)} onBlur={handleMdp}/>
                         {mdpMsgError != undefined && <p className={"text-usmb-red self-center text-xs"}>{mdpMsgError}</p>}
                     </div>
-                    {loggError && <p className={"text-usmb-red self-center mb-7"}>{msgLoggErr}</p>}
+                    {hasCredentialsError && <p className={"text-usmb-red self-center mb-7"}>Identifiant ou mot de passe incorrect</p>}
                     <button type="submit" className={"self-center bg-usmb-cyan"}>Se connecter</button>
                 </div>
                 <Link href={'/activateAccount'} className={"text-xs underline text-usmb-cyan cursor-pointer"}>Activer mon compte</Link>
             </form>
         </div>
 
+    )
+}
+
+export default function Page() {
+    return (
+        <Suspense>
+            <ConnectionForm />
+        </Suspense>
     )
 }
