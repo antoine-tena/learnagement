@@ -207,3 +207,68 @@ def get_etudiants_stages(
     # if(current_user.id == id_enseignant):
     #    request["allowedRolesRequester"] += [current_user.ExplicitSecondaryK]
     return db_request(current_user, SQLRequest(**request))
+
+
+@router.get(
+    "/enseignant/{id_enseignant:int}/module_responsabilities",
+    tags=["administratif", "enseignant"],
+    summary="Modules dont l'enseignant est responsable",
+    description="Return the modules the teacher is responsible for",
+    response_model=None,
+)
+def get_enseignant_module_responsabilities(
+    id_enseignant: int,
+    current_user: Annotated[User, Depends(get_current_active_user)],
+) -> Rows:
+    request = {
+        "request": """
+            SELECT DISTINCT
+                MAQUETTE_module.id_module, MAQUETTE_module.code_module, MAQUETTE_module.nom
+            FROM MAQUETTE_module
+            JOIN LNM_enseignant
+                ON LNM_enseignant.id_enseignant = MAQUETTE_module.id_responsable
+            WHERE LNM_enseignant.id_enseignant = %(id_enseignant)s;
+                    """,
+        "params": {"id_enseignant": id_enseignant},
+        "allowedRolesRequester": {
+            "roles": ["responsable_etudes"],
+            "owner": {"role": "enseignant", "id": "id_enseignant"},
+        },
+    }
+    return db_request(current_user, SQLRequest(**request))
+
+
+@router.get(
+    "/enseignant/{id_enseignant:int}/filieres",
+    tags=["administratif", "enseignant"],
+    summary="Filieres de l'enseignant",
+    description="Return the list of filieres de l'enseignant",
+    response_model=None,
+)
+def get_enseignant_filieres(
+    id_enseignant: int,
+    current_user: Annotated[User, Depends(get_current_active_user)],
+) -> Rows:
+    request = {
+        "request": """
+            SELECT DISTINCT
+                LNM_filiere.id_filiere, LNM_filiere.nom_filiere, LNM_filiere.nom_long
+            FROM LNM_filiere
+            JOIN LNM_promo ON LNM_promo.id_filiere = LNM_filiere.id_filiere
+            JOIN MAQUETTE_learning_unit ON MAQUETTE_learning_unit.id_promo = LNM_promo.id_promo
+            JOIN MAQUETTE_module_as_learning_unit
+                ON MAQUETTE_module_as_learning_unit.id_learning_unit
+                    = MAQUETTE_learning_unit.id_learning_unit
+            JOIN MAQUETTE_module
+                ON MAQUETTE_module.id_module = MAQUETTE_module_as_learning_unit.id_module
+            JOIN LNM_enseignant
+                ON LNM_enseignant.id_enseignant = MAQUETTE_module.id_responsable
+            WHERE LNM_enseignant.id_enseignant = %(id_enseignant)s;
+                    """,
+        "params": {"id_enseignant": id_enseignant},
+        "allowedRolesRequester": {
+            "roles": ["responsable_etudes"],
+            "owner": {"role": "enseignant", "id": "id_enseignant"},
+        },
+    }
+    return db_request(current_user, SQLRequest(**request))

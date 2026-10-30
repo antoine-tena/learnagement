@@ -18,7 +18,7 @@ import Loader from "@/app/indicators/loading";
 /**
  * Composant de la homepage
  * Affiche la page principale avec la charge de cours et les compétences
- * 
+ *
  * @returns {JSX.Element} Composant React
  */
 export default function Homepage(){
@@ -27,6 +27,7 @@ export default function Homepage(){
 
     const [filieres, setNomFilieres] = useState<Filiere[]>([])
     const [isLoading, setIsLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
         if(status == 'unauthenticated'){
@@ -35,18 +36,16 @@ export default function Homepage(){
     }, [session, router]);
 
     useEffect(() => {
+        if (status !== 'authenticated') return
 
-        axios.get('/api/proxy/list/listUserFilieres', {withCredentials: true})
-            .then(response => {
-                if (response.status == 200){
-                    setNomFilieres(response.data)
-                    setIsLoading(false)
-                }else{
-                    console.log('error : filiere.tsx')
-                }
+        axios.get(`/api/proxy/enseignant/${session.user.id}/filieres`)
+            .then(response => setNomFilieres(response.data))
+            .catch(err => {
+                console.error('Erreur chargement filières :', err)
+                setError(err.response?.status ? `Erreur ${err.response.status}` : 'Erreur réseau')
             })
-
-    }, []);
+            .finally(() => setIsLoading(false))
+    }, [status, session?.user?.id])
 
     return(
         <>
@@ -58,7 +57,13 @@ export default function Homepage(){
                 </div>
                 <div className={"w-full self-start"}>
                     <h3>Compétences par filières</h3>
-                    {isLoading ? <Loader /> : <ListFilieres filieres={filieres} />}
+                    {isLoading ? (
+                        <Loader />
+                    ) : error ? (
+                        <p role="alert">Impossible de charger les filières ({error}).</p>
+                    ) : (
+                        <ListFilieres filieres={filieres} />
+                    )}
                 </div>
             </div>
         </>

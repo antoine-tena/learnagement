@@ -50,3 +50,4 @@ Thumbs.db
 
 # scraping exports: personal data
 scraping/out/
+*.tsbuildinfo
