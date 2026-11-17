@@ -6,8 +6,8 @@ from networkx.drawing.nx_pydot import graphviz_layout
 from dash import html, dcc, callback, Input, Output, State
 import dash_flows  # Remplacez par le vrai nom d'import
 
-import app11_dag_dependance_tools
-import app5_module_tools
+from pages import dependances_tools
+from pages import modules_tools
 
 styles = {"width": "100%", "height": "600px", "border": "1px solid #ccc"}
 
@@ -34,9 +34,9 @@ def register_callbacks(app):
     )
     def update_app11_new_filtre_module_option(user_id, role, token):
         if role == "enseignant":
-            df = app5_module_tools.get_moduleByEnseignantId(token, user_id)
+            df = modules_tools.get_moduleByEnseignantId(token, user_id)
         elif role == "etudiant":
-            df = app5_module_tools.get_moduleByEtudiantId(token, user_id)
+            df = modules_tools.get_moduleByEtudiantId(token, user_id)
         options = [
             {"label": row["code_module"], "value": row["id_module"]}
             for _, row in df[["id_module", "code_module"]].drop_duplicates().iterrows()
@@ -56,9 +56,7 @@ def register_callbacks(app):
         message = " "
         if id_module:
             labels = {}
-            df = app11_dag_dependance_tools.get_list_sequence_dependance_by_idModule(
-                token, id_module
-            )
+            df = dependances_tools.get_list_sequence_dependance_by_idModule(token, id_module)
             if not df.empty:
                 labels = {
                     str(
@@ -71,7 +69,7 @@ def register_callbacks(app):
             nodes = []
             edges = []
             G = nx.DiGraph()
-            df = app11_dag_dependance_tools.get_list_dependance_by_idModule(token, id_module)
+            df = dependances_tools.get_list_dependance_by_idModule(token, id_module)
             if not df.empty:
                 edges = [
                     (str(row["id_sequence_prev"]), str(row["id_sequence_next"]))
@@ -139,7 +137,7 @@ def register_callbacks(app):
         for e in nouveaux:
             # messages.append(f"Lien créé : {e['source']} → {e['target']}")
             messages.append(
-                app11_dag_dependance_tools.add_dependance_to_idModule(
+                dependances_tools.add_dependance_to_idModule(
                     token=token,
                     id_module=id_module,
                     id_sequence_prev=e["source"],
@@ -149,7 +147,7 @@ def register_callbacks(app):
         for e in supprimes:
             # messages.append(f"Lien supprimé : {e['source']} → {e['target']}")
             messages.append(
-                app11_dag_dependance_tools.delete_dependencie_to_idModule(
+                dependances_tools.delete_dependencie_to_idModule(
                     token=token,
                     id_module=id_module,
                     id_sequence_prev=e["source"],

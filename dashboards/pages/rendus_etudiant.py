@@ -2,7 +2,7 @@ from dash import html, dcc
 from dash.dependencies import Input, Output, State
 import plotly.graph_objects as go
 import pandas as pd
-import app9_rendu_tools
+from pages import rendus_tools
 
 # Définition de la mise en page de l'application
 app9_layout = html.Div(
@@ -36,7 +36,7 @@ def register_callbacks(app):
     )
     def update_ue_options(user_id, token):
         options = []
-        df = app9_rendu_tools.get_renduByEtudianttId(token, user_id)
+        df = rendus_tools.get_renduByEtudianttId(token, user_id)
         if not df.empty:
             df = df["learning_unit_name"].drop_duplicates()
 
@@ -52,14 +52,14 @@ def register_callbacks(app):
     )
     def update_module_options(selected_ue, user_id, token):
         options = []
-        df = app9_rendu_tools.get_renduByEtudianttId(token, user_id)
+        df = rendus_tools.get_renduByEtudianttId(token, user_id)
         if not df.empty:
             if selected_ue == "Tout":
-                modules = app9_rendu_tools.get_renduByEtudianttId(token, user_id)[
+                modules = rendus_tools.get_renduByEtudianttId(token, user_id)[
                     "nom"
                 ].drop_duplicates()
             else:
-                df = app9_rendu_tools.get_renduByEtudianttId(token, user_id)
+                df = rendus_tools.get_renduByEtudianttId(token, user_id)
                 modules = df[df["learning_unit_name"] == selected_ue]["nom"].drop_duplicates()
 
             options = [{"label": m, "value": m} for m in modules]
@@ -75,7 +75,7 @@ def register_callbacks(app):
         State("token", "data"),
     )
     def update_bar_chart(selected_module, selected_ue, user_id, token):
-        df = app9_rendu_tools.get_renduByEtudianttId(token, user_id)
+        df = rendus_tools.get_renduByEtudianttId(token, user_id)
 
         if df.empty:
             return go.Figure()

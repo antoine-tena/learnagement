@@ -1,7 +1,7 @@
 from dash import html, dcc
 from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
-import app10_stage_tools
+from pages import stages_tools
 
 
 # Définition de la mise en page de l'application
@@ -32,7 +32,7 @@ def register_callbacks(app):
     )
     def display_table(user_id_fake, user_id, token):
         print("user-id:'", user_id, "'", flush=True)
-        df_stages = app10_stage_tools.get_stages_by_studentId(token, user_id)
+        df_stages = stages_tools.get_stages_by_studentId(token, user_id)
         table_stages = dbc.Table.from_dataframe(
             df_stages,
             # Key styling options:

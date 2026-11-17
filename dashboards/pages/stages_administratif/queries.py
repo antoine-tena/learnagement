@@ -1,12 +1,12 @@
-import app10_stage_tools
+from pages import stages_tools
 import app_tools
 import plotly.graph_objects as go
 from dash import dash_table, dcc
 
 
 def get_entreprises(token):
-    df_stages_with_supervisor = app10_stage_tools.get_stages_with_supervisorId(token)
-    df_stages_without_supervisor = app10_stage_tools.get_stages_without_supervisorId(token)
+    df_stages_with_supervisor = stages_tools.get_stages_with_supervisorId(token)
+    df_stages_without_supervisor = stages_tools.get_stages_without_supervisorId(token)
 
     # liste des entreprises
     entreprises = []
@@ -28,12 +28,12 @@ def get_teachers(token):
 
 
 def get_internship_with_supervisor(token):
-    df_stages_with_supervisor = app10_stage_tools.get_stages_with_supervisorId(token)
+    df_stages_with_supervisor = stages_tools.get_stages_with_supervisorId(token)
     return df_stages_with_supervisor
 
 
 def update_table_stages_with_supervisor(nom_promo, token):
-    df = app10_stage_tools.get_stages_with_supervisorId(token)
+    df = stages_tools.get_stages_with_supervisorId(token)
 
     if nom_promo and not df.empty:
         df = df[df["promo"] == nom_promo]
@@ -85,12 +85,12 @@ def update_table_stages_with_supervisor(nom_promo, token):
 
 
 def get_internship_without_supervisor(token):
-    df_stages_without_supervisor = app10_stage_tools.get_stages_without_supervisorId(token)
+    df_stages_without_supervisor = stages_tools.get_stages_without_supervisorId(token)
     return df_stages_without_supervisor
 
 
 def update_table_stages_without_supervisor(nom_promo, token):
-    df = app10_stage_tools.get_stages_without_supervisorId(token)
+    df = stages_tools.get_stages_without_supervisorId(token)
 
     if nom_promo and not df.empty:
         df = df[df["promo"] == nom_promo]
@@ -142,7 +142,7 @@ def update_table_stages_without_supervisor(nom_promo, token):
 
 
 def get_students_without_internship(token):
-    df_students_without_stage = app10_stage_tools.get_students_without_stage(token)
+    df_students_without_stage = stages_tools.get_students_without_stage(token)
     df_students_without_stage.sort_values(by=["nom"], ascending=True, inplace=True)
     # liste des étudiants sans stage
     etudiants_sans_stage = {}
@@ -159,7 +159,7 @@ def get_students_without_internship(token):
 
 
 def update_table_students_without_internship(nom_promo, token):
-    df = app10_stage_tools.get_students_without_stage(token)
+    df = stages_tools.get_students_without_stage(token)
 
     if nom_promo and not df.empty:
         df = df[df["promo"] == nom_promo]
@@ -188,7 +188,7 @@ def update_pie_chart(token, nom_promo=None):
     if token:
         df_stages_with_supervisor = get_internship_with_supervisor(token)
         df_stages_without_supervisor = get_internship_without_supervisor(token)
-        df_students_without_stage = app10_stage_tools.get_students_without_stage(token)
+        df_students_without_stage = stages_tools.get_students_without_stage(token)
 
         if nom_promo:
             if not df_stages_with_supervisor.empty:

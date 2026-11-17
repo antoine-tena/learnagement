@@ -3,7 +3,7 @@ import dash_bootstrap_components as dbc
 from pandas.core.interchange.dataframe_protocol import DataFrame
 import pandas as pd
 
-import app5_module_tools
+from pages import modules_tools
 
 app5_enseignant_view_layout = html.Div(
     [
@@ -65,9 +65,7 @@ def register_callbacks_view(app):
         State("token", "data"),
     )
     def update_options(user_id, token):
-        df = app5_module_tools.get_moduleByEnseignantId(token, user_id)[
-            ["semestre"]
-        ].drop_duplicates()
+        df = modules_tools.get_moduleByEnseignantId(token, user_id)[["semestre"]].drop_duplicates()
         options = [{"label": "Tous les semestres", "value": "all"}]
         options = options + [{"label": s, "value": s} for s in df["semestre"]]
         return options
@@ -80,7 +78,7 @@ def register_callbacks_view(app):
         State("token", "data"),
     )
     def update_table_modules(user_id, selected_semestre, token):
-        df = app5_module_tools.get_moduleByEnseignantId(token, user_id)[
+        df = modules_tools.get_moduleByEnseignantId(token, user_id)[
             [
                 "code_module",
                 "nom_module",
@@ -113,7 +111,7 @@ def register_callbacks_view(app):
         State("token", "data"),
     )
     def update_table_intervenants(user_id, selected_semestre, token):
-        df = app5_module_tools.get_moduleByEnseignantId(token, user_id)
+        df = modules_tools.get_moduleByEnseignantId(token, user_id)
         if df.empty:
             df = pd.DataFrame(columns=["code_module", "nom_module", "semestre", "nom"])
         else:
@@ -152,7 +150,7 @@ def register_callbacks_view(app):
         State("token", "data"),
     )
     def update_table_interventions_summary(user_id, selected_semestre, token):
-        df = app5_module_tools.get_moduleByIntervenantId(token, user_id)
+        df = modules_tools.get_moduleByIntervenantId(token, user_id)
         if df.empty:
             df = pd.DataFrame(
                 columns=[
@@ -211,7 +209,7 @@ def register_callbacks_view(app):
         State("token", "data"),
     )
     def update_table_interventions(user_id, selected_semestre, token):
-        df = app5_module_tools.get_moduleByIntervenantId(token, user_id)
+        df = modules_tools.get_moduleByIntervenantId(token, user_id)
         if df.empty:
             df = pd.DataFrame(
                 columns=[

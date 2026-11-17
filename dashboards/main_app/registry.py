@@ -21,73 +21,73 @@ icon_map = {
 def import_apps():
     """Importe les layouts et callbacks de toutes les applications Dash."""
     from apc_dash.apc_hub import apc_hub_layout, register_apc_hub_callbacks
-    from app2_spyder_plot_competences import (
+    from pages.competences import (
         app2_layout,
         register_callbacks as register_callbacks_app2,
     )
-    from app3_absenteisme_administratif import (
+    from pages.absences_administratif import (
         app3_administratif_layout,
         register_callbacks as register_callbacks_app3_administratif,
     )
-    from app3_absenteisme_enseignant import (
+    from pages.absences_enseignant import (
         app3_enseignant_layout,
         register_callbacks as register_callbacks_app3_enseignant,
     )
-    from app3_absenteisme_etudiant import (
+    from pages.absences_etudiant import (
         app3_etudiant_layout,
         register_callbacks as register_callbacks_app3_etudiant,
     )
-    from app4_notes_eleve import (
+    from pages.notes_etudiant import (
         app4_etudiant_layout,
         register_callbacks as register_callbacks_app4_etudiant,
     )
-    from app4_notes_enseignant import (
+    from pages.notes_enseignant import (
         app4_enseignant_layout,
         register_callbacks as register_callbacks_app4_enseignant,
     )
-    from app5_module_enseignant_edit import (
+    from pages.modules_enseignant_edit import (
         app5_enseignant_edit_layout,
         register_callbacks_edit as register_callbacks_app5_enseignant_edit,
     )
-    from app5_module_enseignant_view import (
+    from pages.modules_enseignant_view import (
         app5_enseignant_view_layout,
         register_callbacks_view as register_callbacks_app5_enseignant_view,
     )
-    from app7_charge_administratif import (
+    from pages.charge_administratif import (
         app7_administratif_layout,
         register_callbacks as register_callbacks_app7_administratif,
     )
-    from app7_charge_enseignant import (
+    from pages.charge_enseignant import (
         app7_enseignant_layout,
         register_callbacks as register_callbacks_app7_enseignant,
     )
-    from app7_charge_etudiant import (
+    from pages.charge_etudiant import (
         app7_etudiant_layout,
         register_callbacks as register_callbacks_app7_etudiant,
     )
-    from app9_rendus_etudiant import app9_layout, register_callbacks as register_callbacks_app9
-    from app10_stage_administratif import (
+    from pages.rendus_etudiant import app9_layout, register_callbacks as register_callbacks_app9
+    from pages.stages_administratif import (
         app10_administratif_layout,
         register_callbacks as register_callbacks_app10_administratif,
     )
-    from app10_stage_enseignant import (
+    from pages.stages_enseignant import (
         app10_enseignant_layout,
         register_callbacks as register_callbacks_app10_enseignant,
     )
-    from app10_stage_etudiant import (
+    from pages.stages_etudiant import (
         app10_etudiant_layout,
         register_callbacks as register_callbacks_app10_etudiant,
     )
-    from app11_dag_dependance import app11_layout, register_callbacks as register_callbacks_app11
-    from app11_dag_dependance_new import (
+    from pages.dependances import app11_layout, register_callbacks as register_callbacks_app11
+    from pages.dependances_new import (
         app11_new_layout,
         register_callbacks as register_callbacks_app11_new,
     )
-    from app13_mccc_administratif import (
+    from pages.mccc_administratif import (
         app13_administratif_layout,
         register_callbacks as register_callbacks_app13_administratif,
     )
-    from app14_check_administratif import (
+    from pages.checks_administratif import (
         app14_administratif_layout,
         register_callbacks as register_callbacks_app14_administratif,
     )

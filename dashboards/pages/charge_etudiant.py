@@ -2,7 +2,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from dash import html, dcc, Input, Output, State
-import app7_charge_tools
+from pages import charge_tools
 
 
 def update_df(df):
@@ -71,10 +71,10 @@ def register_callbacks(app):
         State("token", "data"),
     )
     def update_graph(selected_level, selected_category, user_id, token):
-        data_done = app7_charge_tools.get_etudiant_pastedt(token, user_id)
-        data_all = app7_charge_tools.get_etudiant_edt(token, user_id)
-        data = app7_charge_tools.calcul_avancement(data_done, data_all)
-        df = app7_charge_tools.transforme_données(data)
+        data_done = charge_tools.get_etudiant_pastedt(token, user_id)
+        data_all = charge_tools.get_etudiant_edt(token, user_id)
+        data = charge_tools.calcul_avancement(data_done, data_all)
+        df = charge_tools.transforme_données(data)
 
         # Calculer les pourcentages
         df["Completion (%)"] = (df["Realized"] / df["Total"]) * 100
@@ -128,7 +128,7 @@ def register_callbacks(app):
         State("token", "data"),
     )
     def update_graph(filtre_semaine, user_id, token):
-        df = app7_charge_tools.get_chargeByEtudianttId(token, user_id)
+        df = charge_tools.get_chargeByEtudianttId(token, user_id)
 
         if df.empty or filtre_semaine is None:
             # Si aucune donnée n'est disponible, retourner un graphique vide
@@ -176,7 +176,7 @@ def register_callbacks(app):
             title=f"Charge de travail - Semaine {semaine}, {annee}",
             labels={"schedule": "Date", "duree_h": "Nombre d'heures", "nom": "Matière"},
             text="nom",  # Afficher le type de cours sur les barres
-            color_discrete_sequence=app7_charge_tools.custom_palette,  # ou 'Bold', 'Dark2', etc.
+            color_discrete_sequence=charge_tools.custom_palette,  # ou 'Bold', 'Dark2', etc.
         )
 
         fig.update_traces(

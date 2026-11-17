@@ -1,13 +1,12 @@
 from dash import html, Input, Output, State
 import dash_bootstrap_components as dbc
-import app3_absenteisme_tools
+from pages import absences_tools
 
 
-app3_etudiant_layout = html.Div(
+app3_administratif_layout = html.Div(
     [
         html.Div(
-            [html.Label("Absences à mes séances :"), html.Div(id="seance_etudiant")],
-            className="dropdown-container",
+            [html.Label("Absences :"), html.Div(id="absences")], className="dropdown-container"
         ),  # Conteneur avec une classe pour l'ajouter au style CSS
     ]
 )
@@ -15,13 +14,12 @@ app3_etudiant_layout = html.Div(
 
 def register_callbacks(app):
     @app.callback(
-        Output("seance_etudiant", "children"),
+        Output("absences", "children"),
         Input("user_id", "data"),
         State("token", "data"),
     )
-    def update_table_abs_seance(user_id, token):
-        # df_abs = app3_absenteisme_tools.get_absenceByEtudiantId(user_id)
-        df_abs = app3_absenteisme_tools.get_absences(token, id_etudiant=user_id)
+    def update_table_abs(user_id, token):
+        df_abs = absences_tools.get_absences(token)
         table_absence = dbc.Table.from_dataframe(
             df_abs,
             # Key styling options:

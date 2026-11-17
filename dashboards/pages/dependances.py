@@ -8,8 +8,8 @@ import matplotlib.colors as mcolors  #
 from dash import dcc, html
 from dash.dependencies import Input, Output, State
 
-import app11_dag_dependance_tools
-import app5_module_tools
+from pages import dependances_tools
+from pages import modules_tools
 
 # DEPRECATED Must be updated
 
@@ -20,7 +20,7 @@ node_radius = 0.05
 
 
 def compute_graph(token, id_module):
-    df = app11_dag_dependance_tools.get_list_dependance_by_idModule(token, id_module)
+    df = dependances_tools.get_list_dependance_by_idModule(token, id_module)
 
     if not df.empty:
         # Créer le dag
@@ -30,7 +30,7 @@ def compute_graph(token, id_module):
             if row["id_sequence_next"] is not None
         ]
 
-        df = app11_dag_dependance_tools.get_list_sequence_dependance_by_idModule(token, id_module)
+        df = dependances_tools.get_list_sequence_dependance_by_idModule(token, id_module)
 
         nodes = [row["id_module_sequence"] for _, row in df.iterrows()]
 
@@ -198,9 +198,9 @@ def register_callbacks(app):
     )
     def update_filter_sequencage_option(user_id, role, token):
         if role == "enseignant":
-            df = app5_module_tools.get_moduleByEnseignantId(token, user_id)
+            df = modules_tools.get_moduleByEnseignantId(token, user_id)
         elif role == "etudiant":
-            df = app5_module_tools.get_moduleByEtudiantId(token, user_id)
+            df = modules_tools.get_moduleByEtudiantId(token, user_id)
         options = [
             {"label": row["code_module"], "value": row["id_module"]}
             for _, row in df[["id_module", "code_module"]].drop_duplicates().iterrows()

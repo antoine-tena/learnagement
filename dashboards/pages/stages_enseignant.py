@@ -1,7 +1,7 @@
 from dash import html, dcc, dash_table
 from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
-import app10_stage_tools
+from pages import stages_tools
 
 # Définition de la mise en page de l'application
 app10_enseignant_layout = html.Div(
@@ -30,7 +30,7 @@ def register_callbacks(app):
         State("token", "data"),
     )
     def display_table(user_id_fake, user_id, token):
-        df = app10_stage_tools.get_stages_by_supervisorId(token, user_id)
+        df = stages_tools.get_stages_by_supervisorId(token, user_id)
         table_stages = dash_table.DataTable(
             id="table_stage",
             data=df.to_dict("records"),

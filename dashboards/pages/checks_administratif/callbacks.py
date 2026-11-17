@@ -1,6 +1,6 @@
 import logging
 
-import app14_check_tools
+from pages import checks_tools
 import dash_bootstrap_components as dbc
 import pandas as pd
 from dash import dcc, html
@@ -106,7 +106,7 @@ def register_callbacks(app):
         State(component_id="token", component_property="data"),
     )
     def display_sequencage_vs_maquette(user_id_fake, token):
-        df = app14_check_tools.check_sequencage_vs_maquette(token)
+        df = checks_tools.check_sequencage_vs_maquette(token)
         table_sequencage_vs_maquette = dbc.Table.from_dataframe(
             df, striped=True, bordered=True, hover=True
         )
@@ -118,7 +118,7 @@ def register_callbacks(app):
         State(component_id="token", component_property="data"),
     )
     def display_session_vs_maquette(user_id_fake, token):
-        df = app14_check_tools.check_session_vs_maquette(token)
+        df = checks_tools.check_session_vs_maquette(token)
         if df.empty:
             df = pd.DataFrame(columns=["truc", "bidule"])
         table_session_vs_maquette = dbc.Table.from_dataframe(
@@ -132,7 +132,7 @@ def register_callbacks(app):
         State(component_id="token", component_property="data"),
     )
     def display_modules_sans_ue(user_id_fake, token):
-        df = app14_check_tools.check_module_without_learning_unit(token)
+        df = checks_tools.check_module_without_learning_unit(token)
         table_modules_sans_ue = dbc.Table.from_dataframe(
             df, striped=True, bordered=True, hover=True
         )
@@ -144,7 +144,7 @@ def register_callbacks(app):
         State(component_id="token", component_property="data"),
     )
     def display_modules_sans_ac(user_id_fake, token):
-        df = app14_check_tools.check_module_without_apprentissage_critique(token)
+        df = checks_tools.check_module_without_apprentissage_critique(token)
         table_modules_sans_ac = dbc.Table.from_dataframe(
             df, striped=True, bordered=True, hover=True
         )
@@ -156,7 +156,7 @@ def register_callbacks(app):
         State(component_id="token", component_property="data"),
     )
     def display_enseignant_sans_cours(user_id_fake, token):
-        df = app14_check_tools.check_enseignant_sans_cours(token)
+        df = checks_tools.check_enseignant_sans_cours(token)
         table_enseignant_sans_cours = dbc.Table.from_dataframe(
             df, striped=True, bordered=True, hover=True
         )
@@ -168,7 +168,7 @@ def register_callbacks(app):
         State(component_id="token", component_property="data"),
     )
     def display_session_sans_enseignant(user_id_fake, token):
-        df = app14_check_tools.check_session_sans_enseignant(token)
+        df = checks_tools.check_session_sans_enseignant(token)
         table_session_sans_enseignant = dbc.Table.from_dataframe(
             df, striped=True, bordered=True, hover=True
         )
@@ -180,7 +180,7 @@ def register_callbacks(app):
         State(component_id="token", component_property="data"),
     )
     def display_modules_ects(user_id_fake, token):
-        df = app14_check_tools.check_module_ects(token)
+        df = checks_tools.check_module_ects(token)
         table_modules_ects = dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True)
         return [table_modules_ects]
 
@@ -190,7 +190,7 @@ def register_callbacks(app):
         State(component_id="token", component_property="data"),
     )
     def display_session_corruption(user_id_fake, token):
-        df = app14_check_tools.check_session_corruption(token)
+        df = checks_tools.check_session_corruption(token)
         if not df.empty:
             table_session_corruption = dbc.Table.from_dataframe(
                 df, striped=True, bordered=True, hover=True
@@ -204,7 +204,7 @@ def register_callbacks(app):
         State(component_id="token", component_property="data"),
     )
     def display_auth(user_id_fake, token):
-        df = app14_check_tools.get_access_auth(token)
+        df = checks_tools.get_access_auth(token)
         logging.info(df)
         if not df.empty:
             table_access_auth = dbc.Table.from_dataframe(
@@ -220,7 +220,7 @@ def register_callbacks(app):
         State(component_id="token", component_property="data"),
     )
     def display_tree_sqlglot(user_id_fake, token):
-        data = app14_check_tools.get_access_auth_tree_sqlglot(token)
+        data = checks_tools.get_access_auth_tree_sqlglot(token)
         logging.info(data)
 
         if not data:

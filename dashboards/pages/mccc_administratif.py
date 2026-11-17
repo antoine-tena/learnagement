@@ -2,11 +2,11 @@ from dash import html, dcc, dash_table
 from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
 import app_tools
-import app13_mccc_tools
+from pages import mccc_tools
 
 
 def update_table_m2c3(token, id_filiere, id_statut):
-    df = app13_mccc_tools.get_list_modules_m2c3(token, id_filiere, id_statut)
+    df = mccc_tools.get_list_modules_m2c3(token, id_filiere, id_statut)
     dfi = app_tools.get_enseignants(token)
     intervenant_options = [
         {"label": row["ExplicitSecondaryK"], "value": row["id_enseignant"]}
@@ -107,7 +107,7 @@ def register_callbacks(app):
         State(component_id="token", component_property="data"),
     )
     def display_table_responsabilites(user_id_fake, token):
-        df_stages = app13_mccc_tools.get_list_enseignants_responsabilites(token)
+        df_stages = mccc_tools.get_list_enseignants_responsabilites(token)
         table_responsabilites = dbc.Table.from_dataframe(
             df_stages,
             # Key styling options:
@@ -149,5 +149,5 @@ def register_callbacks(app):
                 row_changed = row_changed[0]
                 new_intervenant_id = row_changed["nouveau_responsable"]
                 id_module = row_changed["id_module"]
-                ret = app13_mccc_tools.set_modules_responsable(token, id_module, new_intervenant_id)
+                ret = mccc_tools.set_modules_responsable(token, id_module, new_intervenant_id)
         return update_table_m2c3(token, id_filiere, id_statut)

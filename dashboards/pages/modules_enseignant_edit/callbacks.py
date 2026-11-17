@@ -1,4 +1,4 @@
-import app5_module_tools
+from pages import modules_tools
 from dash import Input, Output, State
 
 from .callbacks_sequencage import register_sequencage_callbacks
@@ -17,7 +17,7 @@ def register_callbacks_edit(app):
         prevent_initial_call=True,
     )
     def update_filter_sequence_option(user_id, selected_module, token):
-        df = app5_module_tools.get_moduleSequenceByEnseignantId(token, user_id)
+        df = modules_tools.get_moduleSequenceByEnseignantId(token, user_id)
         options = []
         if not df.empty:
             options = [
@@ -69,11 +69,11 @@ def register_callbacks_edit(app):
                 new_intervenant_id = int(row_changed["nouvel_intervenant"])
                 id_sequence = int(row_changed["id_sequence"])
                 if new_intervenant_id is None or new_intervenant_id == "":
-                    app5_module_tools.reset_intervenant_principal_sequence(
+                    modules_tools.reset_intervenant_principal_sequence(
                         token, selected_module, id_sequence
                     )
                 else:
-                    app5_module_tools.set_intervenant_principal_sequence(
+                    modules_tools.set_intervenant_principal_sequence(
                         token, selected_module, id_sequence, new_intervenant_id
                     )
                 return (
@@ -92,7 +92,7 @@ def register_callbacks_edit(app):
         prevent_initial_call=True,
     )
     def update_filter_session_option(user_id, selected_module, token):
-        df = app5_module_tools.get_moduleSessionByEnseignantId(token, user_id)
+        df = modules_tools.get_moduleSessionByEnseignantId(token, user_id)
 
         options = []
         if not df.empty:
@@ -143,9 +143,9 @@ def register_callbacks_edit(app):
                 new_intervenant_id = int(row_changed["nouvel_intervenant"])
                 id_session = int(row_changed["id_session"])
                 if new_intervenant_id is None or new_intervenant_id == "":
-                    app5_module_tools.reset_intervenant_session(token, selected_module, id_session)
+                    modules_tools.reset_intervenant_session(token, selected_module, id_session)
                 else:
-                    app5_module_tools.set_intervenant_session(
+                    modules_tools.set_intervenant_session(
                         token, selected_module, id_session, new_intervenant_id
                     )
                 return update_table_session(

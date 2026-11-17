@@ -2,7 +2,7 @@ from dash import dcc, html, Input, Output, State
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
-import app2_spyder_plot_competences_tools
+from pages import competences_tools
 
 
 # Fonction pour filtrer les apprentissages critiques
@@ -44,11 +44,7 @@ def register_callbacks(app):
         State("token", "data"),
     )
     def create_spyder(user_id, token):
-        data = (
-            app2_spyder_plot_competences_tools.get_evaluation_apprentissage_critique_by_studentId(
-                token, user_id
-            )
-        )
+        data = competences_tools.get_evaluation_apprentissage_critique_by_studentId(token, user_id)
         figure = (
             px.line_polar(data, r="evaluation", theta="libelle_competence", line_close=True)
             .update_traces(
@@ -72,7 +68,7 @@ def register_callbacks(app):
     )
     def update_chart(click_data, user_id, token):
         if click_data and "points" in click_data:
-            data = app2_spyder_plot_competences_tools.get_evaluation_apprentissage_critique_by_studentId(
+            data = competences_tools.get_evaluation_apprentissage_critique_by_studentId(
                 token, user_id
             )
             # Extraire le libellé de la compétence (theta)

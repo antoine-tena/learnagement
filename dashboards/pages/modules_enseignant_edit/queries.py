@@ -1,4 +1,4 @@
-import app5_module_tools
+from pages import modules_tools
 import app_tools
 import pandas as pd
 from dash import dash_table
@@ -7,7 +7,7 @@ from dash import dash_table
 def update_table_sequencage(token, user_id, selected_module):
     if not selected_module:
         return []
-    df = app5_module_tools.get_moduleSequencageByEnseignantId(token, user_id)
+    df = modules_tools.get_moduleSequencageByEnseignantId(token, user_id)
     if df.empty:
         df = pd.DataFrame(
             columns=[
@@ -55,7 +55,7 @@ def update_table_sequencage(token, user_id, selected_module):
 def update_table_sequence(token, user_id, selected_module, selected_seance_type):
     if not selected_module:
         return []
-    df = app5_module_tools.get_moduleSequenceByEnseignantId(token, user_id)
+    df = modules_tools.get_moduleSequenceByEnseignantId(token, user_id)
     if not df.empty:
         if selected_seance_type:
             df = df[
@@ -128,7 +128,7 @@ def update_table_sequence(token, user_id, selected_module, selected_seance_type)
 def update_table_session(token, user_id, selected_module, selected_seance_type, selected_promotion):
     if not selected_module:
         return []
-    df = app5_module_tools.get_moduleSessionByEnseignantId(token, user_id)
+    df = modules_tools.get_moduleSessionByEnseignantId(token, user_id)
 
     if not df.empty:
         if selected_seance_type and selected_promotion:

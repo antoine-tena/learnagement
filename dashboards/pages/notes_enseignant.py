@@ -1,7 +1,7 @@
 from dash import dcc, html
 from dash.dependencies import Input, Output, State
 import plotly.graph_objs as go
-import app4_notes_tools
+from pages import notes_tools
 
 app4_enseignant_layout = html.Div(
     [
@@ -61,7 +61,7 @@ def register_callbacks(app):
         State("token", "data"),
     )
     def update_options_promo_prof(prof_id, token):
-        promo = app4_notes_tools.get_data_prof(token, prof_id)["promo"].drop_duplicates()
+        promo = notes_tools.get_data_prof(token, prof_id)["promo"].drop_duplicates()
 
         options_controles = []  # [{'label': 'Toutes les promos', 'value': 'all'}]
         options_controles.extend([{"label": p, "value": p} for p in promo])
@@ -78,7 +78,7 @@ def register_callbacks(app):
     )
     def update_matiere(promo_selectionnee, prof_id, token):
 
-        prof_data = app4_notes_tools.get_data_prof(token, prof_id)
+        prof_data = notes_tools.get_data_prof(token, prof_id)
         modules = prof_data[prof_data["promo"] == promo_selectionnee]["nom"].drop_duplicates()
 
         options_controles = []  # [{'label': 'Toutes les promos', 'value': 'all'}]
@@ -103,7 +103,7 @@ def register_callbacks(app):
     )
     def update_controles(matiere_selectionnee, promo_selectionnee, prof_id, token):
 
-        prof_data = app4_notes_tools.get_data_prof(token, prof_id)
+        prof_data = notes_tools.get_data_prof(token, prof_id)
 
         dates = prof_data[prof_data["promo"] == promo_selectionnee][
             prof_data["nom"] == matiere_selectionnee
@@ -131,7 +131,7 @@ def register_callbacks(app):
         promo_selectionnee, matiere_selectionnee, controle_selectionne, prof_id, token
     ):
 
-        prof_data = app4_notes_tools.get_data_prof(token, prof_id)
+        prof_data = notes_tools.get_data_prof(token, prof_id)
 
         # le calcul des notes de la promo est différent si on veut la moyenne de tous les contrôles ou seulement un cc
         if controle_selectionne == "moyenne":
@@ -156,7 +156,7 @@ def register_callbacks(app):
                 title="Aucune note disponible"
             ), "Aucune note disponible"
 
-        _, moyenne, mediane, ecart_type, X_notes, Y_notes, _ = app4_notes_tools.calcul_informations(
+        _, moyenne, mediane, ecart_type, X_notes, Y_notes, _ = notes_tools.calcul_informations(
             notes_promo
         )
 

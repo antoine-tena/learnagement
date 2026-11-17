@@ -3,7 +3,7 @@ import plotly.express as px
 from dash import html, dcc, Input, Output, State
 import dash_bootstrap_components as dbc
 from datetime import date, datetime
-import app7_charge_tools
+from pages import charge_tools
 import app_tools
 
 
@@ -117,7 +117,7 @@ def register_callbacks(app):
     )
     def update_graph(filtre_periode, user_id, token):
         print(filtre_periode, user_id, flush=True)
-        df = app7_charge_tools.get_chargeByEnseignantId(token, user_id)
+        df = charge_tools.get_chargeByEnseignantId(token, user_id)
 
         today = datetime.today().date()  # Date d'aujourd'hui
         current_month = datetime.today().strftime("%B")  # Mois courant, par exemple "January"
@@ -153,7 +153,7 @@ def register_callbacks(app):
             title=f"Charge de travail des enseignants ({filtre_periode})",
             labels={"duree_h": "Nombre d'heures", "nom": "Matière"},
             text="nom",  # Afficher la matière des cours sur les barres
-            color_discrete_sequence=app7_charge_tools.custom_palette,  # ou 'Bold', 'Dark2', etc.
+            color_discrete_sequence=charge_tools.custom_palette,  # ou 'Bold', 'Dark2', etc.
         )
 
         fig.update_traces(textposition="outside")  # Placer les labels à l'extérieur des barres
@@ -170,7 +170,7 @@ def register_callbacks(app):
     )
     def display_table(period, user_id, token):
         print(period, user_id, flush=True)
-        df = app7_charge_tools.get_chargeByEnseignantId(token, user_id)
+        df = charge_tools.get_chargeByEnseignantId(token, user_id)
         if period == "all":
             df = df[["type", "duree_h"]].groupby(["type"]).sum().reset_index()
         elif period == "semester":

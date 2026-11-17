@@ -1,6 +1,6 @@
 from time import sleep
 
-import app10_stage_tools
+from pages import stages_tools
 import app_tools
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
@@ -123,7 +123,7 @@ def register_callbacks(app):
         ):
             if not entreprise:
                 entreprise = new_entreprise
-            save_status = app10_stage_tools.add_stage(
+            save_status = stages_tools.add_stage(
                 token,
                 entreprise,
                 sujet,
@@ -184,7 +184,7 @@ def register_callbacks(app):
             to_remove = [row for row in previous if row not in current][0]
             id_etudiant = to_remove["id_etudiant"]
             id_to_remove = to_remove["id_stage"]
-            app10_stage_tools.remove_stage(token, id_etudiant, id_to_remove)
+            stages_tools.remove_stage(token, id_etudiant, id_to_remove)
         else:
             row_changed = [row for row in current if row not in previous]
             if len(row_changed) > 0:  # else callback invoked by data deleted
@@ -192,7 +192,7 @@ def register_callbacks(app):
                 new_supervisor_id = row_changed["nouveau_tuteur"]
                 id_stage = row_changed["id_stage"]
                 id_etudiant = row_changed["id_etudiant"]
-                app10_stage_tools.set_internship_supervisor(
+                stages_tools.set_internship_supervisor(
                     token, id_etudiant, id_stage, new_supervisor_id
                 )
         return (
@@ -226,7 +226,7 @@ def register_callbacks(app):
                 new_supervisor_id = row_changed["nouveau_tuteur"]
                 id_stage = row_changed["id_stage"]
                 id_etudiant = row_changed["id_etudiant"]
-                app10_stage_tools.set_internship_supervisor(
+                stages_tools.set_internship_supervisor(
                     token, id_etudiant, id_stage, new_supervisor_id
                 )
         return update_table_stages_with_supervisor(
@@ -249,5 +249,5 @@ def register_callbacks(app):
             to_remove = [row for row in previous if row not in current][0]
             id_etudiant = to_remove["id_etudiant"]
             id_to_remove = to_remove["id_stage"]
-            app10_stage_tools.remove_stage(token, id_etudiant, id_to_remove)
+            stages_tools.remove_stage(token, id_etudiant, id_to_remove)
         return [update_pie_chart(token, nom_promo)]
