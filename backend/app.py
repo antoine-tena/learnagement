@@ -20,8 +20,10 @@ from domains import (
     lnm_evaluation,
     lnm_filiere,
     lnm_mobility_assignment,
+    lnm_rendu_module,
     lnm_university,
     maquette_module,
+    maquette_module_creation,
 )
 from system import access_auth, check
 
@@ -62,6 +64,8 @@ app.include_router(lnm_etudiant.router)
 app.include_router(lnm_university.router)
 app.include_router(lnm_filiere.router)
 app.include_router(maquette_module.router)
+app.include_router(maquette_module_creation.router)
+app.include_router(lnm_rendu_module.router)
 app.include_router(lnm_evaluation.router)
 app.include_router(apc_data.router)
 app.include_router(apc_kpi_competence.router)
