@@ -40,7 +40,7 @@ budget = 0
 id = "VIEW-15"
 decorator = '\s*@\w*(app|router)\.(get|post|put|patch|delete)'
 files = ["backend/**/*.py"]
-budget = 6
+budget = 2
 
 # A real clock in a test: it passes today and breaks at midnight or on a Sunday.
 [ratchets.clock-in-tests]
