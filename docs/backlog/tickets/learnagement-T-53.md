@@ -7,6 +7,6 @@
 - **Origin**: release notes of the ion-repo releases crossed (`ion repo update`)
 
 What ion-repo cannot guess, to fill in right after the update (`/repo:update`):
-- [ ] run `ion repo install --machine` once on each machine, so that its Claude Code catalogue moves from kiln to ion-repo. (v0.4.11)
-- [ ] run `ion repo install --machine` so the status line runs on ion-repo's Python (it stayed empty on macOS). (v0.4.13)
+- [x] run `ion repo install --machine` once on each machine, so that its Claude Code catalogue moves from kiln to ion-repo. (v0.4.11)
+- [x] run `ion repo install --machine` so the status line runs on ion-repo's Python (it stayed empty on macOS). (v0.4.13)
 - [ ] run `ion repo tickets` if the update had nobody to ask. (v0.4.14)
