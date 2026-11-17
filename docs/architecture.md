@@ -229,4 +229,4 @@ Le reste est déplacé tel quel, puis découpé et renommé sans changer ce qu'i
 - phpMyAdmin : le retirer de la production, ou ne l'ouvrir que par un tunnel SSH (T-45).
 - Postgres avec SQLAlchemy et Alembic, à la place des migrations SQL et des conventions de
   [db/README.md](db/README.md) (T-39).
-- Les noms de branches : ceux de [git.md](git.md) ou ceux de la règle [BRANCHES] de kiln.
+- Les noms de branches : ceux de [git.md](git.md) ou ceux de la règle [BRANCHES] d'ion-repo.
