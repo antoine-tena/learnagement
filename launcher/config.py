@@ -9,7 +9,8 @@ YELLOW = "\033[0;33m"
 NC = "\033[0m"  # No color
 
 # Les conteneurs de chaque environnement, un fragment `docker/compose/<conteneur>.yml` chacun.
-# `data_mysql_backup` (sauvegarde planifiée) n'est encore dans aucune liste : il attend son script.
+# Dans aucune liste pour l'instant : `data_mysql_backup` (sauvegarde planifiée), qui attend son
+# script, et `etl` (Mage AI), premier essai.
 CONTAINERS = {
     "dev": ["data_mysql", "phpmyadmin", "backend", "web", "dashboards", "frontend"],
     "prod": ["data_mysql", "phpmyadmin", "backend", "web", "dashboards"],
@@ -18,6 +19,7 @@ CONTAINERS = {
 CONTAINER_APP_DIRS: dict[str, str | None] = {
     "data_mysql": "db",
     "data_mysql_backup": None,
+    "etl": None,
     "phpmyadmin": None,
     "backend": "backend",
     "web": "web",
