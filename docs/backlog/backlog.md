@@ -440,17 +440,6 @@ hexagonale : seule la logique complexe, comme l'affectation des mobilités, est 
 testée sans base.
 
 Fait partie de la phase C (T-48).
-### T-31 · Des noms parlants pour les tableaux de bord
-- **Type**: improvement
-- **Status**: todo
-- **Opened**: 2026-10-30
-- **Effort**: M · **Owner**: — · **Due**: —
-- **Origin**: revue de l'arborescence
-
-Les préfixes `appNN_` ne disent rien, et `app11_dag_dependance_new.py` côtoie son ancienne
-version. À décider après T-12, qui peut faire disparaître ces apps.
-
-Fait partie de la phase C (T-48) : un dossier par domaine, un fichier par rôle.
 ### T-32 · Des tests pour le front et les tableaux de bord
 - **Type**: improvement
 - **Status**: todo
