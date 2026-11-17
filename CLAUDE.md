@@ -41,7 +41,7 @@ supprime un dossier, un domaine ou un point d'entrée.
 - `frontend/` : le front Next.js en cours de refonte (`app/`, proxy vers l'API).
 - `scraping/` : le paquet `learnagement_scraping` (commande `learnagement-scraping`) : `parsers.py`
   (HTML vers données), `browser.py` (Selenium), `db.py` (écritures), `cli.py` ; `out/` est ignoré.
-  `scraping/scripts/` : les scripts autonomes de l'équipe, gardés tels quels (`ical2json.py`
+  `scraping/scripts/` : les scripts autonomes de l'équipe (`ical2json.py` + `ical2json_lib/`
   emplois du temps ADE, `scrape_maquette.py` catalogue des formations, `matching_26_27/`).
 - `db/` : `sql/` (schéma, migrations versionnées `VX.Y.Z__*.sql`), `freeData/` (jeux de données
   libres), `tools/` ; `db/data/` et `db/backup/` sont privés et ignorés.
