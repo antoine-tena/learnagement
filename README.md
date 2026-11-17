@@ -91,6 +91,15 @@ Si vous souhaitez lancer plusieurs instances de Learnagement sur la même machin
 
 Actuellement 4 instances en parallèle sont possibles.
 
+## Changements d'interface
+
+- **2026-11-17** : `POST /modules/create` est retiré au profit de `POST /modules`. L'ancienne route
+  écrivait dans des colonnes absentes de `MAQUETTE_module` (`nom_module`, `hProj`, `hPerso`) et
+  échouait toujours. La nouvelle prend `code_module`, `nom`, `hCM`, `hTD`, `hTP`, `hProj`,
+  `hPerso`, `ECTS`, `semestre`, `id_responsable`, `id_discipline`, réservée au responsable des
+  études (409 si le code existe déjà). Nouvelle route : `GET /enseignants/{id}/rendus`, les
+  rendus à venir d'un enseignant.
+
 ## Arrêt de l'app
 
 L'app s'arrête, sans perte de donnée, via la commande :  
