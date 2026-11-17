@@ -34,7 +34,7 @@ supprime un dossier, un domaine ou un point d'entrée.
   domaine : `lnm_university/`, `maquette_module/`…, en snake_case ; les tables SQL gardent leur casse), `models/`, `db/` (connexion
   SQLAlchemy), `tests/` (pytest).
 - `web/` : le front principal, en PHP (Apache) ; `index.php` + `utils/router.php`, `views/`
-  (pages), `components/`, `utils/apiProxy.php` (appels à l'API), `theme/`, `assets/`.
+  (pages, dont `views/dashboard/mobility-admin/`), `components/`, `scripts/mobility-admin/`, `utils/apiProxy.php` (appels à l'API), `theme/`, `assets/`.
 - `dashboards/` : les tableaux de bord Dash (`main.py`, une app `appNN_*` par vue et son
   `_tools.py`), `apc_dash/` (approche par compétences).
 - `frontend/` : le front Next.js en cours de refonte (`app/`, proxy vers l'API).
