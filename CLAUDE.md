@@ -31,7 +31,7 @@ supprime un dossier, un domaine ou un point d'entrée.
   lanceur produit `docker/docker-compose.yml` (ignoré).
 - `backend/` : l'API FastAPI (`app.py`) ; `api/` (routes, `dependencies.py`), `auth/` (LNM et
   CAS), `access_control/` (règles, prédicats, responsabilités), `domains/` (requêtes métier par
-  domaine : `lnm_university/`, `maquette_module/`…, en snake_case ; les tables SQL gardent leur casse), `models/`, `db/` (connexion
+  domaine : `lnm_university/`, `maquette_module/`, `lnm_etudiant/`…, en snake_case ; les tables SQL gardent leur casse), `models/`, `db/` (connexion
   SQLAlchemy), `tests/` (pytest).
 - `web/` : le front principal, en PHP (Apache) ; `index.php` + `utils/router.php`, `views/`
   (pages, dont `views/dashboard/mobility-admin/`), `components/`, `scripts/` (`mobility-admin/`, `mobility-map/`, `mobility-map-open/`), `utils/apiProxy.php` (appels à l'API), `theme/` (dont `theme/theme/`), `assets/`.
