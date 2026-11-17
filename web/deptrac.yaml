@@ -1,6 +1,7 @@
 # Les couches du PHP de web/, vérifiées par deptrac : web/tools/run.sh vendor/bin/deptrac
 # Une page ne touche jamais la base : elle passe par l'API (utils/apiProxy.php, utils/endpoint.php).
 deptrac:
+  cache_file: ./vendor/.deptrac.cache
   paths:
     - ./
   exclude_files:
