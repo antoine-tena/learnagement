@@ -3,6 +3,7 @@
 The closed tickets of Learnagement, most recent first, one line each:
 `- **YYYY-MM-DD** · T-NN · Title — what was done (branch) · opened YYYY-MM-DD`.
 
+- **2026-11-17** · T-18 · Plus de données personnelles dans les logs du front — email, prénom, nom et identifiant de connexion remplacés par l'id dans `route.ts` ; Dash n'écrit plus le jeton ni le profil dans ses logs (fix/front-auth-secrets) · opened 2026-10-30
 - **2026-11-17** · T-07 · Le lanceur fonctionne et se lit — `start -d` réparé, `Learnagement.py` découpé dans `launcher/` (`docker.py`, `db.py`), mot de passe MySQL par `MYSQL_PWD`, ruff propre et dans le pre-commit, 7 tests (chore/uv-everywhere) · opened 2026-10-30
 - **2026-11-17** · T-05 · uv partout : `pyproject.toml` et `uv.lock` — un projet uv par composant Python (racine, `backend/`, `dashboards/`, `scraping/`), `requirements*.txt` retirés, conteneurs en `uv sync --frozen` (chore/uv-everywhere) · opened 2026-10-30
 - **2026-10-30** · T-30 · `scraping/` en vrai paquet testé — paquet et commande uniques, requêtes paramétrées, 28 tests sur pages fictives ; `recup_agenda.py` et `filling_etudiant_db.py`, inachevés, retirés ; stages exportés sans écriture en base ; jamais lancé sur les vrais sites (refactor/scraping-package) · opened 2026-10-30
