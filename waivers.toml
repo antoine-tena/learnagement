@@ -1,5 +1,5 @@
-# This repo's waivers of kiln's rules ([WAIVERS]), checked by `charter`.
-# kiln never rewrites this file; `kiln waive` adds or renews an entry.
+# This repo's waivers of ion-repo's rules ([WAIVERS]), checked by `charter`.
+# ion-repo never rewrites this file; `ion repo waive` adds or renews an entry.
 # Duration at most: 7, 30, 90 then 182 days, next tier at each renewal.
 
 [[waiver]]

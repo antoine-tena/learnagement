@@ -1,6 +1,6 @@
-# kiln's answers for this project: never edit by hand, `kiln set` changes them.
-_commit: v0.4.9-281-g04bcd73
-_src_path: https://github.com/antoine-tena/kiln.git
+# ion-repo's answers for this project: never edit by hand, `ion repo set` changes them.
+_commit: v0.4.15-76-geb0dc11
+_src_path: https://github.com/antoine-tena/ion-repo.git
 backend: fastapi
 ci_runner: github
 compact_window: 400000
@@ -13,6 +13,7 @@ kept:
 - README.md
 language: fr
 language_custom: false
+license: ''
 name: learnagement
 north_star: Learnagement in service
 owner: FlavienVernier
