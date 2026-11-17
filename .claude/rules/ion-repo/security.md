@@ -3,7 +3,7 @@ paths:
   - "backend/**"
   - "frontend/**"
 ---
-<!-- Written by kiln and kept current by `kiln update`: do not edit, it would be overwritten. -->
+<!-- Written by ion-repo and kept current by `ion repo update`: do not edit, it would be overwritten. -->
 # Browser security
 
 - **[CSP-NONCE]** A strict Content-Security-Policy by nonce: no `unsafe-inline`, no `unsafe-eval`,
