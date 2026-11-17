@@ -13,4 +13,6 @@ def db_request(
     """Relais vers le package pour préserver le monkeypatching des tests."""
     import domains.lnm_university as pkg
 
+    if conn is None:
+        return pkg.db_request(requester, request)
     return pkg.db_request(requester, request, conn=conn)
