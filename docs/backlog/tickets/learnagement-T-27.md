@@ -1,4 +1,4 @@
-# T-27 · Nommage et structure des tableaux de bord
+# learnagement#T-27 · Nommage et structure des tableaux de bord
 - **Type**: improvement
 - **Priority**: ⚪ background
 - **Status**: to verify — `dashboards/`
@@ -6,6 +6,6 @@
 - **Effort**: M · **Owner**: — · **Due**: —
 - **Origin**: ancien `ToDo/visualisation/ToDo.md`
 
-L'ancienne liste demandait de revoir le nommage : vérifier ce qu'il reste après T-04.
+L'ancienne liste demandait de revoir le nommage : vérifier ce qu'il reste après learnagement#T-04.
 
-Fait partie de la phase C (T-48).
+Fait partie de la phase C (learnagement#T-48).

@@ -1,4 +1,4 @@
-# T-21 · Code, commentaires et doc en anglais
+# learnagement#T-21 · Code, commentaires et doc en anglais
 - **Type**: idea
 - **Priority**: ⚪ background
 - **Status**: todo
@@ -9,4 +9,4 @@
 Tout passer en anglais, sauf l'interface. À décider avec Flavien.
 
 Le glossaire (`docs/glossary.md`) fixe le nom de chaque mot du métier ; fait partie de la
-phase C (T-48).
+phase C (learnagement#T-48).
