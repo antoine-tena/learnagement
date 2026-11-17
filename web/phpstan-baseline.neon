@@ -1,0 +1,13 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Function router not found\.$#'
+			identifier: function.notFound
+			count: 9
+			path: components/header.php
+
+		-
+			message: '#^Function render not found\.$#'
+			identifier: function.notFound
+			count: 49
+			path: components/howtouse.php

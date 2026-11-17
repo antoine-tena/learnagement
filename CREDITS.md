@@ -22,6 +22,9 @@
     Student dev during IDU Project Base Learning (2024-2027)
     - Corentin Campillo Laffin:  
     Student dev during IDU Project Base Learning (2024-2027)
+  - Refactoring
+    - [Antoine Tena][2]:  
+    Refactoring, checked rules and target architecture (2026)
 - Learnangement V0
   - [Flavien Vernier][1]:  
   Author of Learnagement and main dev manager
@@ -54,5 +57,6 @@
   Author of Learnagement and main dev manager
 
 [1]: https://www.univ-smb.fr/listic/presentation/membres/enseignants-chercheurs/flavien-vernier/
+[2]: https://github.com/antoine-tena
 
 [Back](README.md)

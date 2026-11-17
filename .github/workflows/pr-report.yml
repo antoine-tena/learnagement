@@ -1,0 +1,53 @@
+name: Rapport de PR
+
+# Calcule le rapport d'une pull request (règles, tests, routes cassées, migrations, nouvelles
+# dépendances) ; pr-comment.yml le publie. Le calcul lance le code de la PR, souvent celui d'un
+# fork d'étudiant : il n'a ni secret ni droit d'écriture.
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-report-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: antoine-tena/ion-repo/actions/charter@eb0dc112605e3ccda49cc80374ffd3185a96baf7 # develop
+        with:
+          ref: eb0dc112605e3ccda49cc80374ffd3185a96baf7
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+        with:
+          package_json_file: frontend/package.json
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: frontend/.nvmrc
+      - name: Outils
+        run: |
+          uv tool install pre-commit
+          pnpm --dir frontend install --frozen-lockfile
+          pnpm --dir web install --frozen-lockfile
+          (cd web && composer install --no-interaction --no-progress)
+      - name: Rapport
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          mkdir -p pr-report
+          .github/scripts/pr-report.sh "$BASE_SHA" pr-report/report.md
+          echo "$PR_NUMBER" > pr-report/number
+          cat pr-report/report.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: pr-report
+          path: pr-report/
+          retention-days: 7

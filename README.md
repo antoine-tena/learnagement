@@ -25,7 +25,10 @@ L'environnement sera créé dans /.venv. Le bootstrap installe aussi des hooks g
 post-merge, post-rewrite) qui écrivent le commit courant dans `.env.git` (`GIT_COMMIT`).
 Hors production, il installe aussi le hook de pré-commit (avec `uv tool install` : `pre-commit`
 et `ion-repo`, qui fournit `charter`) : avant chaque commit, la mise en forme est corrigée et les
-règles de `charter.toml` vérifiées sur les fichiers commités.
+règles de `charter.toml` vérifiées sur les fichiers commités. Le PHP de `web/` se vérifie par
+`web/tools/run.sh` (le PHP de la machine, sinon podman), son JavaScript par pnpm ;
+`openapi.json`, à la racine, est le schéma de l'API, réécrit par
+`cd backend && uv run python -m tools.export_openapi --output ../openapi.json`.
 
 ### Dev Mode (a la mano)
 

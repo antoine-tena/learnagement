@@ -66,7 +66,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     });
 
                 if (response.ok) {
-                    const result = await response.json();
                     alert("Module créé avec succès !");
                     modal.close();
                     form.reset();

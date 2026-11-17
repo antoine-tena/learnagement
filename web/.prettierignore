@@ -1,0 +1,37 @@
+# Prettier ne vérifie que le JavaScript de web/ ; le PHP a PHP-CS-Fixer.
+*
+!*/
+!*.js
+vendor/
+node_modules/
+
+# Dette : fichiers pas encore au format. Pour en rendre un : retirer sa ligne, puis
+# pnpm --dir web exec prettier --write <fichier>, dans un commit à part.
+scripts/dependance_module/filters.js
+scripts/dependance_module/gantt.js
+scripts/dependance_module/modal.js
+scripts/dependance_module/transform.js
+scripts/liste_personnel.js
+scripts/mobility-admin/api.js
+scripts/mobility-admin/assignment.js
+scripts/mobility-admin/campaign.js
+scripts/mobility-admin/diagnostics.js
+scripts/mobility-admin/exports.js
+scripts/mobility-admin/main.js
+scripts/mobility-admin/map.js
+scripts/mobility-admin/quotas.js
+scripts/mobility-admin/state.js
+scripts/mobility-admin/universities_create.js
+scripts/mobility-admin/universities_table.js
+scripts/mobility-admin/wishes_table.js
+scripts/mobility-map-open/api.js
+scripts/mobility-map-open/main.js
+scripts/mobility-map-open/map.js
+scripts/mobility-map-open/wishes.js
+scripts/mobility-map/api.js
+scripts/mobility-map/main.js
+scripts/mobility-map/map.js
+scripts/mobility-map/wishes.js
+theme/mobility-map-carousel.js
+theme/mobility-map-streetview/places.js
+theme/mobility-map-streetview/ui.js

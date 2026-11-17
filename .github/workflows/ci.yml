@@ -20,6 +20,37 @@ jobs:
     with:
       directory: backend
 
+  # openapi.json, à la racine, suit le code de l'API (le front ne génère pas encore ses types).
+  api-contract:
+    uses: antoine-tena/ion-repo/.github/workflows/api-contract.yml@eb0dc112605e3ccda49cc80374ffd3185a96baf7 # develop
+    with:
+      export: uv run python -m tools.export_openapi --check --output ../openapi.json
+      generate: "true"
+
+  # Les routes cassées par rapport à la production (openapi.json de main) : une route retirée ou
+  # un champ devenu obligatoire sans nouvelle version fait échouer ([FROZEN-CONTRACT]).
+  api-breaking:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: openapi.json de la production
+        id: base
+        run: |
+          if git show origin/main:openapi.json > /tmp/openapi-main.json 2>/dev/null; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::Pas encore d'openapi.json sur main : rien à comparer."
+          fi
+      - name: oasdiff breaking
+        if: steps.base.outputs.found == 'true'
+        run: >-
+          podman run --rm -v /tmp/openapi-main.json:/specs/base.json:ro
+          -v "$PWD/openapi.json:/specs/head.json:ro" docker.io/tufin/oasdiff:v1.39.0
+          breaking /specs/base.json /specs/head.json --fail-on ERR
+
   # Les tableaux de bord Dash : ruff et mypy au niveau qui passe aujourd'hui (dashboards/
   # pyproject.toml) ; pas encore de tests, d'où un job à part plutôt que python.yml.
   dashboards:
@@ -43,6 +74,45 @@ jobs:
         lint
         typecheck
         build
+
+  # Le JavaScript de web/ : ESLint et Prettier (dette dans web/.prettierignore).
+  web-js:
+    uses: antoine-tena/ion-repo/.github/workflows/pnpm.yml@eb0dc112605e3ccda49cc80374ffd3185a96baf7 # develop
+    with:
+      directory: web
+      scripts: |
+        lint
+        format:check
+
+  # Le PHP de web/ : PHP-CS-Fixer et PHPStan au niveau qui passe aujourd'hui (dette dans
+  # web/.php-cs-fixer.dist.php et web/phpstan-baseline.neon).
+  web-php:
+    runs-on: ubuntu-latest
+    container: docker.io/library/composer:2
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: composer install --no-interaction --no-progress
+      - run: composer audit
+      - run: vendor/bin/php-cs-fixer check --show-progress=none
+      - run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+      - run: vendor/bin/deptrac analyse --config-file=deptrac.yaml --no-progress
+      # Une page ne touche jamais la base : pas de fonction SQL native hors de vendor/.
+      - run: "! grep -rnE --include='*.php' --exclude-dir=vendor '\\b(mysqli|mysql|pg|sqlite|odbc)_\\w+\\s*\\(' ."
+
+  # Les couches du backend (import-linter, contrats dans backend/pyproject.toml).
+  backend-layers:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
+      - run: uv sync --locked
+      - run: uv run --no-sync lint-imports --no-cache
 
   charter:
     uses: antoine-tena/ion-repo/.github/workflows/charter.yml@eb0dc112605e3ccda49cc80374ffd3185a96baf7 # develop

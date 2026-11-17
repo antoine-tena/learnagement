@@ -20,6 +20,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "import-linter>=2.16,<3.0.0",
     "mypy>=2.4.0,<3.0.0",
     "pytest>=9.1.1,<10.0.0",
     "pytest-asyncio>=1.3.0,<2.0.0",
@@ -102,3 +103,34 @@ asyncio_default_fixture_loop_scope = "function"
 [tool.coverage.run]
 source = ["."]
 omit = ["tests/*"]
+
+# Les couches, vérifiées par import-linter (uv run lint-imports) : une couche n'importe que celles
+# du dessous. ignore_imports : la dette d'aujourd'hui, un import quitte la liste une fois corrigé.
+[tool.importlinter]
+root_packages = [
+    "access_control", "api", "auth", "core", "db", "domains", "init", "models", "repositories",
+    "system",
+]
+
+[[tool.importlinter.contracts]]
+name = "Couches du backend"
+type = "layers"
+layers = [
+    "domains | system",
+    "auth.authenticate_lnm | auth.authenticate_cas",
+    "api",
+    "auth.authenticate_tools | access_control",
+    "repositories",
+    "db | init",
+    "core | models",
+]
+ignore_imports = [
+    # Import différé dans la fonction pour éviter un cycle : db_request descend dans db/.
+    "access_control.predicates -> api.dependencies",
+]
+
+# Un domaine ne lit pas les requêtes d'un autre : il passe par le service de ce domaine.
+[[tool.importlinter.contracts]]
+name = "Domaines indépendants"
+type = "independence"
+modules = ["domains.*"]

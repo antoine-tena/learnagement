@@ -187,7 +187,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         if (btnPrev) {
             btnPrev.addEventListener('click', () => {
-                const dynamicTotalPages = Math.ceil(filteredEtudiants.length / parPage) || 1;
                 if (pageCourante > 1) {
                     pageCourante--;
                     afficherEtuPage(pageCourante);

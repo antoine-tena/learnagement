@@ -1,0 +1,36 @@
+# Les couches du PHP de web/, vérifiées par deptrac : web/tools/run.sh vendor/bin/deptrac
+# Une page ne touche jamais la base : elle passe par l'API (utils/apiProxy.php, utils/endpoint.php).
+deptrac:
+  cache_file: ./vendor/.deptrac.cache
+  paths:
+    - ./
+  exclude_files:
+    - '#^.*/(vendor|node_modules|tools)/.*$#'
+  analyser:
+    types: [class, use, file, function, function_call]
+  layers:
+    - name: Pages
+      collectors:
+        - type: directory
+          value: views/.*
+        - type: glob
+          value: ./{index,api}.php
+    - name: Components
+      collectors:
+        - type: directory
+          value: components/.*
+    - name: Utils
+      collectors:
+        - type: directory
+          value: utils/.*
+    - name: Database
+      collectors:
+        - type: classLike
+          value: ^(PDO|PDOStatement|mysqli|mysqli_result|mysqli_stmt)$
+        # Les fonctions natives (mysqli_query…) échappent à deptrac : le hook no-sql-web du
+        # pré-commit et le job web-php de la CI les refusent.
+  ruleset:
+    Pages: [Components, Utils]
+    Components: [Utils]
+    Utils: []
+    Database: []

@@ -36,18 +36,27 @@ Les règles de code sont dans la [charte](.claude/rules/ion-repo/charter.md) et 
 
 | Partie | Vérifié aujourd'hui |
 |---|---|
-| `backend/`, `launcher/`, `scraping/` | ruff (lint et mise en forme), charte |
+| `backend/` | ruff, couches (import-linter), `openapi.json` réécrit d'après le code, charte |
+| `launcher/`, `scraping/`, `dashboards/` | ruff (lint et mise en forme), charte |
 | `frontend/` | ESLint, charte |
-| `dashboards/` | charte (taille des fichiers) ; T-46 ajoute ruff |
-| `web/` | rien de propre au PHP ; T-46 ajoute PHP-CS-Fixer et PHPStan |
+| `web/` (PHP) | PHP-CS-Fixer, PHPStan, couches (deptrac), pas de SQL dans une page, charte |
+| `web/` (JavaScript) | ESLint, Prettier, charte |
 | tout le repo | gros fichiers, conflits, clés privées, secrets |
 
-En CI s'ajoutent les tests et le typage du backend, le lint, le typage et la compilation du front,
-et l'audit des dépendances.
+Chaque outil part du niveau qui passe aujourd'hui ; la dette restante est écrite dans sa
+configuration (`web/.php-cs-fixer.dist.php`, `web/phpstan-baseline.neon`, `web/.prettierignore`,
+`backend/pyproject.toml`) et ne fait que baisser. Le PHP se vérifie sans PHP installé :
+`web/tools/run.sh` passe alors par podman (`web/tools/run.sh vendor/bin/phpstan analyse`).
+
+En CI s'ajoutent les tests et le typage du backend, le contrat de l'API (`openapi.json` et les
+routes cassées par rapport à `main`), le lint, le typage et la compilation du front, et l'audit
+des dépendances.
 
 ## Ouvrir une pull request
 
 - Remplir le modèle de PR : quoi, pourquoi, comment tester.
+- La CI commente la PR : règles, tests, routes cassées, migrations et nouvelles dépendances ; le
+  commentaire se met à jour à chaque poussée.
 - Une PR courte, sur un seul sujet ; un bug corrigé arrive avec le test qui l'aurait détecté.
 - Aucun secret ni donnée personnelle réelle dans le diff, les logs ou les captures.
 - Une route de l'API, une variable d'environnement ou une commande du lanceur ne change pas sans

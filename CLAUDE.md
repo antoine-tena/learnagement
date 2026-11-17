@@ -32,9 +32,11 @@ supprime un dossier, un domaine ou un point d'entrée.
 - `backend/` : l'API FastAPI (`app.py`) ; `api/` (routes, `dependencies/`), `auth/` (LNM et
   `authenticate_cas/`), `access_control/` (règles, prédicats, responsabilités), `domains/` (requêtes métier par
   domaine : `lnm_university/`, `maquette_module/`, `lnm_etudiant/`, `lnm_evaluation/`, `lnm_mobility_assignment/`…, en snake_case ; les tables SQL gardent leur casse), `models/`, `db/` (connexion
-  SQLAlchemy), `tests/` (pytest).
+  SQLAlchemy), `tools/` (`export_openapi.py` : le schéma `openapi.json` de la racine), `tests/`
+  (pytest) ; les couches import-linter sont dans `pyproject.toml`.
 - `web/` : le front principal, en PHP (Apache) ; `index.php` + `utils/router.php`, `views/`
-  (pages, dont `views/dashboard/mobility-admin/`, `views/dashboard/stage/`), `components/`, `scripts/` (`dependance_module/`, `mobility-admin/`, `mobility-map/`, `mobility-map-open/`), `utils/apiProxy.php` (appels à l'API), `theme/` (dont `theme/theme/`, `theme/mobility-map-streetview/`), `assets/`.
+  (pages, dont `views/dashboard/mobility-admin/`, `views/dashboard/stage/`), `components/`, `scripts/` (`dependance_module/`, `mobility-admin/`, `mobility-map/`, `mobility-map-open/`), `utils/apiProxy.php` (appels à l'API), `theme/` (dont `theme/theme/`, `theme/mobility-map-streetview/`), `assets/` ; `tools/run.sh` (PHP, ou podman sans PHP) et la
+  configuration de PHP-CS-Fixer, PHPStan, deptrac, ESLint, Prettier (`package.json`).
 - `dashboards/` : les tableaux de bord Dash (`main.py`, `main_app/`, `pages/` : une page par vue (dont les paquets
   `modules_enseignant_edit/`, `stages_administratif/`, `checks_administratif/`) et son `_tools.py`), `apc_dash/` (approche par compétences, dont
   `apc20_chatbot_tools/`, `apc20_competence_ac/`, `apc20_heatmap_apc/`, `apc20_ens_contribution/`, `apc20_ens_fiche_module/`, `apc20_ens_reseau_gaps/`, `apc20_metier_orientation/`, `app_reseaupolytech_etudiant/`).
@@ -51,6 +53,8 @@ supprime un dossier, un domaine ou un point d'entrée.
   racine : comment contribuer aujourd'hui.
 - `docs/backlog/` : le travail à faire ; `charter.toml` : les règles vérifiées ;
   `.claude/rules/ion-repo/` : les règles d'ion-repo pour Claude.
+- `.github/` : `workflows/ci.yml` (la CI d'une release), `pr-report.yml` et `pr-comment.yml` (le
+  rapport commenté sur chaque PR), `scripts/` (le calcul de ce rapport).
 
 ## Notes
 

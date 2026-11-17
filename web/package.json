@@ -1,0 +1,17 @@
+{
+  "name": "learnagement-web",
+  "private": true,
+  "description": "Outils de vérification du JavaScript de web/ (rien n'est empaqueté : Apache sert les fichiers tels quels).",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint .",
+    "format:check": "prettier --check ."
+  },
+  "packageManager": "pnpm@12.8.1",
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "eslint": "9.39.5",
+    "globals": "^17.14.0",
+    "prettier": "^3.10.1"
+  }
+}
