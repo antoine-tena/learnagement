@@ -44,6 +44,34 @@ repos:
         types: [python]
         files: ^backend/
 
+      - id: ruff-check-launcher
+        name: ruff check (launcher)
+        entry: uv run ruff check --fix --force-exclude
+        language: system
+        types: [python]
+        files: ^(launcher/|Learnagement\.py$|bootstrap\.py$)
+
+      - id: ruff-format-launcher
+        name: ruff format (launcher)
+        entry: uv run ruff format --force-exclude
+        language: system
+        types: [python]
+        files: ^(launcher/|Learnagement\.py$|bootstrap\.py$)
+
+      - id: ruff-check-scraping
+        name: ruff check (scraping)
+        entry: bash -c 'cd scraping && uv run ruff check --fix --force-exclude "${@#scraping/}"' --
+        language: system
+        types: [python]
+        files: ^scraping/
+
+      - id: ruff-format-scraping
+        name: ruff format (scraping)
+        entry: bash -c 'cd scraping && uv run ruff format --force-exclude "${@#scraping/}"' --
+        language: system
+        types: [python]
+        files: ^scraping/
+
       - id: eslint
         name: eslint (frontend)
         entry: bash -c 'cd frontend && pnpm exec eslint --fix "${@#frontend/}"' --
