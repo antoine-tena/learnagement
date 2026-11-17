@@ -18,7 +18,7 @@ supprime un dossier, un domaine ou un point d'entrée.
   `generate-env`, `backupdb`…), dont le code est dans `launcher/` : `cli.py` (les commandes
   click), `instance.py` (changer d'environnement, remise à zéro, export, import), `docker.py` et
   `compose.py` (commandes compose, `docker-compose.yml` assemblé, attente des sondes), `db.py`
-  (initialisation, administrateur, sauvegardes), `backup/` (sauvegarde planifiée, pas encore
+  (initialisation, administrateur, sauvegardes), `backups/` (sauvegarde planifiée, pas encore
   branchée), `env.py` (génération et propagation des `.env`), `git.py` (commit dans `.env.git`),
   `config.py` (conteneurs par environnement), `security.py` (certificats :
   `python -m launcher.security`), `tools.py`, `tests/`.

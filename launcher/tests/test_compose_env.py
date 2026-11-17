@@ -52,7 +52,7 @@ def test_a_key_defined_in_two_parts_is_refused(tmp_path: Path) -> None:
 def test_next_backup_is_today_or_tomorrow() -> None:
     from datetime import datetime, time
 
-    from launcher.backup.schedule import PARIS, parse_backup_at, seconds_until
+    from launcher.backups.schedule import PARIS, parse_backup_at, seconds_until
 
     morning = datetime(2026, 11, 17, 8, 0, tzinfo=PARIS)
     assert parse_backup_at("22h30") == time(22, 30)
