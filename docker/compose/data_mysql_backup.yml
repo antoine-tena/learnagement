@@ -1,4 +1,5 @@
-    # Sauvegarde planifiée, pas encore activée : docker/backup/backup.sh reste à écrire.
+    # Sauvegarde quotidienne de la base (docker/backup/backup.sh) ; sonde en échec si la
+    # dernière sauvegarde a raté ou a plus de BACKUP_MAX_AGE_HOURS heures.
     data_mysql_backup_${INSTANCE_NAME}:
         container_name: learnagement_data_mysql_backup_${INSTANCE_NAME}
         image: mysql:8.4
@@ -12,9 +13,11 @@
         entrypoint: ["/bin/bash", "/opt/backup.sh"]
         environment:
             TZ: ${TZ:-Europe/Paris}
-            BACKUP: ${BACKUP:-false}
-            BACKUP_AT: ${BACKUP_AT:-00:00}
-            BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-}
+            BACKUP: ${BACKUP:-true}
+            BACKUP_AT: ${BACKUP_AT:-02:00}
+            BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-30}
+            BACKUP_MAX_AGE_HOURS: ${BACKUP_MAX_AGE_HOURS:-26}
+            BACKUP_ALERT_URL: ${BACKUP_ALERT_URL:-}
             MYSQL_SERVER: ${MYSQL_SERVER}
             MYSQL_DB: ${MYSQL_DB}
             MYSQL_USER_LOGIN: ${MYSQL_USER_LOGIN}
@@ -23,3 +26,9 @@
             - ./backup/backup.sh:/opt/backup.sh:ro
             - ${BACKUP_DIRECTORY:-../db/backup}:/backup
             - learnagement_persistent_backup_state_${INSTANCE_NAME}:/state
+        healthcheck:
+            test: ["CMD", "/bin/bash", "/opt/backup.sh", "health"]
+            start_period: 10m
+            interval: 10m
+            timeout: 10s
+            retries: 1
