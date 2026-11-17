@@ -72,6 +72,20 @@ repos:
         types: [python]
         files: ^scraping/
 
+      - id: ruff-check-dashboards
+        name: ruff check (dashboards)
+        entry: bash -c 'cd dashboards && uv run ruff check --fix --force-exclude "${@#dashboards/}"' --
+        language: system
+        types: [python]
+        files: ^dashboards/
+
+      - id: ruff-format-dashboards
+        name: ruff format (dashboards)
+        entry: bash -c 'cd dashboards && uv run ruff format --force-exclude "${@#dashboards/}"' --
+        language: system
+        types: [python]
+        files: ^dashboards/
+
       - id: eslint
         name: eslint (frontend)
         entry: bash -c 'cd frontend && pnpm exec eslint --fix "${@#frontend/}"' --
