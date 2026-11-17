@@ -8,6 +8,9 @@
 # data and backup directories store private data, NEVER PUT IN ON GIT
 **/data
 **/backup
+# sauf le script de sauvegarde, qui ne contient aucune donnée
+!docker/backup/
+!docker/backup/backup.sh
 db/docker-entrypoint-initdb.d
 
 __pycache__
