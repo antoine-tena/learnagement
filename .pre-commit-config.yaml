@@ -146,14 +146,14 @@ repos:
 
       - id: eslint-web
         name: eslint (web)
-        entry: bash -c 'cd web && pnpm exec eslint --fix "${@#web/}"' --
+        entry: bash -c 'cd web && { [ -d node_modules ] || pnpm install --frozen-lockfile --silent; } && pnpm exec eslint --fix "${@#web/}"' --
         language: system
         types: [javascript]
         files: ^web/
 
       - id: prettier-web
         name: prettier (web)
-        entry: bash -c 'cd web && pnpm exec prettier --write --ignore-unknown "${@#web/}"' --
+        entry: bash -c 'cd web && { [ -d node_modules ] || pnpm install --frozen-lockfile --silent; } && pnpm exec prettier --write --ignore-unknown "${@#web/}"' --
         language: system
         types: [javascript]
         files: ^web/
