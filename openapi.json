@@ -1,0 +1,5601 @@
+{
+  "components": {
+    "schemas": {
+      "AssignmentRunPayload": {
+        "properties": {
+          "annee_eligible": {
+            "default": 4,
+            "title": "Annee Eligible",
+            "type": "integer"
+          },
+          "annee_scolaire": {
+            "default": "2025-2026",
+            "title": "Annee Scolaire",
+            "type": "string"
+          },
+          "mobility_quotas": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/MobilityQuota"
+            },
+            "title": "Mobility Quotas",
+            "type": "array"
+          }
+        },
+        "title": "AssignmentRunPayload",
+        "type": "object"
+      },
+      "Body_login_for_access_token_token_post": {
+        "properties": {
+          "client_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Id"
+          },
+          "client_secret": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "format": "password",
+            "title": "Client Secret"
+          },
+          "grant_type": {
+            "anyOf": [
+              {
+                "pattern": "^password$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grant Type"
+          },
+          "password": {
+            "format": "password",
+            "title": "Password",
+            "type": "string"
+          },
+          "scope": {
+            "default": "",
+            "title": "Scope",
+            "type": "string"
+          },
+          "username": {
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ],
+        "title": "Body_login_for_access_token_token_post",
+        "type": "object"
+      },
+      "CalendarUpdate": {
+        "properties": {
+          "url": {
+            "title": "Url",
+            "type": "string"
+          },
+          "url_name": {
+            "default": "Planning des cours",
+            "title": "Url Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "title": "CalendarUpdate",
+        "type": "object"
+      },
+      "CampaignLaunchRequestPayload": {
+        "properties": {
+          "doublants": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/DoublantScore"
+            },
+            "title": "Doublants",
+            "type": "array"
+          }
+        },
+        "title": "CampaignLaunchRequestPayload",
+        "type": "object"
+      },
+      "CasUserProvision": {
+        "properties": {
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "login": {
+            "title": "Login",
+            "type": "string"
+          },
+          "members": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "nom": {
+            "title": "Nom",
+            "type": "string"
+          },
+          "prenom": {
+            "title": "Prenom",
+            "type": "string"
+          }
+        },
+        "required": [
+          "login",
+          "email",
+          "nom",
+          "prenom"
+        ],
+        "title": "CasUserProvision",
+        "type": "object"
+      },
+      "DoublantScore": {
+        "properties": {
+          "id_etudiant": {
+            "title": "Id Etudiant",
+            "type": "integer"
+          },
+          "z_score": {
+            "title": "Z Score",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id_etudiant",
+          "z_score"
+        ],
+        "title": "DoublantScore",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "MobilityQuota": {
+        "properties": {
+          "id_filiere": {
+            "title": "Id Filiere",
+            "type": "integer"
+          },
+          "id_semestre": {
+            "title": "Id Semestre",
+            "type": "integer"
+          },
+          "places": {
+            "title": "Places",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id_filiere",
+          "id_semestre",
+          "places"
+        ],
+        "title": "MobilityQuota",
+        "type": "object"
+      },
+      "MobilityQuotasUpdatePayload": {
+        "properties": {
+          "annee_scolaire": {
+            "title": "Annee Scolaire",
+            "type": "string"
+          },
+          "quotas": {
+            "items": {
+              "$ref": "#/components/schemas/MobilityQuota"
+            },
+            "title": "Quotas",
+            "type": "array"
+          }
+        },
+        "required": [
+          "annee_scolaire",
+          "quotas"
+        ],
+        "title": "MobilityQuotasUpdatePayload",
+        "type": "object"
+      },
+      "ModuleCreation": {
+        "additionalProperties": false,
+        "description": "Corps de `POST /modules` : les noms reçus sont ceux du formulaire de `web/`.",
+        "properties": {
+          "ECTS": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Ects",
+            "type": "number"
+          },
+          "code_module": {
+            "maxLength": 20,
+            "minLength": 1,
+            "title": "Code Module",
+            "type": "string"
+          },
+          "hCM": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Hcm",
+            "type": "number"
+          },
+          "hPerso": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Hperso",
+            "type": "number"
+          },
+          "hProj": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Hproj",
+            "type": "number"
+          },
+          "hTD": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Htd",
+            "type": "number"
+          },
+          "hTP": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Htp",
+            "type": "number"
+          },
+          "id_discipline": {
+            "title": "Id Discipline",
+            "type": "integer"
+          },
+          "id_responsable": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id Responsable"
+          },
+          "nom": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Nom",
+            "type": "string"
+          },
+          "semestre": {
+            "title": "Semestre",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "code_module",
+          "nom",
+          "semestre",
+          "id_discipline"
+        ],
+        "title": "ModuleCreation",
+        "type": "object"
+      },
+      "StudentDecisionPayload": {
+        "properties": {
+          "decision": {
+            "title": "Decision",
+            "type": "string"
+          }
+        },
+        "required": [
+          "decision"
+        ],
+        "title": "StudentDecisionPayload",
+        "type": "object"
+      },
+      "Token": {
+        "properties": {
+          "access_token": {
+            "title": "Access Token",
+            "type": "string"
+          },
+          "token_type": {
+            "title": "Token Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "access_token",
+          "token_type"
+        ],
+        "title": "Token",
+        "type": "object"
+      },
+      "UniversityAdminPayload": {
+        "properties": {
+          "S8_total_places": {
+            "default": 0,
+            "title": "S8 Total Places",
+            "type": "integer"
+          },
+          "S9_total_places": {
+            "default": 0,
+            "title": "S9 Total Places",
+            "type": "integer"
+          },
+          "address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Code"
+          },
+          "country": {
+            "title": "Country",
+            "type": "string"
+          },
+          "languages": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Languages"
+          },
+          "latitude": {
+            "default": 0.0,
+            "title": "Latitude",
+            "type": "number"
+          },
+          "longitude": {
+            "default": 0.0,
+            "title": "Longitude",
+            "type": "number"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "note_min": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note Min"
+          },
+          "places": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/UniversityPlacePayload"
+            },
+            "title": "Places",
+            "type": "array"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": "ERASMUS",
+            "title": "Type"
+          },
+          "website": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Website"
+          }
+        },
+        "required": [
+          "name",
+          "country"
+        ],
+        "title": "UniversityAdminPayload",
+        "type": "object"
+      },
+      "UniversityPlacePayload": {
+        "properties": {
+          "annee": {
+            "title": "Annee",
+            "type": "integer"
+          },
+          "id_filiere": {
+            "title": "Id Filiere",
+            "type": "integer"
+          },
+          "number_of_places": {
+            "minimum": 0.0,
+            "title": "Number Of Places",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id_filiere",
+          "annee",
+          "number_of_places"
+        ],
+        "title": "UniversityPlacePayload",
+        "type": "object"
+      },
+      "UpdateAssignmentStatusPayload": {
+        "properties": {
+          "id_assignment": {
+            "title": "Id Assignment",
+            "type": "integer"
+          },
+          "new_status": {
+            "title": "New Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id_assignment",
+          "new_status"
+        ],
+        "title": "UpdateAssignmentStatusPayload",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "OAuth2PasswordBearer": {
+        "flows": {
+          "password": {
+            "scopes": {},
+            "tokenUrl": "token"
+          }
+        },
+        "type": "oauth2"
+      }
+    }
+  },
+  "info": {
+    "title": "FastAPI",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "root__get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Root"
+      }
+    },
+    "/access_auth": {
+      "get": {
+        "description": "Check teacher without session.",
+        "operationId": "get_access_auth_access_auth_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Teacher without session",
+        "tags": [
+          "check",
+          "table"
+        ]
+      }
+    },
+    "/access_auth_tree": {
+      "get": {
+        "description": "Check teacher without session.",
+        "operationId": "get_access_auth_tree_access_auth_tree_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Teacher without session",
+        "tags": [
+          "check",
+          "tree"
+        ]
+      }
+    },
+    "/access_auth_tree_sqlglot": {
+      "get": {
+        "description": "Check teacher without session.",
+        "operationId": "get_access_auth_tree_sqlglot_access_auth_tree_sqlglot_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Teacher without session",
+        "tags": [
+          "check",
+          "tree"
+        ]
+      }
+    },
+    "/acp_kpi": {
+      "get": {
+        "description": "nombre de competence:",
+        "operationId": "get_competence_acp_kpi_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "nb competence",
+        "tags": [
+          "apc"
+        ]
+      }
+    },
+    "/apc/ac_modules": {
+      "get": {
+        "description": "Retourne les associations apprentissages critiques / modules",
+        "operationId": "get_ac_modules_apc_ac_modules_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "APC AC-Modules",
+        "tags": [
+          "apc"
+        ]
+      }
+    },
+    "/apc/apprentissages": {
+      "get": {
+        "description": "Retourne la liste des apprentissages critiques",
+        "operationId": "get_apprentissages_apc_apprentissages_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "APC Apprentissages critiques",
+        "tags": [
+          "apc"
+        ]
+      }
+    },
+    "/apc/competences": {
+      "get": {
+        "description": "Retourne la liste des compétences APC",
+        "operationId": "get_competences_apc_competences_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "APC Compétences",
+        "tags": [
+          "apc"
+        ]
+      }
+    },
+    "/apc/composantes": {
+      "get": {
+        "description": "Retourne la liste des composantes essentielles",
+        "operationId": "get_composantes_apc_composantes_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "APC Composantes essentielles",
+        "tags": [
+          "apc"
+        ]
+      }
+    },
+    "/apc/modules": {
+      "get": {
+        "description": "Retourne la liste des modules de la maquette",
+        "operationId": "get_apc_modules_apc_modules_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "APC Modules",
+        "tags": [
+          "apc"
+        ]
+      }
+    },
+    "/apc/niveaux": {
+      "get": {
+        "description": "Retourne la liste des niveaux de compétences",
+        "operationId": "get_niveaux_apc_niveaux_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "APC Niveaux",
+        "tags": [
+          "apc"
+        ]
+      }
+    },
+    "/apc/situations": {
+      "get": {
+        "description": "Retourne la liste des situations professionnelles / métiers",
+        "operationId": "get_situations_apc_situations_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "APC Situations professionnelles",
+        "tags": [
+          "apc"
+        ]
+      }
+    },
+    "/competence": {
+      "get": {
+        "description": "Return the list of partner universities",
+        "operationId": "tree_competence_competence_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Universities",
+        "tags": [
+          "competence"
+        ]
+      }
+    },
+    "/competence_ac": {
+      "get": {
+        "description": "Return the list of competences and apprentissages for the students",
+        "operationId": "get_competence_ac_competence_ac_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Students",
+        "tags": [
+          "apc"
+        ]
+      }
+    },
+    "/competence_big": {
+      "get": {
+        "description": "Return the list of partner universities",
+        "operationId": "tree_competence_big_competence_big_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Universities",
+        "tags": [
+          "competence"
+        ]
+      }
+    },
+    "/competence_ce": {
+      "get": {
+        "description": "Return the list of competences and essentiel composant",
+        "operationId": "get_competence_ce_competence_ce_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Students",
+        "tags": [
+          "apc"
+        ]
+      }
+    },
+    "/disciplines": {
+      "get": {
+        "description": "Get disciplines",
+        "operationId": "get_disciplines_disciplines_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get disciplines",
+        "tags": [
+          "module"
+        ]
+      }
+    },
+    "/enseignant/{id_enseignant}/filieres": {
+      "get": {
+        "description": "Return the list of filieres de l'enseignant",
+        "operationId": "get_enseignant_filieres_enseignant__id_enseignant__filieres_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_enseignant",
+            "required": true,
+            "schema": {
+              "title": "Id Enseignant",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Filieres de l'enseignant",
+        "tags": [
+          "administratif",
+          "enseignant"
+        ]
+      }
+    },
+    "/enseignant/{id_enseignant}/module_responsabilities": {
+      "get": {
+        "description": "Return the modules the teacher is responsible for",
+        "operationId": "get_enseignant_module_responsabilities_enseignant__id_enseignant__module_responsabilities_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_enseignant",
+            "required": true,
+            "schema": {
+              "title": "Id Enseignant",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Modules dont l'enseignant est responsable",
+        "tags": [
+          "administratif",
+          "enseignant"
+        ]
+      }
+    },
+    "/enseignant_responsabilite": {
+      "get": {
+        "description": "Return the list of teachers' responsibilities",
+        "operationId": "enseignants_responsabilities_enseignant_responsabilite_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Teachers responsibilities",
+        "tags": [
+          "enseignant"
+        ]
+      }
+    },
+    "/enseignant_sans_cours": {
+      "get": {
+        "description": "Check teacher without session.",
+        "operationId": "check_lnm_enseignant_sans_cours_enseignant_sans_cours_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Teacher without session",
+        "tags": [
+          "check"
+        ]
+      }
+    },
+    "/enseignants": {
+      "get": {
+        "description": "Return the list of teachers",
+        "operationId": "enseignants_enseignants_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Teachers",
+        "tags": [
+          "enseignant"
+        ]
+      }
+    },
+    "/enseignants/charge": {
+      "get": {
+        "description": "Return the list of teachers load",
+        "operationId": "enseignants_load_enseignants_charge_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Teachers load",
+        "tags": [
+          "administratif",
+          "enseignant"
+        ]
+      }
+    },
+    "/enseignants/{id_enseignant}/charge": {
+      "get": {
+        "description": "Return the list of teachers load",
+        "operationId": "enseignant_load_enseignants__id_enseignant__charge_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_enseignant",
+            "required": true,
+            "schema": {
+              "title": "Id Enseignant",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Teachers load",
+        "tags": [
+          "administratif",
+          "enseignant"
+        ]
+      }
+    },
+    "/enseignants/{id_enseignant}/rendus": {
+      "get": {
+        "description": "Return the submissions to come of the teacher's modules, one per promotion",
+        "operationId": "get_enseignant_rendus_enseignants__id_enseignant__rendus_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_enseignant",
+            "required": true,
+            "schema": {
+              "title": "Id Enseignant",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Teacher's upcoming submissions",
+        "tags": [
+          "enseignant"
+        ]
+      }
+    },
+    "/enseignants/{id_enseignant}/stages": {
+      "get": {
+        "description": "Return the list of students",
+        "operationId": "get_etudiants_stages_enseignants__id_enseignant__stages_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_enseignant",
+            "required": true,
+            "schema": {
+              "title": "Id Enseignant",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Students",
+        "tags": [
+          "administratif",
+          "enseignant",
+          "internship"
+        ]
+      }
+    },
+    "/etudiants": {
+      "get": {
+        "description": "Return the list of students",
+        "operationId": "get_etudiants_etudiants_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Students",
+        "tags": [
+          "student"
+        ]
+      }
+    },
+    "/etudiants/absences": {
+      "get": {
+        "description": "Return the list of students",
+        "operationId": "get_etudiants_absences_etudiants_absences_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id_responsable",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Id Responsable"
+            }
+          },
+          {
+            "in": "query",
+            "name": "id_enseignant",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Id Enseignant"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Students",
+        "tags": [
+          "student",
+          "administratif"
+        ]
+      }
+    },
+    "/etudiants/stages": {
+      "get": {
+        "description": "Return the list of students",
+        "operationId": "get_etudiants_stages_etudiants_stages_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Students",
+        "tags": [
+          "administratif",
+          "student",
+          "internship"
+        ]
+      }
+    },
+    "/etudiants/without_stage": {
+      "get": {
+        "description": "Return the list of students",
+        "operationId": "get_etudiants_without_stage_etudiants_without_stage_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Students",
+        "tags": [
+          "administratif",
+          "student",
+          "internship"
+        ]
+      }
+    },
+    "/etudiants/{id_etudiant}": {
+      "get": {
+        "description": "Return the list of students",
+        "operationId": "get_etudiant_etudiants__id_etudiant__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_etudiant",
+            "required": true,
+            "schema": {
+              "title": "Id Etudiant",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Students",
+        "tags": [
+          "student"
+        ]
+      }
+    },
+    "/etudiants/{id_etudiant}/absences": {
+      "get": {
+        "description": "Return the list of students",
+        "operationId": "get_etudiant_absences_etudiants__id_etudiant__absences_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_etudiant",
+            "required": true,
+            "schema": {
+              "title": "Id Etudiant",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Students",
+        "tags": [
+          "administratif",
+          "student"
+        ]
+      }
+    },
+    "/etudiants/{id_etudiant}/edt": {
+      "get": {
+        "description": "Return the list of students",
+        "operationId": "get_etudiant_edt_etudiants__id_etudiant__edt_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_etudiant",
+            "required": true,
+            "schema": {
+              "title": "Id Etudiant",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Students",
+        "tags": [
+          "student",
+          "administratif"
+        ]
+      }
+    },
+    "/etudiants/{id_etudiant}/load": {
+      "get": {
+        "description": "Return the list of students",
+        "operationId": "get_etudiant_load_etudiants__id_etudiant__load_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_etudiant",
+            "required": true,
+            "schema": {
+              "title": "Id Etudiant",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Students",
+        "tags": [
+          "student",
+          "administratif"
+        ]
+      }
+    },
+    "/etudiants/{id_etudiant}/pastedt": {
+      "get": {
+        "description": "Return the list of students",
+        "operationId": "get_etudiant_pastedt_etudiants__id_etudiant__pastedt_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_etudiant",
+            "required": true,
+            "schema": {
+              "title": "Id Etudiant",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Students",
+        "tags": [
+          "student"
+        ]
+      }
+    },
+    "/etudiants/{id_etudiant}/polypoints": {
+      "get": {
+        "description": "Return the list of students",
+        "operationId": "get_etudiant_polypoints_etudiants__id_etudiant__polypoints_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_etudiant",
+            "required": true,
+            "schema": {
+              "title": "Id Etudiant",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Students",
+        "tags": [
+          "student"
+        ]
+      }
+    },
+    "/etudiants/{id_etudiant}/rendus": {
+      "get": {
+        "description": "Return the list of students",
+        "operationId": "get_etudiant_rendus_etudiants__id_etudiant__rendus_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_etudiant",
+            "required": true,
+            "schema": {
+              "title": "Id Etudiant",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Students",
+        "tags": [
+          "student"
+        ]
+      }
+    },
+    "/etudiants/{id_etudiant}/stage": {
+      "post": {
+        "description": "Return the list of students",
+        "operationId": "post_etudiant_stage_etudiants__id_etudiant__stage_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_etudiant",
+            "required": true,
+            "schema": {
+              "title": "Id Etudiant",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "title": "Data",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Students",
+        "tags": [
+          "administratif",
+          "student",
+          "internship"
+        ]
+      }
+    },
+    "/etudiants/{id_etudiant}/stages": {
+      "get": {
+        "description": "Return the list of students",
+        "operationId": "get_etudiant_stages_etudiants__id_etudiant__stages_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_etudiant",
+            "required": true,
+            "schema": {
+              "title": "Id Etudiant",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Students",
+        "tags": [
+          "administratif",
+          "student",
+          "internship"
+        ]
+      }
+    },
+    "/etudiants/{id_etudiant}/stages/{id_stage}": {
+      "delete": {
+        "description": "Return the list of students",
+        "operationId": "delete_etudiant_stage_etudiants__id_etudiant__stages__id_stage__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_etudiant",
+            "required": true,
+            "schema": {
+              "title": "Id Etudiant",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id_stage",
+            "required": true,
+            "schema": {
+              "title": "Id Stage",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Students",
+        "tags": [
+          "administratif",
+          "student",
+          "internship"
+        ]
+      },
+      "patch": {
+        "description": "Return the list of students",
+        "operationId": "patch_etudiant_stage_etudiants__id_etudiant__stages__id_stage__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_etudiant",
+            "required": true,
+            "schema": {
+              "title": "Id Etudiant",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id_stage",
+            "required": true,
+            "schema": {
+              "title": "Id Stage",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "title": "Data",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Students",
+        "tags": [
+          "administratif",
+          "student",
+          "internship"
+        ]
+      }
+    },
+    "/evaluations/apc/etudiants/{id_etudiant}": {
+      "get": {
+        "description": "Return the list of partner universities",
+        "operationId": "get_apc_etudiant_evaluation_evaluations_apc_etudiants__id_etudiant__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_etudiant",
+            "required": true,
+            "schema": {
+              "title": "Id Etudiant",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Universities",
+        "tags": [
+          "student"
+        ]
+      }
+    },
+    "/evaluations/classical/enseignants/{id_enseignant}": {
+      "get": {
+        "description": "Return the list of partner universities",
+        "operationId": "get_classical_evaluations_enseignant_evaluations_classical_enseignants__id_enseignant__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_enseignant",
+            "required": true,
+            "schema": {
+              "title": "Id Enseignant",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Universities",
+        "tags": [
+          "enseignant"
+        ]
+      }
+    },
+    "/evaluations/classical/etudiants/{id_etudiant}": {
+      "get": {
+        "description": "Return the list of partner universities",
+        "operationId": "get_classical_etudiant_evaluation_evaluations_classical_etudiants__id_etudiant__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_etudiant",
+            "required": true,
+            "schema": {
+              "title": "Id Etudiant",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Universities",
+        "tags": [
+          "student"
+        ]
+      }
+    },
+    "/evaluations/classical/modules/{id_module}": {
+      "get": {
+        "description": "Return the list of partner universities",
+        "operationId": "get_classical_module_evaluation_evaluations_classical_modules__id_module__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_module",
+            "required": true,
+            "schema": {
+              "title": "Id Module",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Universities",
+        "tags": [
+          "student"
+        ]
+      }
+    },
+    "/evaluations/classical/modules/{id_module}/average": {
+      "get": {
+        "description": "Return the list of partner universities",
+        "operationId": "get_classical_module_evaluation_average_evaluations_classical_modules__id_module__average_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_module",
+            "required": true,
+            "schema": {
+              "title": "Id Module",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Universities",
+        "tags": [
+          "student"
+        ]
+      }
+    },
+    "/filiere/competence/{id_competence}/composantes_essentielles": {
+      "get": {
+        "description": "Return the DAGs",
+        "operationId": "handler_filiere_competence__id_competence__composantes_essentielles_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_competence",
+            "required": true,
+            "schema": {
+              "title": "Id Competence",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "DAGs",
+        "tags": [
+          "anonymous",
+          "filiere"
+        ]
+      }
+    },
+    "/filiere/{nom_filiere}/competences": {
+      "get": {
+        "description": "Return the DAGs",
+        "operationId": "handler_filiere__nom_filiere__competences_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "nom_filiere",
+            "required": true,
+            "schema": {
+              "title": "Nom Filiere",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "DAGs",
+        "tags": [
+          "anonymous",
+          "filiere"
+        ]
+      }
+    },
+    "/filieres": {
+      "get": {
+        "description": "Return the list of filieres",
+        "operationId": "handler_filieres_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Filiere",
+        "tags": [
+          "anonymous",
+          "filiere"
+        ]
+      }
+    },
+    "/filieres/dags": {
+      "get": {
+        "description": "Return the DAGs",
+        "operationId": "handler_filieres_dags_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "DAGs",
+        "tags": [
+          "anonymous",
+          "filiere"
+        ]
+      }
+    },
+    "/filieres/stages": {
+      "get": {
+        "description": "Return the list of filieres",
+        "operationId": "stages_filieres_stages_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Filiere",
+        "tags": [
+          "filiere",
+          "internship"
+        ]
+      }
+    },
+    "/groupe_types": {
+      "get": {
+        "description": "Return the list of groupe types",
+        "operationId": "handler_groupe_types_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Groupe types",
+        "tags": [
+          "filiere"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health"
+      }
+    },
+    "/logout": {
+      "post": {
+        "description": "...",
+        "operationId": "logout_logout_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "User logout",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/m2c3": {
+      "get": {
+        "description": "Return maquette et modalités de contrôle de connaissances et compétences",
+        "operationId": "get_m2c3_m2c3_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id_filiere",
+            "required": true,
+            "schema": {
+              "title": "Id Filiere",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "id_statut",
+            "required": true,
+            "schema": {
+              "title": "Id Statut",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "M2c3",
+        "tags": [
+          "module"
+        ]
+      }
+    },
+    "/maquette_vs_sequencage": {
+      "get": {
+        "description": "Check whether the number of sequencage hours corresponds to the program.",
+        "operationId": "maquette_vs_sequencage_maquette_vs_sequencage_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Session hours Vs Program",
+        "tags": [
+          "check"
+        ]
+      }
+    },
+    "/maquette_vs_sequencage/{id_responsable}": {
+      "get": {
+        "description": "Check whether the number of sequencage hours corresponds to the program.",
+        "operationId": "maquette_vs_sequencage_by_id_resp_maquette_vs_sequencage__id_responsable__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_responsable",
+            "required": true,
+            "schema": {
+              "title": "Id Responsable",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Session hours Vs Program",
+        "tags": [
+          "check"
+        ]
+      }
+    },
+    "/metier": {
+      "get": {
+        "description": "Return the list of situation_professionnelle",
+        "operationId": "get_metier_metier_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Students",
+        "tags": [
+          "apc"
+        ]
+      }
+    },
+    "/metier_ac/{id_metier}": {
+      "get": {
+        "description": "Return the list of AC, semester and competence for a metier",
+        "operationId": "get_metier_ac_metier_ac__id_metier__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_metier",
+            "required": true,
+            "schema": {
+              "title": "Id Metier",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get AC, semester and competence by metier",
+        "tags": [
+          "apc"
+        ]
+      }
+    },
+    "/module/{id_module}": {
+      "patch": {
+        "description": "Update module according to parameters",
+        "operationId": "update_module_module__id_module__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_module",
+            "required": true,
+            "schema": {
+              "title": "Id Module",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "title": "Data",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Update module",
+        "tags": [
+          "module"
+        ]
+      }
+    },
+    "/module/{id_module}/apc": {
+      "get": {
+        "description": "Get APC of a module",
+        "operationId": "get_module_apc_module__id_module__apc_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_module",
+            "required": true,
+            "schema": {
+              "title": "Id Module",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get APC of a module",
+        "tags": [
+          "module"
+        ]
+      }
+    },
+    "/module_detail_ects": {
+      "get": {
+        "description": "Check ratio hours ECTs.",
+        "operationId": "module_detail_ects_module_detail_ects_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "ECTs weight",
+        "tags": [
+          "check"
+        ]
+      }
+    },
+    "/module_sans_apprentissage_critique": {
+      "get": {
+        "description": "Check module without apprentissage critique.",
+        "operationId": "module_sans_apprentissage_critique_module_sans_apprentissage_critique_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Module without apprentissage critique",
+        "tags": [
+          "check"
+        ]
+      }
+    },
+    "/module_sans_unite_d_enseignement": {
+      "get": {
+        "description": "Check module not link to a learning unit.",
+        "operationId": "check_maquette_module_without_learning_unit_module_sans_unite_d_enseignement_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Module without learning unit",
+        "tags": [
+          "check"
+        ]
+      }
+    },
+    "/modules": {
+      "post": {
+        "description": "Create a module of the curriculum; 409 if its code already exists",
+        "operationId": "create_module_modules_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModuleCreation"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Create module",
+        "tags": [
+          "module"
+        ]
+      }
+    },
+    "/modules/etudiants/{id_etudiant}": {
+      "get": {
+        "description": "Get all modules of a responsible",
+        "operationId": "get_modules_etudiant_modules_etudiants__id_etudiant__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_etudiant",
+            "required": true,
+            "schema": {
+              "title": "Id Etudiant",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get modules by responsible",
+        "tags": [
+          "module"
+        ]
+      }
+    },
+    "/modules/gantt/etudiant/{id_etudiant}": {
+      "get": {
+        "description": "Get all modules sequence dependencies formatted for a Gantt chart for an etudiant",
+        "operationId": "get_data_gantt_endpoint_etudiant_modules_gantt_etudiant__id_etudiant__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_etudiant",
+            "required": true,
+            "schema": {
+              "title": "Id Etudiant",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get sequence dependencies for Gantt",
+        "tags": [
+          "module"
+        ]
+      }
+    },
+    "/modules/gantt/{id_responsable}": {
+      "get": {
+        "description": "Get all modules sequence dependencies formatted for a Gantt chart",
+        "operationId": "get_data_gantt_endpoint_modules_gantt__id_responsable__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_responsable",
+            "required": true,
+            "schema": {
+              "title": "Id Responsable",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get sequence dependencies for Gantt",
+        "tags": [
+          "module"
+        ]
+      }
+    },
+    "/modules/intervenants": {
+      "get": {
+        "description": "Get all modules of a responsible",
+        "operationId": "get_modules_intervenants_modules_intervenants_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get modules by responsible",
+        "tags": [
+          "module"
+        ]
+      }
+    },
+    "/modules/intervenants/{id_intervenant}": {
+      "get": {
+        "description": "Get all modules of a responsible",
+        "operationId": "get_modules_intervenant_modules_intervenants__id_intervenant__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_intervenant",
+            "required": true,
+            "schema": {
+              "title": "Id Intervenant",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get modules by responsible",
+        "tags": [
+          "module"
+        ]
+      }
+    },
+    "/modules/responsables": {
+      "get": {
+        "description": "Get modules responsibles",
+        "operationId": "get_modules_responsables_modules_responsables_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get responsibles",
+        "tags": [
+          "module"
+        ]
+      }
+    },
+    "/modules/responsables/{id_responsable}": {
+      "get": {
+        "description": "Get all modules of a responsible",
+        "operationId": "get_modules_responsable_modules_responsables__id_responsable__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_responsable",
+            "required": true,
+            "schema": {
+              "title": "Id Responsable",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get modules by responsible",
+        "tags": [
+          "module"
+        ]
+      }
+    },
+    "/modules/sequencages/{id_responsable}": {
+      "get": {
+        "description": "Get all modules of a responsible",
+        "operationId": "get_sequencages_responsable_modules_sequencages__id_responsable__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_responsable",
+            "required": true,
+            "schema": {
+              "title": "Id Responsable",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get modules by responsible",
+        "tags": [
+          "module"
+        ]
+      }
+    },
+    "/modules/sequences/{id_responsable}": {
+      "get": {
+        "description": "Get all modules of a responsible",
+        "operationId": "get_sequences_responsable_modules_sequences__id_responsable__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_responsable",
+            "required": true,
+            "schema": {
+              "title": "Id Responsable",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get modules by responsible",
+        "tags": [
+          "module"
+        ]
+      }
+    },
+    "/modules/sessions/{id_responsable}": {
+      "get": {
+        "description": "Get all modules of a responsible",
+        "operationId": "get_sessions_responsable_modules_sessions__id_responsable__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_responsable",
+            "required": true,
+            "schema": {
+              "title": "Id Responsable",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get modules by responsible",
+        "tags": [
+          "module"
+        ]
+      }
+    },
+    "/modules/{id_module}/dependencies": {
+      "get": {
+        "description": "Get all modules dependencies",
+        "operationId": "get_module_dependencies_modules__id_module__dependencies_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_module",
+            "required": true,
+            "schema": {
+              "title": "Id Module",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get modules dependencies",
+        "tags": [
+          "module"
+        ]
+      },
+      "post": {
+        "description": "Update module according to parameters",
+        "operationId": "add_dependencies_modules__id_module__dependencies_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_module",
+            "required": true,
+            "schema": {
+              "title": "Id Module",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "title": "Data",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Update module",
+        "tags": [
+          "module"
+        ]
+      }
+    },
+    "/modules/{id_module}/dependencies/{id_sequence_prev}/{id_sequence_next}": {
+      "delete": {
+        "description": "Update module according to parameters",
+        "operationId": "delete_dependencies_modules__id_module__dependencies__id_sequence_prev___id_sequence_next__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_module",
+            "required": true,
+            "schema": {
+              "title": "Id Module",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id_sequence_prev",
+            "required": true,
+            "schema": {
+              "title": "Id Sequence Prev",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id_sequence_next",
+            "required": true,
+            "schema": {
+              "title": "Id Sequence Next",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Update module",
+        "tags": [
+          "module"
+        ]
+      }
+    },
+    "/modules/{id_module}/sequencage": {
+      "post": {
+        "description": "Update module according to parameters",
+        "operationId": "add_sequencage_modules__id_module__sequencage_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_module",
+            "required": true,
+            "schema": {
+              "title": "Id Module",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "title": "Data",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Update module",
+        "tags": [
+          "module"
+        ]
+      }
+    },
+    "/modules/{id_module}/sequencages/{id_sequencage}": {
+      "delete": {
+        "description": "Update module according to parameters",
+        "operationId": "delete_sequencage_modules__id_module__sequencages__id_sequencage__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_module",
+            "required": true,
+            "schema": {
+              "title": "Id Module",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id_sequencage",
+            "required": true,
+            "schema": {
+              "title": "Id Sequencage",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Update module",
+        "tags": [
+          "module"
+        ]
+      },
+      "patch": {
+        "description": "Update sequencage according to parameters",
+        "operationId": "update_sequencage_modules__id_module__sequencages__id_sequencage__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_module",
+            "required": true,
+            "schema": {
+              "title": "Id Module",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id_sequencage",
+            "required": true,
+            "schema": {
+              "title": "Id Sequencage",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "title": "Data",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Update sequencage",
+        "tags": [
+          "module"
+        ]
+      }
+    },
+    "/modules/{id_module}/sequence_dependencies": {
+      "get": {
+        "description": "Get all modules sequence dependencies",
+        "operationId": "get_module_sequence_dependencies_modules__id_module__sequence_dependencies_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_module",
+            "required": true,
+            "schema": {
+              "title": "Id Module",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get sequence dependencies",
+        "tags": [
+          "module"
+        ]
+      }
+    },
+    "/modules/{id_module}/sequences/{id_sequence}": {
+      "patch": {
+        "description": "Update sequencage according to parameters",
+        "operationId": "update_sequence_modules__id_module__sequences__id_sequence__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_module",
+            "required": true,
+            "schema": {
+              "title": "Id Module",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id_sequence",
+            "required": true,
+            "schema": {
+              "title": "Id Sequence",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "title": "Data",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Update sequencage",
+        "tags": [
+          "module"
+        ]
+      }
+    },
+    "/modules/{id_module}/sessions/{id_session}": {
+      "patch": {
+        "description": "Update sequencage according to parameters",
+        "operationId": "update_session_modules__id_module__sessions__id_session__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_module",
+            "required": true,
+            "schema": {
+              "title": "Id Module",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id_session",
+            "required": true,
+            "schema": {
+              "title": "Id Session",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "title": "Data",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Update sequencage",
+        "tags": [
+          "module"
+        ]
+      }
+    },
+    "/promos": {
+      "get": {
+        "description": "Return the list of promos",
+        "operationId": "handler_promos_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Promos",
+        "tags": [
+          "filiere"
+        ]
+      }
+    },
+    "/seance_types": {
+      "get": {
+        "description": "Return the list of seance types",
+        "operationId": "handler_seance_types_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Seance types",
+        "tags": [
+          "filiere"
+        ]
+      }
+    },
+    "/session_reference_corruption": {
+      "get": {
+        "description": "Check session not linked to module.",
+        "operationId": "session_reference_corruption_session_reference_corruption_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Session foreign K coruption",
+        "tags": [
+          "check"
+        ]
+      }
+    },
+    "/session_sans_intervenant": {
+      "get": {
+        "description": "Check session without teacher.",
+        "operationId": "session_sans_intervenant_session_sans_intervenant_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Session without teacher",
+        "tags": [
+          "check"
+        ]
+      }
+    },
+    "/statuts": {
+      "get": {
+        "description": "Return the list of statuts",
+        "operationId": "handler_statuts_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Status",
+        "tags": [
+          "filiere"
+        ]
+      }
+    },
+    "/token": {
+      "post": {
+        "description": "Authenticate user and return JWT token",
+        "operationId": "login_for_access_token_token_post",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_login_for_access_token_token_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Token"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Token",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/token-cas": {
+      "post": {
+        "description": "Internal endpoint — login or create user from CAS, returns JWT token",
+        "operationId": "cas_login_token_cas_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-cas-token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Cas-Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CasUserProvision"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Token"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "CAS login or provision",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/university": {
+      "get": {
+        "description": "Return the list of partner universities",
+        "operationId": "list_universities_university_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Universities",
+        "tags": [
+          "mobility"
+        ]
+      }
+    },
+    "/university/admin": {
+      "post": {
+        "description": "Create a partner university and its places by filiere/semester for International Relations admins",
+        "operationId": "create_university_ri_university_admin_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UniversityAdminPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Create partner university for RI",
+        "tags": [
+          "mobility"
+        ]
+      }
+    },
+    "/university/admin/assignment/run": {
+      "post": {
+        "description": "Lancer l'algorithme d'affectation automatique pour la mobilité internationale",
+        "operationId": "run_mobility_assignment_university_admin_assignment_run_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignmentRunPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Run assignment algorithm",
+        "tags": [
+          "admin",
+          "mobility"
+        ]
+      }
+    },
+    "/university/admin/assignment/status": {
+      "get": {
+        "operationId": "get_assignment_status_university_admin_assignment_status_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get assignment progress",
+        "tags": [
+          "admin",
+          "mobility"
+        ]
+      }
+    },
+    "/university/admin/assignments/export": {
+      "get": {
+        "operationId": "export_admin_assignments_university_admin_assignments_export_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Export student mobility assignments to Excel",
+        "tags": [
+          "admin",
+          "mobility"
+        ]
+      }
+    },
+    "/university/admin/campaign/doublant/{id_etudiant}": {
+      "get": {
+        "operationId": "verify_doublant_university_admin_campaign_doublant__id_etudiant__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_etudiant",
+            "required": true,
+            "schema": {
+              "title": "Id Etudiant",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Vérifier un étudiant doublant avant l'ajout",
+        "tags": [
+          "admin",
+          "mobility"
+        ]
+      }
+    },
+    "/university/admin/campaign/launch": {
+      "post": {
+        "operationId": "launch_mobility_campaign_university_admin_campaign_launch_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CampaignLaunchRequestPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Lancer la campagne et calculer les Z-scores",
+        "tags": [
+          "admin",
+          "mobility"
+        ]
+      }
+    },
+    "/university/admin/catalog": {
+      "get": {
+        "description": "Return partner universities enriched with their available filieres for International Relations admins",
+        "operationId": "list_university_catalog_ri_university_admin_catalog_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "University catalog for RI",
+        "tags": [
+          "mobility"
+        ]
+      }
+    },
+    "/university/admin/mobility-quotas": {
+      "get": {
+        "description": "Récupérer les quotas de mobilité par filière",
+        "operationId": "get_mobility_quotas_university_admin_mobility_quotas_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "annee_scolaire",
+            "required": true,
+            "schema": {
+              "title": "Annee Scolaire",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get mobility quotas",
+        "tags": [
+          "admin",
+          "mobility"
+        ]
+      },
+      "post": {
+        "description": "Sauvegarder les quotas de mobilité par filière",
+        "operationId": "save_mobility_quotas_university_admin_mobility_quotas_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MobilityQuotasUpdatePayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Save mobility quotas",
+        "tags": [
+          "admin",
+          "mobility"
+        ]
+      }
+    },
+    "/university/admin/mobility/assigned-students": {
+      "get": {
+        "operationId": "get_assigned_students_university_admin_mobility_assigned_students_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get list of students who have an assignment",
+        "tags": [
+          "admin",
+          "mobility"
+        ]
+      }
+    },
+    "/university/admin/mobility/assigned-students/export/{status}": {
+      "get": {
+        "operationId": "export_assigned_students_status_university_admin_mobility_assigned_students_export__status__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "status",
+            "required": true,
+            "schema": {
+              "title": "Status",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Export assigned students by status",
+        "tags": [
+          "admin",
+          "mobility"
+        ]
+      }
+    },
+    "/university/admin/mobility/assignment/close": {
+      "post": {
+        "operationId": "close_assignment_phase_university_admin_mobility_assignment_close_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Decline all pending assignments to close the acceptance phase",
+        "tags": [
+          "admin",
+          "mobility"
+        ]
+      }
+    },
+    "/university/admin/mobility/diagnostics": {
+      "get": {
+        "operationId": "get_mobility_diagnostics_university_admin_mobility_diagnostics_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get statistics and diagnostics for mobility procedure",
+        "tags": [
+          "admin",
+          "mobility"
+        ]
+      }
+    },
+    "/university/admin/mobility/diagnostics/export/{category}": {
+      "get": {
+        "operationId": "export_mobility_diagnostics_university_admin_mobility_diagnostics_export__category__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "category",
+            "required": true,
+            "schema": {
+              "title": "Category",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Export specific diagnostic category to Excel",
+        "tags": [
+          "admin",
+          "mobility"
+        ]
+      }
+    },
+    "/university/admin/mobility/reset-wishes/{id_etudiant}": {
+      "post": {
+        "operationId": "reset_student_wishes_university_admin_mobility_reset_wishes__id_etudiant__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_etudiant",
+            "required": true,
+            "schema": {
+              "title": "Id Etudiant",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Reset submission date for a student's wishes",
+        "tags": [
+          "admin",
+          "mobility"
+        ]
+      }
+    },
+    "/university/admin/mobility/submitted-students": {
+      "get": {
+        "operationId": "get_submitted_students_university_admin_mobility_submitted_students_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get list of students who have submitted wishes",
+        "tags": [
+          "admin",
+          "mobility"
+        ]
+      }
+    },
+    "/university/admin/mobility/unassigned-students/export": {
+      "get": {
+        "operationId": "export_unassigned_students_university_admin_mobility_unassigned_students_export_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Export students with submitted wishes but no assignments",
+        "tags": [
+          "admin",
+          "mobility"
+        ]
+      }
+    },
+    "/university/admin/mobility/update-assignment-status": {
+      "post": {
+        "operationId": "update_assignment_status_university_admin_mobility_update_assignment_status_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAssignmentStatusPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Update assignment status",
+        "tags": [
+          "admin",
+          "mobility"
+        ]
+      }
+    },
+    "/university/admin/places/export": {
+      "get": {
+        "operationId": "export_admin_places_university_admin_places_export_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Export partner university places status to Excel",
+        "tags": [
+          "admin",
+          "mobility"
+        ]
+      }
+    },
+    "/university/admin/wishes": {
+      "get": {
+        "description": "Return all student wishes (submitted and in progress) for International Relations admins",
+        "operationId": "list_all_wishes_ri_university_admin_wishes_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "All wishes for RI",
+        "tags": [
+          "mobility"
+        ]
+      }
+    },
+    "/university/admin/wishes/export": {
+      "get": {
+        "operationId": "export_admin_wishes_university_admin_wishes_export_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Export student mobility wishes to Excel",
+        "tags": [
+          "admin",
+          "mobility"
+        ]
+      }
+    },
+    "/university/admin/wishes/force-submit": {
+      "post": {
+        "description": "Force the submission of all existing student wishes that have not been submitted yet.",
+        "operationId": "force_submit_wishes_university_admin_wishes_force_submit_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Force submit all incomplete wishes",
+        "tags": [
+          "admin",
+          "mobility"
+        ]
+      }
+    },
+    "/university/admin/{id_partner_university}": {
+      "put": {
+        "description": "Update a partner university and its places by filiere/semester for International Relations admins",
+        "operationId": "update_university_ri_university_admin__id_partner_university__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_partner_university",
+            "required": true,
+            "schema": {
+              "title": "Id Partner University",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UniversityAdminPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Update partner university for RI",
+        "tags": [
+          "mobility"
+        ]
+      }
+    },
+    "/university/etudiant/{id_etudiant}": {
+      "get": {
+        "description": "Return the list of partner universities with the number of places for the student",
+        "operationId": "list_universities_etudiant_university_etudiant__id_etudiant__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_etudiant",
+            "required": true,
+            "schema": {
+              "title": "Id Etudiant",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Universities for student",
+        "tags": [
+          "mobility"
+        ]
+      }
+    },
+    "/university/etudiant/{id_etudiant}/assignment": {
+      "get": {
+        "operationId": "get_student_assignment_university_etudiant__id_etudiant__assignment_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_etudiant",
+            "required": true,
+            "schema": {
+              "title": "Id Etudiant",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get the assigned university for a student",
+        "tags": [
+          "etudiant",
+          "mobility"
+        ]
+      }
+    },
+    "/university/etudiant/{id_etudiant}/assignment/decision": {
+      "post": {
+        "operationId": "submit_student_decision_university_etudiant__id_etudiant__assignment_decision_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_etudiant",
+            "required": true,
+            "schema": {
+              "title": "Id Etudiant",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StudentDecisionPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Submit student decision for assignment",
+        "tags": [
+          "etudiant",
+          "mobility"
+        ]
+      }
+    },
+    "/university/etudiant/{id_etudiant}/campaign-status": {
+      "get": {
+        "description": "Indique si la campagne de mobilité est ouverte pour cet étudiant",
+        "operationId": "get_campaign_status_university_etudiant__id_etudiant__campaign_status_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_etudiant",
+            "required": true,
+            "schema": {
+              "title": "Id Etudiant",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Statut de la campagne pour l'étudiant",
+        "tags": [
+          "mobility"
+        ]
+      }
+    },
+    "/university/etudiant/{id_etudiant}/quota": {
+      "get": {
+        "description": "Récupérer les quotas disponibles pour la filière d'un étudiant",
+        "operationId": "get_student_quota_university_etudiant__id_etudiant__quota_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_etudiant",
+            "required": true,
+            "schema": {
+              "title": "Id Etudiant",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "annee_scolaire",
+            "required": true,
+            "schema": {
+              "title": "Annee Scolaire",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get student mobility quota",
+        "tags": [
+          "etudiant",
+          "mobility"
+        ]
+      }
+    },
+    "/university/etudiant/{id_etudiant}/wish/{id_partner_university}": {
+      "post": {
+        "description": "Add a partner university to the student's mobility wishes",
+        "operationId": "add_university_to_wishes_university_etudiant__id_etudiant__wish__id_partner_university__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_etudiant",
+            "required": true,
+            "schema": {
+              "title": "Id Etudiant",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id_partner_university",
+            "required": true,
+            "schema": {
+              "title": "Id Partner University",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Payload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Add university to wishes",
+        "tags": [
+          "mobility"
+        ]
+      }
+    },
+    "/university/etudiant/{id_etudiant}/wish/{id_partner_university}/semestre/{id_semestre}": {
+      "delete": {
+        "description": "Delete a partner university from the student's mobility wishes",
+        "operationId": "delete_university_from_wishes_university_etudiant__id_etudiant__wish__id_partner_university__semestre__id_semestre__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_etudiant",
+            "required": true,
+            "schema": {
+              "title": "Id Etudiant",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id_partner_university",
+            "required": true,
+            "schema": {
+              "title": "Id Partner University",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id_semestre",
+            "required": true,
+            "schema": {
+              "title": "Id Semestre",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Delete university from wishes",
+        "tags": [
+          "mobility"
+        ]
+      }
+    },
+    "/university/etudiant/{id_etudiant}/wish/{id_partner_university}/semestre/{id_semestre}/move/{direction}": {
+      "post": {
+        "description": "Move a wish up or down in the student's priority list",
+        "operationId": "move_university_wish_university_etudiant__id_etudiant__wish__id_partner_university__semestre__id_semestre__move__direction__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_etudiant",
+            "required": true,
+            "schema": {
+              "title": "Id Etudiant",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id_partner_university",
+            "required": true,
+            "schema": {
+              "title": "Id Partner University",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id_semestre",
+            "required": true,
+            "schema": {
+              "title": "Id Semestre",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "direction",
+            "required": true,
+            "schema": {
+              "title": "Direction",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Move university wish",
+        "tags": [
+          "mobility"
+        ]
+      }
+    },
+    "/university/etudiant/{id_etudiant}/wishes": {
+      "get": {
+        "description": "Return the student's current mobility wishes",
+        "operationId": "list_university_wishes_etudiant_university_etudiant__id_etudiant__wishes_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_etudiant",
+            "required": true,
+            "schema": {
+              "title": "Id Etudiant",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Wishes for student",
+        "tags": [
+          "mobility"
+        ]
+      }
+    },
+    "/university/etudiant/{id_etudiant}/wishes/submit": {
+      "post": {
+        "description": "Submit the student's mobility wishes for processing",
+        "operationId": "submit_university_wishes_university_etudiant__id_etudiant__wishes_submit_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id_etudiant",
+            "required": true,
+            "schema": {
+              "title": "Id Etudiant",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Submit university wishes",
+        "tags": [
+          "mobility"
+        ]
+      }
+    },
+    "/user/{id}/calendars": {
+      "get": {
+        "description": "Returns all ADE iCal URLs for the currently logged-in user",
+        "operationId": "get_user_calendar_urls_user__id__calendars_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get User Calendar URLs",
+        "tags": [
+          "calendar"
+        ]
+      },
+      "post": {
+        "description": "Saves a specific iCal URL",
+        "operationId": "add_user_calendar_url_user__id__calendars_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CalendarUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Update User Calendar URL",
+        "tags": [
+          "calendar"
+        ]
+      }
+    },
+    "/user/{id}/calendars/{id_calendar}": {
+      "patch": {
+        "description": "Updates a specific iCal URL",
+        "operationId": "update_user_calendar_url_user__id__calendars__id_calendar__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id_calendar",
+            "required": true,
+            "schema": {
+              "title": "Id Calendar",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CalendarUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Update User Calendar URL",
+        "tags": [
+          "calendar"
+        ]
+      }
+    }
+  }
+}

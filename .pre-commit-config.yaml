@@ -134,6 +134,16 @@ repos:
         files: ^backend/
         pass_filenames: false
 
+      # openapi.json réécrit d'après le code : un changement de route s'y voit dans la PR.
+      - id: openapi-backend
+        name: openapi.json (backend)
+        entry: bash -c 'cd backend && uv run python -m tools.export_openapi --output ../openapi.json >/dev/null' --
+        language: system
+        types: [python]
+        files: ^backend/
+        exclude: ^backend/tests/
+        pass_filenames: false
+
       - id: eslint-web
         name: eslint (web)
         entry: bash -c 'cd web && pnpm exec eslint --fix "${@#web/}"' --

@@ -20,6 +20,37 @@ jobs:
     with:
       directory: backend
 
+  # openapi.json, à la racine, suit le code de l'API (le front ne génère pas encore ses types).
+  api-contract:
+    uses: antoine-tena/ion-repo/.github/workflows/api-contract.yml@eb0dc112605e3ccda49cc80374ffd3185a96baf7 # develop
+    with:
+      export: uv run python -m tools.export_openapi --check --output ../openapi.json
+      generate: "true"
+
+  # Les routes cassées par rapport à la production (openapi.json de main) : une route retirée ou
+  # un champ devenu obligatoire sans nouvelle version fait échouer ([FROZEN-CONTRACT]).
+  api-breaking:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: openapi.json de la production
+        id: base
+        run: |
+          if git show origin/main:openapi.json > /tmp/openapi-main.json 2>/dev/null; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::Pas encore d'openapi.json sur main : rien à comparer."
+          fi
+      - name: oasdiff breaking
+        if: steps.base.outputs.found == 'true'
+        run: >-
+          podman run --rm -v /tmp/openapi-main.json:/specs/base.json:ro
+          -v "$PWD/openapi.json:/specs/head.json:ro" docker.io/tufin/oasdiff:v1.39.0
+          breaking /specs/base.json /specs/head.json --fail-on ERR
+
   # Les tableaux de bord Dash : ruff et mypy au niveau qui passe aujourd'hui (dashboards/
   # pyproject.toml) ; pas encore de tests, d'où un job à part plutôt que python.yml.
   dashboards:
