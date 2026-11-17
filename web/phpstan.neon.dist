@@ -1,0 +1,17 @@
+# PHPStan sur le PHP de web/ : web/tools/run.sh vendor/bin/phpstan analyse
+# Niveau 0, celui qui passe aujourd'hui ; la dette restante est dans phpstan-baseline.neon. Le
+# relever : niveau + 1, puis vendor/bin/phpstan analyse --generate-baseline.
+includes:
+    - phpstan-baseline.neon
+
+parameters:
+    level: 0
+    paths:
+        - .
+    excludePaths:
+        - vendor
+        - tools
+        - node_modules
+    # Les pages incluent leurs fonctions par require : PHPStan les lit sans les exécuter.
+    scanDirectories:
+        - utils

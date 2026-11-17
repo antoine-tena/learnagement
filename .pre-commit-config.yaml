@@ -92,6 +92,37 @@ repos:
         language: system
         files: ^frontend/.*\.(vue|ts|tsx|mjs)$
 
+      # web/ : le PHP par web/tools/run.sh (le PHP de la machine, sinon podman), le JavaScript par
+      # pnpm ; les règles et leur dette sont dans les fichiers de configuration de web/.
+      - id: php-cs-fixer-web
+        name: php-cs-fixer (web)
+        entry: bash -c 'web/tools/run.sh vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --show-progress=none --path-mode=intersection "${@#web/}"' --
+        language: system
+        types: [php]
+        files: ^web/
+
+      - id: phpstan-web
+        name: phpstan (web)
+        entry: bash -c 'web/tools/run.sh vendor/bin/phpstan analyse --no-progress --memory-limit=1G "${@#web/}"' --
+        language: system
+        types: [php]
+        files: ^web/
+        exclude: ^web/(vendor|tools)/
+
+      - id: eslint-web
+        name: eslint (web)
+        entry: bash -c 'cd web && pnpm exec eslint --fix "${@#web/}"' --
+        language: system
+        types: [javascript]
+        files: ^web/
+
+      - id: prettier-web
+        name: prettier (web)
+        entry: bash -c 'cd web && pnpm exec prettier --write --ignore-unknown "${@#web/}"' --
+        language: system
+        types: [javascript]
+        files: ^web/
+
       - id: charter
         name: charter (charter.toml, committed files)
         entry: charter file
