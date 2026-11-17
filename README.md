@@ -116,6 +116,12 @@ python Learnagement.py stop
 python Learnagement.py start --from_scratch
 ```
 
+## Sauvegardes
+
+En production, la base est sauvegardée chaque jour dans `db/backup/` par le conteneur
+`data_mysql_backup` ; la vérification et la restauration sont décrites dans
+[docs/prod.md](docs/prod.md#sauvegardes).
+
 ## Major upgrade
 
 - step 1: back-up your DB

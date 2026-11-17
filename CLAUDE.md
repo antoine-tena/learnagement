@@ -18,14 +18,15 @@ supprime un dossier, un domaine ou un point d'entrée.
   `generate-env`, `backupdb`…), dont le code est dans `launcher/` : `cli.py` (les commandes
   click), `instance.py` (changer d'environnement, remise à zéro, export, import), `docker.py` et
   `compose.py` (commandes compose, `docker-compose.yml` assemblé, attente des sondes), `db.py`
-  (initialisation, administrateur, sauvegardes), `backups/` (sauvegarde planifiée, pas encore
-  branchée), `env.py` (génération et propagation des `.env`), `git.py` (commit dans `.env.git`),
+  (initialisation, administrateur, sauvegardes), `backups/` (ancienne sauvegarde planifiée en Python,
+  pas branchée), `env.py` (génération et propagation des `.env`), `git.py` (commit dans `.env.git`),
   `config.py` (conteneurs par environnement), `security.py` (certificats :
   `python -m launcher.security`), `tools.py`, `tests/`.
   `bootstrap.py` lance `Learnagement.py` avec `uv run`. Chaque composant Python (la racine pour
   le lanceur, `backend/`, `dashboards/`, `scraping/`) a son `pyproject.toml` et son `uv.lock`.
 - `docker/` : un dossier par conteneur (`backend/`, `web/`, `frontend/`, `dashboards/`,
-  `phpmyadmin/` : Dockerfile, entrypoint) et `compose/` (un fragment par conteneur), d'où le
+  `phpmyadmin/` : Dockerfile, entrypoint), `backup/` (`backup.sh`, la sauvegarde quotidienne
+  de la prod) et `compose/` (un fragment par conteneur), d'où le
   lanceur produit `docker/docker-compose.yml` (ignoré).
 - `backend/` : l'API FastAPI (`app.py`) ; `api/` (routes, `dependencies.py`), `auth/` (LNM et
   CAS), `access_control/` (règles, prédicats, responsabilités), `domains/` (requêtes métier par
