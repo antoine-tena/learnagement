@@ -9,6 +9,7 @@ importer l'application.
 
 import argparse
 import json
+import logging
 import sys
 from pathlib import Path
 
@@ -19,6 +20,7 @@ EXIT_DRIFT = 1
 
 def render_schema() -> str:
     """Le schéma OpenAPI de l'application, en JSON stable (clés triées, fin de ligne)."""
+    logging.disable(logging.INFO)  # les routes générées se journalisent à l'import
     from app import app
 
     return json.dumps(app.openapi(), indent=2, sort_keys=True, ensure_ascii=False) + "\n"
