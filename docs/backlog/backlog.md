@@ -13,8 +13,6 @@ North star: **Learnagement in service**.
 
 ## 🔴 Critical
 
-
-
 ## 🟠 Important
 
 ### T-18 · Plus de données personnelles dans les logs du front
@@ -37,18 +35,6 @@ les logs à chaque connexion ([PERSONAL-DATA]) : ne garder que l'identifiant.
 `pnpm audit` signale encore zod < 4.6.6 (élevée, dépendance directe en 3.x, version majeure à
 passer), postcss-selector-parser par `@tailwindcss/typography` (modérée) et deepmerge par
 `@svgr/webpack` (faible, sans correctif).
-
-
-### T-05 · uv partout : `pyproject.toml` et `uv.lock`
-- **Type**: improvement
-- **Status**: todo
-- **Opened**: 2026-10-30
-- **Effort**: S · **Owner**: — · **Due**: —
-- **Origin**: charte UV-PODMAN, `kiln score` LOCKED-DEPENDENCIES et NO-OBSOLETE-BACKPORTS
-
-Les `requirements*.txt` deviennent un `pyproject.toml` par composant Python avec son `uv.lock`;
-`typing`, `pip`, `setuptools` sortent des dépendances ; `requirements-click-gui.txt` demande
-`click-gui-runner`, absent de PyPI. Les conteneurs installent avec `uv sync --frozen`.
 
 ### T-06 · Conteneurs : podman, utilisateur non root, images épinglées, sondes
 - **Type**: improvement
@@ -74,18 +60,6 @@ Node 18 (fin de vie) → Node LTS.
 Le hook de commit vérifie chaque fichier touché, et `eslint .` trouve encore des erreurs
 anciennes dans tout `frontend/` (`any`, `set-state-in-effect`, `prefer-const`) : le premier qui
 modifie un de ces fichiers doit les corriger. À solder d'un coup.
-
-### T-07 · Le lanceur fonctionne et se lit
-- **Type**: bug
-- **Status**: todo
-- **Opened**: 2026-10-30
-- **Effort**: S · **Owner**: — · **Due**: —
-- **Origin**: lancement de référence du 2026-10-30
-
-`start --docker_option=-d` plante (`TypeError: can only concatenate list (not "str") to
-list`). `Learnagement.py` (715 lignes) se découpe par commande ; les mots de passe ne passent
-plus en argument de `mysqldump`. `launcher/cli.py` et `launcher/env.py` ne passent pas ruff
-(58 erreurs, dont 37 `LOG015`, et le format) : le lanceur n'est pas encore dans le pre-commit.
 
 ### T-08 · Python : plus d'`except:` nu ni de date sans fuseau
 - **Type**: improvement
