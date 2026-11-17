@@ -7,13 +7,42 @@ n'est ouvert.**
 
 North star: **Learnagement in service**.
 
-**Next free: T-39.**
+**Next free: T-44.**
 
 ---
 
 ## 🔴 Critical
 
 ## 🟠 Important
+
+### T-39 · La base passe de MySQL à Postgres et tient la charge de septembre
+- **Type**: improvement
+- **Status**: todo
+- **Opened**: 2026-11-17
+- **Effort**: L · **Owner**: — · **Due**: —
+- **Origin**: réunion avec Flavien Vernier, 2026-11-17
+
+Environ 50 utilisateurs peu actifs aujourd'hui, environ 200 étudiants actifs en septembre (stages,
+puis mobilité, environ 400). Le serveur qui porte tous les conteneurs sature déjà. Postgres se
+réplique pour répartir la lecture ; remplace T-26 (mise à jour de MySQL).
+
+- [ ] Mesurer la charge actuelle (conteneur par conteneur) pour savoir ce qui sature
+- [ ] Migrer le schéma et les migrations `db/sql/` vers Postgres, puis les données
+- [ ] Adapter `launcher/db.py` (sauvegardes, initialisation) et le fragment `docker/compose/data_mysql*.yml`
+- [ ] Décider d'un cache (Redis) et d'une réplique en lecture selon la mesure
+- [ ] Coordonner avec les étudiants qui travaillent sur le déploiement automatique
+- [ ] Signaler le changement dans le README (variables d'environnement, commandes du lanceur)
+
+### T-38 · Le RAG hors de l'image Dash
+- **Type**: improvement
+- **Status**: todo
+- **Opened**: 2026-10-30
+- **Effort**: M · **Owner**: — · **Due**: —
+- **Origin**: revue de l'architecture ; priorité relevée le 2026-11-17 (serveur déjà surchargé)
+
+`dashboards/apc_dash/polytech_rag/` embarque `sentence-transformers` et `faiss-cpu` dans l'image
+de tous les tableaux de bord. Le sortir dans son propre conteneur, appelé par `apc20_chatbot`, en
+respectant [AI-FEATURES].
 
 ### T-33 · Prévenir les contributeurs du refacto du fork
 - **Type**: task
@@ -104,9 +133,31 @@ Node 18 (fin de vie) → Node LTS.
 
 ## 🟡 Normal
 
+### T-40 · Le conteneur Next redémarre
+- **Type**: bug
+- **Status**: to verify — `frontend/`, `docker/frontend/`
+- **Opened**: 2026-11-17
+- **Effort**: S · **Owner**: — · **Due**: —
+- **Origin**: réunion avec Flavien Vernier, 2026-11-17
+
+Selon Flavien, le front Next ne démarre plus depuis une montée de version ; il ne sert qu'au
+développement et ne va pas en production. À réparer avant T-36, T-20, T-09 et T-19, qui n'ont de
+sens que sur un front qui tourne.
+
+### T-43 · Le proxy CAS seulement en développement
+- **Type**: task
+- **Status**: to verify — `backend/auth/`, `config/`
+- **Opened**: 2026-11-17
+- **Effort**: XS · **Owner**: — · **Due**: —
+- **Origin**: réunion avec Flavien Vernier, 2026-11-17
+
+L'université a autorisé l'application sur son CAS : le proxy qui passait par le site de
+l'université n'est plus utilisé en production. Vérifier qu'il est désactivé dans `config/env.prod`
+(ou l'équivalent) et le documenter comme outil de développement.
+
 ### T-36 · Les appels de Next visent des routes qui existent
 - **Type**: bug
-- **Status**: to verify — `frontend/app/`
+- **Status**: blocked — waiting for T-40
 - **Opened**: 2026-10-30
 - **Effort**: M · **Owner**: — · **Due**: —
 - **Origin**: revue de l'architecture
@@ -273,16 +324,6 @@ L'ancienne liste demandait d'ajouter `etudiant` aux rôles : vérifier si c'est 
 
 Vérifier qu'un utilisateur n'est présent qu'une fois parmi administratif, enseignant et étudiant.
 
-### T-26 · Commande du lanceur pour mettre à jour MySQL
-- **Type**: improvement
-- **Status**: todo
-- **Opened**: 2026-10-30
-- **Effort**: S · **Owner**: — · **Due**: —
-- **Origin**: ancien `ToDo/docker/mysql/ToDo.md`
-
-- [ ] Verrouiller l'accès à la base
-- [ ] Redémarrer Learnagement
-
 ### T-27 · Nommage et structure des tableaux de bord
 - **Type**: improvement
 - **Status**: to verify — `dashboards/`
@@ -325,13 +366,32 @@ restent tant que rien ne pousse à les déplacer. Préalables : T-34, T-35, T-36
 Recenser les vues Dash qui écrivent (`app5_module_enseignant_edit.py`, par exemple) et les migrer
 une à une. Réécrire les graphiques en React coûterait cher pour peu de gain : ils restent en Dash.
 
-### T-38 · Le RAG hors de l'image Dash
-- **Type**: improvement
-- **Status**: todo
-- **Opened**: 2026-10-30
-- **Effort**: M · **Owner**: — · **Due**: —
-- **Origin**: revue de l'architecture
+### T-41 · Un front unique fait de widgets, chacun dans son langage
+- **Type**: idea
+- **Status**: blocked — waiting for T-12
+- **Opened**: 2026-11-17
+- **Effort**: L · **Owner**: — · **Due**: —
+- **Origin**: réunion avec Flavien Vernier, 2026-11-17
 
-`dashboards/apc_dash/polytech_rag/` embarque `sentence-transformers` et `faiss-cpu` dans l'image
-de tous les tableaux de bord. Le sortir dans son propre conteneur, appelé par `apc20_chatbot`, en
-respectant [AI-FEATURES].
+Idée de Flavien : un seul front qui affiche des widgets, chacun écrit dans le langage que
+l'étudiant veut apprendre (comme les apps Dash aujourd'hui), tous passant par l'API. Le repo reste
+un projet où l'on apprend : chacun contribue dans son langage.
+
+Piste : une coquille (authentification CAS, menu, mise en page) lit un registre des widgets
+(nom, URL, rôles) et les affiche ; chaque widget est un conteneur servi sous `/widgets/<nom>/`
+par le reverse proxy, avec un modèle de départ par langage. Une seule API possède la base :
+les autres langages n'écrivent jamais en base directement. À décider avec T-12.
+
+### T-42 · Des projets extérieurs lisent les données par l'API
+- **Type**: idea
+- **Status**: todo
+- **Opened**: 2026-11-17
+- **Effort**: M · **Owner**: — · **Due**: —
+- **Origin**: réunion avec Flavien Vernier, 2026-11-17
+
+Des projets de recherche voisins (visualisation des maquettes et des compétences) veulent les
+données de Learnagement. L'API n'est joignable que par le VPN de l'université.
+
+- [ ] Décider : le projet tourne dans le même environnement, ou appelle l'API de l'extérieur
+- [ ] Un accès en lecture seule, par jeton de service, sur les routes de maquettes et de modules
+- [ ] Documenter ces routes (OpenAPI) comme un contrat stable
