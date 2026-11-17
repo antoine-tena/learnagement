@@ -1,4 +1,4 @@
-# T-49 · Phase D : réécrire le code qui doit l'être
+# learnagement#T-49 · Phase D : réécrire le code qui doit l'être
 - **Type**: improvement
 - **Priority**: 🟡 normal
 - **Status**: todo
@@ -7,7 +7,7 @@
 - **Origin**: architecture cible (`docs/architecture.md`), lecture du code, 2026-11-17
 
 Seulement ce que le découpage ne suffit pas à rendre lisible : des tests qui figent le comportement
-actuel d'abord, puis la réécriture. Le plus simple après T-48 ; le SQL et le code mort peuvent
+actuel d'abord, puis la réécriture. Le plus simple après learnagement#T-48 ; le SQL et le code mort peuvent
 partir avant.
 
 - [ ] `mobility-admin.php` (2 953 lignes) : le JS en modules (indicateurs, tableau, filtres, exports)
