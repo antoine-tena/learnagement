@@ -67,6 +67,21 @@ jobs:
       - run: composer audit
       - run: vendor/bin/php-cs-fixer check --show-progress=none
       - run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+      - run: vendor/bin/deptrac analyse --config-file=deptrac.yaml --no-progress
+      # Une page ne touche jamais la base : pas de fonction SQL native hors de vendor/.
+      - run: "! grep -rnE --include='*.php' --exclude-dir=vendor '\\b(mysqli|mysql|pg|sqlite|odbc)_\\w+\\s*\\(' ."
+
+  # Les couches du backend (import-linter, contrats dans backend/pyproject.toml).
+  backend-layers:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
+      - run: uv sync --locked
+      - run: uv run --no-sync lint-imports --no-cache
 
   charter:
     uses: antoine-tena/ion-repo/.github/workflows/charter.yml@eb0dc112605e3ccda49cc80374ffd3185a96baf7 # develop

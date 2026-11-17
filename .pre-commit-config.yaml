@@ -109,6 +109,31 @@ repos:
         files: ^web/
         exclude: ^web/(vendor|tools)/
 
+      # Les couches : tout le graphe, relu dès qu'un fichier de la couche change.
+      - id: deptrac-web
+        name: deptrac (web)
+        entry: web/tools/run.sh vendor/bin/deptrac analyse --config-file=deptrac.yaml --no-progress
+        language: system
+        types: [php]
+        files: ^web/
+        pass_filenames: false
+
+      - id: no-sql-web
+        name: pas de SQL dans web/ (l'API seule lit la base)
+        entry: '\b(mysqli|mysql|pg|sqlite|odbc)_\w+\s*\('
+        language: pygrep
+        types: [php]
+        files: ^web/
+        exclude: ^web/vendor/
+
+      - id: lint-imports-backend
+        name: import-linter (backend)
+        entry: bash -c 'cd backend && uv run lint-imports --no-cache' --
+        language: system
+        types: [python]
+        files: ^backend/
+        pass_filenames: false
+
       - id: eslint-web
         name: eslint (web)
         entry: bash -c 'cd web && pnpm exec eslint --fix "${@#web/}"' --
