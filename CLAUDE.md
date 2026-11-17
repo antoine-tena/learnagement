@@ -30,7 +30,7 @@ supprime un dossier, un domaine ou un point d'entrée.
   de la prod) et `compose/` (un fragment par conteneur), d'où le
   lanceur produit `docker/docker-compose.yml` (ignoré).
 - `backend/` : l'API FastAPI (`app.py`) ; `api/` (routes, `dependencies/`), `auth/` (LNM et
-  CAS), `access_control/` (règles, prédicats, responsabilités), `domains/` (requêtes métier par
+  `authenticate_cas/`), `access_control/` (règles, prédicats, responsabilités), `domains/` (requêtes métier par
   domaine : `lnm_university/`, `maquette_module/`, `lnm_etudiant/`, `lnm_mobility_assignment/`…, en snake_case ; les tables SQL gardent leur casse), `models/`, `db/` (connexion
   SQLAlchemy), `tests/` (pytest).
 - `web/` : le front principal, en PHP (Apache) ; `index.php` + `utils/router.php`, `views/`
