@@ -3,9 +3,10 @@
 
 cd /app
 
-# L'environnement reste à côté du code monté, distinct du .venv de la machine hôte
-UV_PROJECT_ENVIRONMENT=docker_venv uv sync --frozen
+# L'environnement reste dans le conteneur, hors du code monté depuis la machine hôte ;
+# uv sync le remet à jour quand uv.lock change
+UV_PROJECT_ENVIRONMENT=/opt/docker_venv uv sync --frozen
 
-. docker_venv/bin/activate
+. /opt/docker_venv/bin/activate
 
 python main.py
