@@ -39,7 +39,7 @@ const handler = NextAuth({
 
                 if (!responseData || !responseData.access_token) {
                     // Symétrique au message "Incorrect login or password." de login.php
-                    console.error("Incorrect login or password for user:", credentials.username)
+                    console.error("Incorrect login or password")
                     throw new Error("Incorrect login or password")
                 }
 
@@ -64,11 +64,11 @@ const handler = NextAuth({
 
                 if (decoded.exp < Math.floor(Date.now() / 1000)) {
                     // Symétrique à la vérification d'expiration de login.php
-                    console.error("Token expiré pour l'utilisateur:", decoded.email)
+                    console.error("Token expiré pour l'utilisateur:", decoded.id)
                     throw new Error("Token expired")
                 }
 
-                console.log(`Utilisateur : ${decoded.email} ${decoded.firstname} ${decoded.lastname}`)
+                console.log(`Utilisateur : ${decoded.id}`)
                 console.log(`Expire à : ${new Date(decoded.exp * 1000).toISOString()}`)
 
                 return {

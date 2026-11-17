@@ -65,19 +65,18 @@ pas que rien n'est supprimé : le diff compte 33 suppressions (dont `ToDo.md`, a
 
 ### T-34 · Plus de JWT dans les URL
 - **Type**: bug
-- **Status**: todo
+- **Status**: in progress — fix/front-auth-secrets
 - **Opened**: 2026-10-30
-- **Effort**: S · **Owner**: — · **Due**: —
+- **Effort**: S · **Owner**: @antoine-tena · **Due**: —
 - **Origin**: revue de l'architecture
 
-`web/views/dashboard/python.php` et `nextjs.php` redirigent vers Dash et Next avec
-`?jwt_token=…` ; `dashboards/apc_dash/apc_hub.py` le conserve dans ses liens. Le jeton peut finir
-dans les historiques et les logs. `nextjs.php` force en plus `http` quel que soit l'environnement,
-donc le jeton peut circuler en clair.
+Le jeton ne passe plus par l'URL : le PHP pose un cookie `lnm_token` (`HttpOnly`, `SameSite=Strict`,
+`Secure` en HTTPS), que Dash lit sur le même hôte ; Next ne lisait pas `?jwt_token` et ne le reçoit
+plus. `nextjs.php` force encore `http`, mais seule la connexion de Next y transite désormais.
 
-- [ ] Vérifier le comportement sur une instance en HTTPS (code lu, pas encore lancé).
-- [ ] Transmettre l'authentification autrement : cookie `HttpOnly` et `Secure` sur un même domaine
-  ou code à usage unique échangé côté serveur.
+- [ ] Vérifier sur une instance lancée, en HTTP puis en HTTPS : connexion, passage du PHP à Dash,
+  navigation entre les pages de Dash, déconnexion (code modifié, pas encore lancé).
+- [x] Transmettre l'authentification autrement : cookie `HttpOnly` et `Secure` sur un même domaine.
 - [ ] Servir Next en HTTPS.
 
 ### T-35 · Le PHP ne parle plus à la base
@@ -92,16 +91,6 @@ Quatre fichiers de `web/` exécutent du SQL par `mysqli`, hors de l'API : `views
 `views/dashboard/rendus-enseignant.php`. Créer les routes manquantes dans le backend, avec leurs
 tests et leurs droits, puis les appeler par `utils/apiProxy.php`. C'est le premier pas vers un
 seul backend, et il ne dépend pas de T-12.
-
-### T-18 · Plus de données personnelles dans les logs du front
-- **Type**: bug
-- **Status**: todo
-- **Opened**: 2026-10-30
-- **Effort**: XS · **Owner**: — · **Due**: —
-- **Origin**: T-14, lecture de `route.ts`
-
-`app/api/auth/[...nextauth]/route.ts` écrit l'email, le prénom et le nom de l'utilisateur dans
-les logs à chaque connexion ([PERSONAL-DATA]) : ne garder que l'identifiant.
 
 ### T-19 · Zod 4 et audit des dépendances du front
 - **Type**: bug

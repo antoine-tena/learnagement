@@ -8,9 +8,7 @@ import jwt
 import dash_bootstrap_components as dbc
 from flask import session, jsonify
 from dash import Input, Output, dcc, html, State
-from urllib.parse import urlparse
-from urllib.parse import parse_qs
-from auth import FlaskAuth, decode_token
+from auth import FlaskAuth, decode_token, token_from_cookie
 
 class HealthFilter(logging.Filter):
     def filter(self, record):
@@ -142,7 +140,7 @@ if environment == "dev":
 
 #SECRET_KEY = os.getenv("INSTANCE_SECRET").encode()
 
-def render_sidebar(section, token_arg, status):
+def render_sidebar(section, status):
     # AJOUTE CES DEUX LIGNES POUR LE DÉBOGAGE :
     print(f"====== CRÉATION DU MENU POUR : {section} ======", flush=True)
     print(f"====== CONTENU DU MENU : {menu_items[section]} ======", flush=True)
@@ -156,7 +154,7 @@ def render_sidebar(section, token_arg, status):
     # Navigation
     navs = []
     for label, key in menu_items[section]:
-        href = f"/{section}/{key}?" + token_arg
+        href = f"/{section}/{key}"
         icon_class = icon_map.get(key, 'fa-solid fa-circle')  # icône par défaut si manquante
         navs.append(
             dbc.NavLink([
@@ -219,15 +217,12 @@ app.layout = html.Div([
 )
 def update_sidebar(url, pathname, status):
     logging.info("update_sidebar")
-    args=url.strip().split('?')
-    if len(args) > 1:
-        token_arg = args[1]
     if pathname and pathname.startswith('/enseignant'):
-        return render_sidebar('enseignant', token_arg, status)
+        return render_sidebar('enseignant', status)
     elif pathname and pathname.startswith('/etudiant'):
-        return render_sidebar('etudiant', token_arg, status)
+        return render_sidebar('etudiant', status)
     elif pathname and pathname.startswith('/administratif'):
-        return render_sidebar('administratif', token_arg, status)
+        return render_sidebar('administratif', status)
     else:
         # Chemin non reconnu : sidebar vide ou message par défaut
         return html.Div([
@@ -267,13 +262,11 @@ def render_page(url, pathname, token):
 def check_auth_token(url):
     logging.info("check_auth_token")
     # print(url, flush=True)
-    parsed_url = urlparse(url)
     instance_protocol = os.getenv("INSTANCE_PROTOCOL")
     instance_url = os.getenv("INSTANCE_URL")
     front_php_port = os.getenv("FRONT_PHP_PORT")
 
-    jwt_token = parse_qs(parsed_url.query)['jwt_token'][0]
-    # print(jwt_token, flush=True)
+    jwt_token = token_from_cookie()
 
     session['token'] = jwt_token
 
@@ -284,7 +277,7 @@ def check_auth_token(url):
         return "-1", "none", "none", "no token"
     #try:
     payload = decode_token(jwt_token)
-    print(payload, flush=True)
+    logging.info("user %s connected", payload["id"])
     # Attach user info to the Flask global context
     if 'enseignant' in payload["roles"]:
         return jwt_token, payload['id'], "enseignant", "Connected"
@@ -298,7 +291,7 @@ def check_auth_token(url):
 
 
 def render_page_content(url, pathname, token):
-    logging.info("render_page_content " + token)
+    logging.info("render_page_content")
 
     parts = pathname.strip('/').split('/')  # ['enseignant', 'app2'] ou ['etudiant','app7'] ou ['enseignant'] etc.
     if len(parts) == 1:

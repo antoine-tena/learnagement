@@ -222,7 +222,7 @@ def register_apc_hub_callbacks(app):
         Output('apc-hub-navbar', 'children'),
         Output('apc-hub-content', 'children'),
         Input('url', 'pathname'),
-        Input('url', 'search'),  # pour conserver ?jwt_token=... dans les liens
+        Input('url', 'search'),
     )
     def render_apc_hub(pathname, search):
         if not pathname:
@@ -250,7 +250,7 @@ def register_apc_hub_callbacks(app):
             subpage_key = default_subpage
 
         # Construire la navbar avec dcc.Link (pas de rechargement de page)
-        # On préserve la query string (?jwt_token=...) pour garder l'auth
+        # On préserve la query string des liens
         query = search or ''
         navbar_children = [
             dcc.Link(
@@ -264,7 +264,7 @@ def register_apc_hub_callbacks(app):
     for key, page in SUBPAGES.items()
     if key in allowed_pages
 ]
-        
+
 
         # Contenu de la sous-page
         content = SUBPAGES[subpage_key]['layout']
