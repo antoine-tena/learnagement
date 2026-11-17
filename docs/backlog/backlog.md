@@ -7,13 +7,91 @@ n'est ouvert.**
 
 North star: **Learnagement in service**.
 
-**Next free: T-44.**
+**Next free: T-53.**
 
 ---
 
 ## 🔴 Critical
 
+### T-44 · Les sauvegardes automatiques, et une restauration testée
+- **Type**: bug
+- **Status**: todo
+- **Opened**: 2026-11-17
+- **Effort**: S · **Owner**: — · **Due**: —
+- **Origin**: lecture du code, 2026-11-17
+
+La base de production n'a pas de sauvegarde automatique : `docker/compose/data_mysql_backup.yml`
+attend `docker/backup/backup.sh`, qui n'existe pas, et le conteneur n'est lancé dans aucun
+environnement (`launcher/config.py`). Seule la commande manuelle `backupdb` existe, alors que la
+base porte les stages et bientôt la mobilité d'environ 400 étudiants.
+
+- [ ] Écrire `backup.sh` : une sauvegarde par jour, une durée de conservation
+- [ ] Une copie hors du serveur, dans un stockage que l'université accepte pour des données
+  personnelles (décision dans `urgent.md`)
+- [ ] Restaurer une sauvegarde sur une instance de test, et décrire la marche à suivre dans
+  `docs/prod.md`
+- [ ] Une alerte quand une sauvegarde échoue
+
 ## 🟠 Important
+
+### T-45 · phpMyAdmin hors de la production
+- **Type**: bug
+- **Status**: todo
+- **Opened**: 2026-11-17
+- **Effort**: XS · **Owner**: — · **Due**: —
+- **Origin**: lecture du code, 2026-11-17
+
+Le lanceur démarre phpMyAdmin en production (`launcher/config.py`, liste `prod`), sur un port
+publié de l'hôte (`docker/compose/phpmyadmin.yml`) : une interface d'administration directe d'une
+base qui contient des données personnelles, joignable depuis tout le VPN. Le retirer de la liste
+`prod` ou, si Flavien en a besoin, ne l'ouvrir qu'en local par un tunnel SSH. Signaler le
+changement dans le README.
+
+### T-46 · Phase A : les règles vérifiées partout
+- **Type**: improvement
+- **Status**: todo
+- **Opened**: 2026-11-17
+- **Effort**: M · **Owner**: — · **Due**: —
+- **Origin**: architecture cible (`docs/architecture.md`)
+
+Avant de déplacer quoi que ce soit, la machine vérifie les règles dans tous les langages, pour que
+les phases suivantes se relisent vite. Rien n'est déplacé ici.
+
+- [ ] La charte compte aussi le `.php` et le `.js` ([FILE-SIZE]), budget au niveau actuel
+- [ ] ruff (lint et mise en forme) et mypy sur `dashboards/`, dans le pre-commit et la CI
+- [ ] PHP-CS-Fixer et PHPStan sur `web/`, au niveau qui passe aujourd'hui, relevé ensuite
+- [ ] Prettier et ESLint sur le JS de `web/`
+- [ ] Les couches vérifiées : import-linter en Python, deptrac en PHP
+- [ ] `openapi.json` exporté et versionné, vérifié en CI (le workflow `api-contract.yml`
+  d'ion-repo, avec une commande d'export FastAPI) ; les routes cassées détectées (oasdiff), à
+  proposer à ion-repo s'il ne le fait pas ([REPORT-TO-KILN])
+- [ ] Les hooks de pré-commit installés par `bootstrap.py`
+- [ ] `no-commit-to-branch` protège `main` et `develop`, qui n'existe pas ici, mais ni `dev` ni
+  `prerelease` : défaut d'un fichier généré, à corriger dans ion-repo ([REPORT-TO-KILN])
+- [ ] La CI poste un commentaire par PR : règles, tests, routes cassées ou non, migrations,
+  nouvelles dépendances
+
+### T-47 · Phase B : la nouvelle arborescence
+- **Type**: improvement
+- **Status**: blocked — waiting for T-46
+- **Opened**: 2026-11-17
+- **Effort**: M · **Owner**: — · **Due**: —
+- **Origin**: architecture cible (`docs/architecture.md`)
+
+Les dossiers prennent leur place cible (`app/`, `lab/`, `database/`, `deploy/`) par déplacements
+purs (`git mv`) : une application par commit, sans changer ce que fait le code. L'arborescence se
+fait valider par Flavien (`urgent.md`) : refusée, elle coûterait toute la phase.
+
+- [ ] `backend/` → `app/api/`, `web/` → `app/web/`, `dashboards/` → `app/dashboards/`,
+  `scraping/` → `app/importers/`
+- [ ] `db/` → `database/` (`migrations/`, `open-data/`, `tools/`)
+- [ ] `Containerfile` et `compose.yaml` dans le dossier de chaque application ;
+  `docker/compose/` et `config/` → `deploy/`
+- [ ] `frontend/` → `lab/javascript/nextjs/`, si T-12 le retient
+- [ ] Le lanceur, la CI, le pre-commit et `charter.toml` suivent les nouveaux chemins
+- [ ] `docs/moved.md` : chaque ancien chemin et le nouveau, pour les branches en cours
+- [ ] README, `CONTRIBUTING.md`, carte du `CLAUDE.md` à jour ; CODEOWNERS par zone
+- [ ] Prévenir les contributeurs avant (T-33)
 
 ### T-39 · La base passe de MySQL à Postgres et tient la charge de septembre
 - **Type**: improvement
@@ -132,6 +210,101 @@ passer), postcss-selector-parser par `@tailwindcss/typography` (modérée) et de
 Node 18 (fin de vie) → Node LTS.
 
 ## 🟡 Normal
+
+### T-48 · Phase C : découper et bien nommer, domaine par domaine
+- **Type**: improvement
+- **Status**: blocked — waiting for T-47
+- **Opened**: 2026-11-17
+- **Effort**: L · **Owner**: — · **Due**: —
+- **Origin**: architecture cible (`docs/architecture.md`)
+
+Chaque application prend le même rythme : `core/`, puis un dossier par domaine du glossaire
+(`docs/glossary.md`). Un domaine par série de commits : on découpe et on renomme sans changer le
+comportement, les tests passent avant et après. Regroupe T-11, T-29, T-31, T-27 et T-21.
+
+- [ ] API : un paquet par domaine (`api.py`, `services.py`, `schemas.py`, `queries.py`,
+  `tests/`) ; `core/` pour la configuration, la base, l'authentification et les droits
+- [ ] Web : une page par dossier (`view.php`, `actions.php`, `js/`, `style.css`), rangée par domaine
+- [ ] Tableaux de bord : un dossier par domaine, un fichier par rôle, sans préfixe `appNN_`
+- [ ] Les noms du glossaire appliqués au code, sans toucher aux tables ni aux routes publiées
+- [ ] La fabrique de routes déclare un schéma de réponse par requête
+
+### T-49 · Phase D : réécrire le code qui doit l'être
+- **Type**: improvement
+- **Status**: todo
+- **Opened**: 2026-11-17
+- **Effort**: L · **Owner**: — · **Due**: —
+- **Origin**: architecture cible (`docs/architecture.md`), lecture du code, 2026-11-17
+
+Seulement ce que le découpage ne suffit pas à rendre lisible : des tests qui figent le comportement
+actuel d'abord, puis la réécriture. Le plus simple après T-48 ; le SQL et le code mort peuvent
+partir avant.
+
+- [ ] `mobility-admin.php` (2 953 lignes) : le JS en modules (indicateurs, tableau, filtres, exports)
+- [ ] `mobility-map.php` et `mobility-map_open.php` (31 lignes de différence) : une seule page
+- [ ] Les routes de plus de 100 lignes de la mobilité et des maquettes : route, service, requêtes
+- [ ] Le SQL assemblé à la main (9 endroits, dont `lnm_university.py`, `lnm_calendar.py`,
+  `init.py`) : des paramètres liés ([ORM])
+- [ ] Le vieux code commenté (`api/dependencies.py`, `auth/authenticate_cas.py`…),
+  `views/dashboard/test.php` et `app11_dag_dependance_new.py` : supprimés
+- [ ] Le scraping n'écrit plus en base : il passe par des routes d'import de l'API
+
+### T-51 · Des données fictives pour travailler
+- **Type**: improvement
+- **Status**: todo
+- **Opened**: 2026-11-17
+- **Effort**: M · **Owner**: — · **Due**: —
+- **Origin**: architecture cible (`docs/architecture.md`)
+
+Le développement, la recette, la CI, le lab et les sessions Claude tournent sur des données
+inventées, jamais réelles ([PERSONAL-DATA], [AI-CONFIDENTIALITY]). Les jeux de `db/freeData/` sont
+figés ; un générateur produit des promos, des étudiants, des enseignants, des stages, des vœux de
+mobilité et des absences cohérents, sur les maquettes publiques.
+
+- [ ] Un générateur reproductible (graine fixe), en plusieurs tailles
+- [ ] Le lanceur le propose au premier lancement, à côté des jeux libres
+- [ ] Des comptes de test par rôle, listés dans le README
+
+### T-50 · Le lab : apprendre dans le langage de son choix
+- **Type**: idea
+- **Status**: blocked — waiting for T-47, T-51
+- **Opened**: 2026-11-17
+- **Effort**: L · **Owner**: — · **Due**: —
+- **Origin**: architecture cible (`docs/architecture.md`)
+
+`lab/` à la racine : un dossier par langage puis par framework, chacun avec le même kit
+(`README.md`, `lab.toml`, `example/`, `template/`, `projects/`). Rien n'en part en production ; le
+détail est dans `docs/architecture.md`.
+
+- [ ] `lab/README.md` : le tableau pour choisir (langage, niveau, ce qu'on apprend, durée visée)
+- [ ] Le kit des premiers frameworks : `php/vanilla`, `python/flask`, `python/dash`,
+  `javascript/vanilla`, `javascript/react`, `javascript/nextjs`, `java/spring-boot`
+- [ ] `python Learnagement.py lab new` et `lab run`, qui lisent `lab.toml`
+- [ ] Un client de l'API généré par langage (OpenAPI Generator), jamais commité
+- [ ] La suite de tests du contrat (Schemathesis) pour les projets de back
+- [ ] La CI refuse un dossier sans kit et vérifie chaque projet avec les outils de son langage
+- [ ] L'instance de recette affiche les projets du lab
+- [ ] Les règles de passage en production et d'archivage, dans `lab/README.md`
+
+### T-52 · Une production prête pour la charge
+- **Type**: improvement
+- **Status**: todo
+- **Opened**: 2026-11-17
+- **Effort**: L · **Owner**: — · **Due**: —
+- **Origin**: architecture cible (`docs/architecture.md`), lecture du code, 2026-11-17
+
+Le serveur sature déjà, selon Flavien. Le code montre des suspects : Dash lancé avec 2 processus
+qui chargent chacun PyTorch par le RAG (T-38), l'API qui relance sa suite de tests et `uv sync` à
+chaque démarrage, production comprise (`docker/backend/entrypoint.sh`), le code monté en volume
+dans les conteneurs.
+
+- [ ] Mesurer la mémoire et le processeur de chaque conteneur
+- [ ] Des images construites en CI ; plus de tests ni d'installation au démarrage
+- [ ] Une API sans état, lancée en plusieurs copies derrière la porte d'entrée (T-41)
+- [ ] Une file de tâches persistée pour les exports Excel, les imports et l'assistant
+  ([OUT-OF-REQUEST])
+- [ ] OpenTelemetry pour les traces et les métriques, journaux structurés (T-13)
+- [ ] Une limite de mémoire par conteneur, des sondes de santé (T-06)
 
 ### T-40 · Le conteneur Next redémarre
 - **Type**: bug
