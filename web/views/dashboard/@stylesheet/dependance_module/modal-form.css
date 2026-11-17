@@ -1,0 +1,194 @@
+/* ===================== MODAL ===================== */
+
+#modal-ajout-module {
+    border: none;
+    border-radius: var(--radius-xl);
+    padding: 0;
+    width: 100%;
+    max-width: 520px;
+    background: var(--surface);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    color: var(--text-primary);
+}
+
+#modal-ajout-module::backdrop {
+    background: rgba(0,0,0,0.4);
+}
+
+#modal-ajout-module .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 14px;
+    border-bottom: 0.5px solid var(--border);
+}
+
+#modal-ajout-module .modal-header h2 {
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+#modal-ajout-module .modal-body {
+    padding: 20px 24px;
+}
+
+#modal-ajout-module .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 0 24px 20px;
+}
+
+
+/* ===================== FORMULAIRE ===================== */
+
+#form-ajout-module .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 16px;
+}
+
+#form-ajout-module .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+#form-ajout-module .form-group.full {
+    grid-column: 1 / -1;
+}
+
+#form-ajout-module .input-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+}
+
+#form-ajout-module label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 0;
+}
+
+#form-ajout-module input[type="text"],
+#form-ajout-module input[type="number"],
+#form-ajout-module select,
+#form-ajout-module textarea {
+    height: 36px;
+    padding: 0 10px;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    width: 100%;
+    background: var(--surface);
+    color: var(--text-primary);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    box-sizing: border-box;
+}
+
+#form-ajout-module input:focus,
+#form-ajout-module select:focus,
+#form-ajout-module textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+#form-ajout-module textarea {
+    height: 72px;
+    padding: 8px 10px;
+    resize: vertical;
+}
+
+/* Pills semestre */
+#form-ajout-module .semestre-pills {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+#form-ajout-module .pill-input {
+    display: none !important;
+}
+
+#form-ajout-module .pill-label {
+    display: inline-flex;
+    align-items: center;
+    height: 30px;
+    padding: 0 12px;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+#form-ajout-module .pill-input:checked + .pill-label {
+    background: #EEEDFE;
+    color: #3C3489;
+    border-color: #AFA9EC;
+}
+
+[data-theme="dark"] #form-ajout-module .pill-input:checked + .pill-label {
+    background: rgba(99, 102, 241, 0.2);
+    color: #a5b4fc;
+    border-color: rgba(99, 102, 241, 0.4);
+}
+
+
+/* ===================== BOUTONS GÉNÉRIQUES (.btn) ===================== */
+
+.dependance-module-container .btn,
+#modal-ajout-module .btn {
+    height: 36px;
+    padding: 0 18px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 0.5px solid var(--border);
+    background: var(--surface);
+    color: var(--text-primary);
+    transition: background var(--transition), color var(--transition), box-shadow var(--transition);
+}
+
+.dependance-module-container .btn:hover,
+#modal-ajout-module .btn:hover {
+    background: var(--accent);
+    color: var(--on-accent);
+    border-color: var(--accent);
+    box-shadow: var(--shadow-md);
+}
+
+#modal-ajout-module .btn-primary {
+    background: var(--accent);
+    color: var(--on-accent);
+    border-color: var(--accent);
+}
+
+#modal-ajout-module .btn-primary:hover {
+    filter: brightness(0.9);
+}
+
+#modal-ajout-module .btn-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    color: var(--text-muted);
+    line-height: 1;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color var(--transition);
+}
+
+#modal-ajout-module .btn-close:hover {
+    color: var(--text-primary);
+}

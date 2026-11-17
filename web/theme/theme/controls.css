@@ -1,0 +1,165 @@
+/* ============================================================
+   CUSTOM DROPDOWN (JS-powered)
+   ============================================================ */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  min-width: 180px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--c-radius-lg);
+  padding: 5px;
+  z-index: 300;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1), 0 2px 6px rgba(0,0,0,0.06);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.dropdown-menu.open {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateY(0);
+}
+.dropdown-menu.align-right { left: auto; right: 0; }
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: var(--c-radius-sm);
+  font-size: 13.5px;
+  color: var(--c-text-2);
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+  user-select: none;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.dropdown-item:hover { background: var(--c-surface-2); color: var(--c-text); }
+.dropdown-item.danger { color: var(--error); }
+.dropdown-item.danger:hover { background: #fee2e2; }
+.dropdown-item .item-icon { opacity: 0.5; font-size: 13px; flex-shrink: 0; }
+.dropdown-item:hover .item-icon { opacity: 1; }
+
+.dropdown-divider { height: 1px; background: var(--c-border); margin: 4px 6px; }
+
+.dropdown-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--c-text-3);
+  padding: 6px 10px 2px;
+}
+
+
+/* ============================================================
+   CHECKBOX & RADIO
+   ============================================================ */
+.check-wrap, .radio-wrap {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  user-select: none;
+}
+.check-wrap input[type="checkbox"],
+.radio-wrap  input[type="radio"] {
+  appearance: none;
+  width: 16px; height: 16px;
+  border: 1.5px solid var(--c-border-2);
+  border-radius: 4px;
+  background: var(--c-surface);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.12s, border-color 0.12s, box-shadow 0.12s;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
+.radio-wrap input[type="radio"] { border-radius: 50%; }
+
+.check-wrap input[type="checkbox"]:hover,
+.radio-wrap  input[type="radio"]:hover { border-color: var(--accent); }
+
+.check-wrap input[type="checkbox"]:checked,
+.radio-wrap  input[type="radio"]:checked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.check-wrap input[type="checkbox"]:checked::after {
+  content: '';
+  display: block;
+  width: 9px; height: 5px;
+  border-left: 2px solid white;
+  border-bottom: 2px solid white;
+  transform: rotate(-45deg) translate(1px, -1px);
+  position: absolute;
+}
+.radio-wrap input[type="radio"]:checked::after {
+  content: '';
+  display: block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: white;
+  position: absolute;
+}
+.check-wrap input:focus-visible,
+.radio-wrap  input:focus-visible {
+  box-shadow: 0 0 0 3px var(--c-focus-ring);
+  outline: none;
+}
+.check-label, .radio-label {
+  font-size: 13.5px;
+  color: var(--c-text);
+}
+
+
+/* ============================================================
+   TOGGLE SWITCH
+   ============================================================ */
+.toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  user-select: none;
+}
+.toggle {
+  position: relative;
+  width: 36px; height: 20px;
+  flex-shrink: 0;
+}
+.toggle input {
+  opacity: 0;
+  width: 0; height: 0;
+  position: absolute;
+}
+.toggle-track {
+  position: absolute;
+  inset: 0;
+  border-radius: 99px;
+  background: var(--c-border-2);
+  transition: background 0.2s;
+  cursor: pointer;
+}
+.toggle-thumb {
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  transition: transform 0.2s cubic-bezier(0.4,0,0.2,1), box-shadow 0.2s;
+  pointer-events: none;
+}
+.toggle input:checked ~ .toggle-track { background: var(--accent); }
+.toggle input:checked ~ .toggle-thumb { transform: translateX(16px); }
+.toggle input:focus-visible ~ .toggle-track { box-shadow: 0 0 0 3px var(--c-focus-ring); }
+.toggle-label { font-size: 13.5px; color: var(--c-text); }

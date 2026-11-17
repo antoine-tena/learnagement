@@ -29,19 +29,20 @@ supprime un dossier, un domaine ou un point d'entrée.
   `phpmyadmin/` : Dockerfile, entrypoint), `backup/` (`backup.sh`, la sauvegarde quotidienne
   de la prod) et `compose/` (un fragment par conteneur), d'où le
   lanceur produit `docker/docker-compose.yml` (ignoré).
-- `backend/` : l'API FastAPI (`app.py`) ; `api/` (routes, `dependencies.py`), `auth/` (LNM et
-  CAS), `access_control/` (règles, prédicats, responsabilités), `domains/` (requêtes métier par
-  domaine : `lnm_university.py`, `maquette_module.py`…, en snake_case ; les tables SQL gardent leur casse), `models/`, `db/` (connexion
+- `backend/` : l'API FastAPI (`app.py`) ; `api/` (routes, `dependencies/`), `auth/` (LNM et
+  `authenticate_cas/`), `access_control/` (règles, prédicats, responsabilités), `domains/` (requêtes métier par
+  domaine : `lnm_university/`, `maquette_module/`, `lnm_etudiant/`, `lnm_evaluation/`, `lnm_mobility_assignment/`…, en snake_case ; les tables SQL gardent leur casse), `models/`, `db/` (connexion
   SQLAlchemy), `tests/` (pytest).
 - `web/` : le front principal, en PHP (Apache) ; `index.php` + `utils/router.php`, `views/`
-  (pages), `components/`, `utils/apiProxy.php` (appels à l'API), `theme/`, `assets/`.
-- `dashboards/` : les tableaux de bord Dash (`main.py`, une app `appNN_*` par vue et son
-  `_tools.py`), `apc_dash/` (approche par compétences).
+  (pages, dont `views/dashboard/mobility-admin/`, `views/dashboard/stage/`), `components/`, `scripts/` (`dependance_module/`, `mobility-admin/`, `mobility-map/`, `mobility-map-open/`), `utils/apiProxy.php` (appels à l'API), `theme/` (dont `theme/theme/`, `theme/mobility-map-streetview/`), `assets/`.
+- `dashboards/` : les tableaux de bord Dash (`main.py`, `main_app/`, une app `appNN_*` par vue (dont
+  `app5_module_enseignant_edit/`, `app10_stage_administratif/`, `app14_check_administratif/`) et son `_tools.py`), `apc_dash/` (approche par compétences, dont
+  `apc20_chatbot_tools/`, `apc20_competence_ac/`, `apc20_heatmap_apc/`, `apc20_ens_contribution/`, `apc20_ens_fiche_module/`, `apc20_ens_reseau_gaps/`, `apc20_metier_orientation/`, `app_reseaupolytech_etudiant/`).
 - `frontend/` : le front Next.js en cours de refonte (`app/`, proxy vers l'API).
 - `scraping/` : le paquet `learnagement_scraping` (commande `learnagement-scraping`) : `parsers.py`
   (HTML vers données), `browser.py` (Selenium), `db.py` (écritures), `cli.py` ; `out/` est ignoré.
-  `scraping/scripts/` : les scripts autonomes de l'équipe, gardés tels quels (`ical2json.py`
-  emplois du temps ADE, `scrape_maquette.py` catalogue des formations, `matching_26_27/`).
+  `scraping/scripts/` : les scripts autonomes de l'équipe (`ical2json.py` + `ical2json_lib/`
+  emplois du temps ADE, `scrape_maquette.py` + `scrape_maquette_lib/` catalogue des formations, `matching_26_27/`).
 - `db/` : `sql/` (schéma, migrations versionnées `VX.Y.Z__*.sql`), `freeData/` (jeux de données
   libres), `tools/` ; `db/data/` et `db/backup/` sont privés et ignorés.
 - `archive/` : le code mort gardé pour mémoire (ancien backend PHP…), hors des règles ; son

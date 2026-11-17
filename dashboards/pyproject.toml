@@ -92,6 +92,7 @@ module = [
     "apc_dash.apc20_layout",
     "apc_dash.polytech_rag.app.rag.vectorstore",
     "app10_stage_administratif",
+    "app10_stage_administratif.*",
     "main",
 ]
 disable_error_code = ["arg-type", "attr-defined", "var-annotated"]

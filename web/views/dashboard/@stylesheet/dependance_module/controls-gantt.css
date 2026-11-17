@@ -1,0 +1,99 @@
+/* ===================== BOUTONS (button-section) ===================== */
+
+.dependance-module-container .button-section {
+    display: flex;
+    gap: 12px;
+    flex-direction: row;
+    width: 30%;
+    padding-bottom: 3px;
+}
+
+.dependance-module-container .button-section button {
+    position: relative;
+    padding: 6px 11px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all var(--transition);
+    max-height: 35px;
+    background-color: var(--primary);
+    color: var(--on-primary);
+    box-shadow: var(--shadow-btn);
+}
+
+/* Shimmer */
+.dependance-module-container .button-section button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.15), transparent);
+    transition: left 0.4s ease;
+}
+
+.dependance-module-container .button-section button:hover {
+    background-color: color-mix(in srgb, var(--primary) 70%, white);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.dependance-module-container .button-section button:hover::before {
+    left: 150%;
+}
+
+.dependance-module-container .button-section button:active {
+    transform: translateY(0px);
+    box-shadow: var(--shadow-sm);
+    background-color: color-mix(in srgb, var(--primary) 85%, black);
+}
+
+/* Variante outline */
+.dependance-module-container .button-section button.btn-outline {
+    background-color: transparent;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    box-shadow: none;
+}
+
+.dependance-module-container .button-section button.btn-outline:hover {
+    background-color: var(--primary);
+    color: var(--on-primary);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+
+/* ===================== GANTT ===================== */
+
+body .dependance-module-container .gantt-container-with-button {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    width: 100% !important;
+}
+
+body .dependance-module-container .gantt-wrapper,
+body .dependance-module-container #gantt-chart,
+body .dependance-module-container .gantt-chart {
+    /* ✅ height explicite — c'est ça qui débloquerait dhtmlx */
+    height: 700px !important;
+    min-height: 700px !important;
+    max-height: 900px !important;
+    width: 100% !important;
+    display: block !important;
+    box-sizing: border-box !important;
+    overflow: auto !important;
+    resize: vertical !important;
+}
+
+/* dhtmlx injecte ses propres divs — on les force aussi */
+body .dependance-module-container .gantt_container,
+body .dependance-module-container .gantt_container > div {
+    height: 100% !important;
+    min-height: 100% !important;
+}

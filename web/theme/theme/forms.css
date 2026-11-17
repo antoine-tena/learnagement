@@ -1,0 +1,186 @@
+/* ============================================================
+   BADGES
+   ============================================================ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+.badge-primary   { background: color-mix(in srgb, var(--primary) 12%, white); color: var(--primary); }
+.badge-accent    { background: color-mix(in srgb, var(--accent)  12%, white); color: var(--accent); }
+.badge-success   { background: #dcfce7; color: #15803d; }
+.badge-warning   { background: #fef9c3; color: #a16207; }
+.badge-error     { background: #fee2e2; color: #b91c1c; }
+.badge-neutral   { background: var(--c-border); color: var(--c-text-2); }
+
+.badge-dot::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+
+/* ============================================================
+   INPUTS
+   ============================================================ */
+.input-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.input-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--c-text);
+}
+.input-hint {
+  font-size: 11.5px;
+  color: var(--c-text-3);
+}
+.input-error-msg {
+  font-size: 11.5px;
+  color: var(--error);
+}
+
+/* The input field itself */
+.input {
+  height: var(--c-h-md);
+  padding: 0 12px;
+  border-radius: var(--c-radius);
+  border: 1px solid var(--c-border-2);
+  background: var(--c-surface);
+  color: var(--c-text);
+  font-size: 13.5px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.13s, box-shadow 0.13s;
+  width: 100%;
+}
+.input::placeholder { color: var(--c-placeholder); }
+.input:hover  { border-color: var(--c-text-3); }
+.input:focus  { border-color: var(--accent); box-shadow: 0 0 0 3px var(--c-focus-ring); }
+.input.error  { border-color: var(--error); }
+.input.error:focus { box-shadow: 0 0 0 3px rgba(220,38,38,0.2); }
+.input:disabled { opacity: 0.5; cursor: not-allowed; background: var(--c-surface-2); }
+
+/* Sizes */
+.input-sm { height: var(--c-h-sm);  font-size: 12.5px; padding: 0 10px; border-radius: var(--c-radius-sm); }
+.input-lg { height: var(--c-h-lg);  font-size: 14.5px; padding: 0 14px; border-radius: var(--c-radius-lg); }
+
+/* Input with icon */
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.input-group .input { padding-left: 36px; }
+.input-group .input-group-icon {
+  position: absolute;
+  left: 11px;
+  color: var(--c-text-3);
+  pointer-events: none;
+  font-size: 15px;
+  line-height: 1;
+}
+.input-group .input-group-suffix {
+  position: absolute;
+  right: 10px;
+  color: var(--c-text-3);
+  font-size: 12px;
+  pointer-events: none;
+}
+
+/* Textarea */
+.textarea {
+  padding: 10px 12px;
+  height: auto;
+  min-height: 80px;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+
+/* ============================================================
+   SEARCH BAR
+   ============================================================ */
+.search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+.search-bar .input {
+  padding-left: 38px;
+  padding-right: 36px;
+}
+.search-bar-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--c-text-3);
+  pointer-events: none;
+  display: flex;
+}
+.search-bar-clear {
+  position: absolute;
+  right: 8px;
+  width: 20px; height: 20px;
+  border-radius: 99px;
+  background: var(--c-border);
+  border: none;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--c-text-2);
+  font-size: 10px;
+  transition: background 0.12s, opacity 0.12s;
+  opacity: 0;
+  pointer-events: none;
+}
+.search-bar input:not(:placeholder-shown) ~ .search-bar-clear {
+  opacity: 1;
+  pointer-events: all;
+}
+.search-bar-clear:hover { background: var(--c-border-2); }
+
+
+/* ============================================================
+   SELECT / DROPDOWN (native)
+   ============================================================ */
+.select-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.select {
+  appearance: none;
+  height: var(--c-h-md);
+  padding: 0 36px 0 12px;
+  border-radius: var(--c-radius);
+  border: 1px solid var(--c-border-2);
+  background: var(--c-surface);
+  color: var(--c-text);
+  font-size: 13.5px;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.13s, box-shadow 0.13s;
+}
+.select:hover { border-color: var(--c-text-3); }
+.select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--c-focus-ring); }
+.select-chevron {
+  position: absolute;
+  right: 10px;
+  pointer-events: none;
+  color: var(--c-text-3);
+  font-size: 10px;
+}
+.select-sm { height: var(--c-h-sm); font-size: 12.5px; padding: 0 30px 0 10px; border-radius: var(--c-radius-sm); }
+.select-lg { height: var(--c-h-lg); font-size: 14.5px; padding: 0 40px 0 14px; border-radius: var(--c-radius-lg); }

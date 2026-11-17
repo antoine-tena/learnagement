@@ -34,13 +34,13 @@ exclude = '(^docs/|^charter\.toml$|/migrations/|-lock\.yaml$|\.lock$)'
 id = "FILE-SIZE"
 files = []
 suffixes = [".py", ".ts", ".tsx", ".vue", ".astro", ".css", ".mjs"]
-budget = 26
+budget = 0
 
 [ratchets.long-routes]
 id = "VIEW-15"
 decorator = '\s*@\w*(app|router)\.(get|post|put|patch|delete)'
 files = ["backend/**/*.py"]
-budget = 6
+budget = 2
 
 # A real clock in a test: it passes today and breaks at midnight or on a Sunday.
 [ratchets.clock-in-tests]
@@ -66,4 +66,4 @@ rule = "file-size"
 id = "FILE-SIZE"
 files = []
 suffixes = [".php", ".js"]
-budget = 6
+budget = 0
