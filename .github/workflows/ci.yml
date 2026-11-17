@@ -1,7 +1,7 @@
 name: CI
 
-# The reusable workflows live in kiln (antoine-tena/kiln, public), cited at the kiln release the
-# project comes from (develop): `kiln update` moves them to the next one. The project only
+# The reusable workflows live in ion-repo (antoine-tena/ion-repo, public), cited at the ion-repo release the
+# project comes from (develop): `ion repo update` moves them to the next one. The project only
 # keeps its parameters here.
 on:
   # Only on the way to main: a release branch. A merge into develop runs fast linters only.
@@ -10,13 +10,13 @@ on:
   # Callable from another workflow of the repo.
   workflow_call:
 
-# [WORKFLOW-PERMISSIONS]: the token reads the repo, nothing more; kiln's workflows need no more.
+# [WORKFLOW-PERMISSIONS]: the token reads the repo, nothing more; ion-repo's workflows need no more.
 permissions:
   contents: read
 
 jobs:
   backend:
-    uses: antoine-tena/kiln/.github/workflows/python.yml@develop
+    uses: antoine-tena/ion-repo/.github/workflows/python.yml@develop
     with:
       directory: backend
 
@@ -37,7 +37,7 @@ jobs:
       - run: uv run --no-sync mypy .
 
   frontend:
-    uses: antoine-tena/kiln/.github/workflows/pnpm.yml@develop
+    uses: antoine-tena/ion-repo/.github/workflows/pnpm.yml@develop
     with:
       scripts: |
         lint
@@ -45,14 +45,14 @@ jobs:
         build
 
   charter:
-    uses: antoine-tena/kiln/.github/workflows/charter.yml@develop
+    uses: antoine-tena/ion-repo/.github/workflows/charter.yml@develop
 
   # [SECRETS]: gitleaks searches the whole history, with no organisation licence.
   secrets-scan:
-    uses: antoine-tena/kiln/.github/workflows/secrets.yml@develop
+    uses: antoine-tena/ion-repo/.github/workflows/secrets.yml@develop
 
   security:
-    uses: antoine-tena/kiln/.github/workflows/security.yml@develop
+    uses: antoine-tena/ion-repo/.github/workflows/security.yml@develop
     with:
       uv: "backend"
       pnpm: "frontend"

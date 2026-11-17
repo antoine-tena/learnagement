@@ -31,7 +31,7 @@ dans le langage de son choix (T-50).
 
 ## Les règles
 
-Les règles de code sont dans la [charte](.claude/rules/kiln/charter.md) et les fichiers voisins
+Les règles de code sont dans la [charte](.claude/rules/ion-repo/charter.md) et les fichiers voisins
 (Python, FastAPI, Next, sécurité, production). Une partie est vérifiée à chaque commit et en CI :
 
 | Partie | Vérifié aujourd'hui |

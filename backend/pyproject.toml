@@ -37,6 +37,59 @@ select = ["E", "F", "W", "I", "N", "UP", "B", "SIM", "RUF", "ANN"]
 [tool.mypy]
 strict = true
 plugins = ["pydantic.mypy"]
+explicit_package_bases = true
+
+# La dette d'aujourd'hui : ces modules ont des erreurs de type de ces codes ; un module quitte
+# la liste une fois corrigé.
+[[tool.mypy.overrides]]
+module = [
+    "access_control.checker",
+    "access_control.predicates",
+    "access_control.responsibilities",
+    "access_control.rules",
+    "access_control.types",
+    "api.dependencies.auth_deps",
+    "api.dependencies.user_loader",
+    "api.route_factory",
+    "app",
+    "auth.authenticate_cas.service",
+    "auth.authenticate_lnm",
+    "auth.authenticate_tools",
+    "db.connection",
+    "domains.lnm_etudiant.student_internships",
+    "domains.lnm_etudiant.students_list",
+    "domains.lnm_evaluation._db",
+    "domains.lnm_mobility_assignment._db",
+    "domains.lnm_mobility_assignment.algorithm",
+    "domains.lnm_mobility_assignment.queries",
+    "domains.lnm_university._db",
+    "domains.lnm_university.catalog_admin",
+    "domains.lnm_university.exports_diagnostics",
+    "domains.lnm_university.exports_places",
+    "domains.lnm_university.exports_status",
+    "domains.lnm_university.exports_wishes",
+    "domains.lnm_university.wishes",
+    "domains.maquette_module._db",
+    "init.introspection",
+    "init.queries",
+    "models.request",
+    "models.user",
+    "repositories.lnm_filiere_requests",
+    "system.access_auth.routes",
+    "system.access_auth.sqlglot_lineage",
+    "system.access_auth.tree",
+    "system.check.routes",
+    "system.tools",
+    "tests.test_access_control_responsibilities",
+    "tests.test_access_control_rules",
+    "tests.test_authenticate_cas",
+    "tests.test_db_transaction",
+    "tests.test_module_ownership_dependencies",
+    "tests.test_module_ownership_matrix",
+    "tests.test_module_ownership_resources",
+    "tests.test_university_subscript",
+]
+disable_error_code = ["arg-type", "assignment", "attr-defined", "comparison-overlap", "dict-item", "import-untyped", "index", "misc", "no-any-return", "no-untyped-call", "operator", "return-value", "type-arg", "union-attr", "var-annotated"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

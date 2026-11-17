@@ -5,8 +5,8 @@ enseignants et administratifs (planning prévisionnel, cohérence MCCC, absences
 Développé surtout par des étudiants (IDU de Polytech Annecy, Licence SCEM), sous la
 responsabilité de Flavien Vernier.
 
-<!-- This file belongs to the project: kiln wrote it once and never changes it. kiln's rules live
-in .claude/rules/kiln/ and are kept current by `kiln update`. Write here what Claude cannot
+<!-- This file belongs to the project: ion-repo wrote it once and never changes it. ion-repo's rules live
+in .claude/rules/ion-repo/ and are kept current by `ion repo update`. Write here what Claude cannot
 guess about this project, and keep it under 200 lines: every session reads it. -->
 
 ## Carte du repo
@@ -50,7 +50,7 @@ supprime un dossier, un domaine ou un point d'entrée.
   du métier dans le code), `docs/mobility/` pour le module de mobilité. `CONTRIBUTING.md`, à la
   racine : comment contribuer aujourd'hui.
 - `docs/backlog/` : le travail à faire ; `charter.toml` : les règles vérifiées ;
-  `.claude/rules/kiln/` : les règles de kiln pour Claude.
+  `.claude/rules/ion-repo/` : les règles d'ion-repo pour Claude.
 
 ## Notes
 

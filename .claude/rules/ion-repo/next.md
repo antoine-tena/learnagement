@@ -2,12 +2,12 @@
 paths:
   - "frontend/**"
 ---
-<!-- Written by kiln and kept current by `kiln update`: do not edit, it would be overwritten. -->
+<!-- Written by ion-repo and kept current by `ion repo update`: do not edit, it would be overwritten. -->
 # Frontend: Next.js 16 and React 19
 
 `frontend/app/`: routes (App Router); `frontend/components/`: components; `frontend/lib/`: API
 client and constants (`constants.ts`). Read `frontend/AGENTS.md` before using a Next.js API.
-Run: `kiln dev`; check: `kiln check` (ESLint, `tsc`).
+Run: `ion repo dev`; check: `ion repo check` (ESLint, `tsc`).
 
 ## Code
 
