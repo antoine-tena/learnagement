@@ -12,6 +12,12 @@ from urllib.parse import urlparse
 from urllib.parse import parse_qs
 from auth import FlaskAuth, decode_token
 
+class HealthFilter(logging.Filter):
+    def filter(self, record):
+        return "/health" not in record.getMessage()
+
+logging.getLogger().addFilter(HealthFilter())
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(filename)s:%(funcName)s:%(lineno)d - %(message)s')
 
 load_dotenv()
@@ -64,7 +70,7 @@ def import_apps():
     from app11_dag_dependance import app11_layout, register_callbacks as register_callbacks_app11
     from app11_dag_dependance_new import app11_new_layout, register_callbacks as register_callbacks_app11_new
     from app13_mccc_administratif import app13_administratif_layout, register_callbacks as register_callbacks_app13_administratif
-    from app14_check_administratif import app14_administratif_layout, register_callbacks as register_callbacks_app14_administratif    
+    from app14_check_administratif import app14_administratif_layout, register_callbacks as register_callbacks_app14_administratif
     from apc_dash.apc_hub import apc_hub_layout, register_apc_hub_callbacks
 
     return {
@@ -116,7 +122,7 @@ menu_items = {
         ('Charge de travail', 'app7_enseignant'),
         ('Tutorat stages', 'app10_enseignant'),
         ('Approche par compétences', 'apc20_hub'),
-      
+
     ],
     'etudiant': [
         ('Stages', 'app10_etudiant'),
@@ -150,7 +156,7 @@ def render_sidebar(section, token_arg, status):
     # Navigation
     navs = []
     for label, key in menu_items[section]:
-        href = f"/{section}/{key}?" + token_arg 
+        href = f"/{section}/{key}?" + token_arg
         icon_class = icon_map.get(key, 'fa-solid fa-circle')  # icône par défaut si manquante
         navs.append(
             dbc.NavLink([
@@ -213,7 +219,9 @@ app.layout = html.Div([
 )
 def update_sidebar(url, pathname, status):
     logging.info("update_sidebar")
-    token_arg = url.strip().split('?')[1]
+    args=url.strip().split('?')
+    if len(args) > 1:
+        token_arg = args[1]
     if pathname and pathname.startswith('/enseignant'):
         return render_sidebar('enseignant', token_arg, status)
     elif pathname and pathname.startswith('/etudiant'):
@@ -318,6 +326,10 @@ for key, (_, register_cb) in apps.items():
         register_cb(app)
         registered_callbacks.add(key)
 
+@server.route("/health")
+def health():
+    return jsonify(status="ok"), 200
+
 if __name__ == '__main__':
     is_prod = os.getenv("ENV", "dev") == "prod"
     ssl_dir = os.getenv("DOCKER_SSL_EXTERNAL_DIR")
@@ -343,6 +355,12 @@ if __name__ == '__main__':
             "workers": 2,
             "certfile": os.path.join(ssl_dir, "cert.pem"),
             "keyfile": os.path.join(ssl_dir, "key.pem"),
+            # Logs d'accès et d'erreurs vers stdout/stderr
+            "accesslog": "-",        # Access log vers stdout
+            "errorlog": "-",         # Error log vers stderr
+            "loglevel": "info",      # Niveau de log
+            # Optionnel : capturer les print() de votre app Flask
+            "capture_output": True,
         }
         StandaloneApp(server, options).run()
     else:

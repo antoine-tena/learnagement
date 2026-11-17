@@ -3,11 +3,6 @@
 
 cd /app
 
-apt-get update && apt-get install -y \
-    libldap2-dev \
-    libsasl2-dev \
-    libssl-dev
-
 # L'environnement reste à côté du code monté, distinct du .venv de la machine hôte
 UV_PROJECT_ENVIRONMENT=docker_venv uv sync --frozen
 

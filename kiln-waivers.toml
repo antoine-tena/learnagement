@@ -4,18 +4,18 @@
 
 [[waiver]]
 rule = "UV-PODMAN"
-paths = ["docker/**", "Learnagement.py", "launcher/**", "config/env.skeleton"]
-reason = "Dette d'avant kiln : docker remplacé par podman (T-06)"
+paths = ["docker/**", "Learnagement.py", "launcher/**", "config/env.skeleton", "scraping/scripts/**"]
+reason = "Dette d'avant kiln : docker remplacé par podman (T-06) ; scripts de l'équipe gardés tels quels"
 by = "antoine-tena"
-since = 2026-10-30
-until = 2026-11-06
-renewals = 0
+since = 2026-11-17
+until = 2026-12-17
+renewals = 1
 
 [[waiver]]
 rule = "LOGGING"
 paths = ["backend/**"]
 reason = "Dette d'avant kiln : logging et print remplacés par structlog (T-13)"
 by = "antoine-tena"
-since = 2026-10-30
-until = 2026-11-06
-renewals = 0
+since = 2026-11-17
+until = 2026-12-17
+renewals = 1

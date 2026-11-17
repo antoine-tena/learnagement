@@ -1,8 +1,34 @@
+import atexit
 import os
 import socket
+import sys
+from getpass import getpass
 
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+
+
+def protect_tty() -> None:
+    """Rend au terminal ses réglages à la sortie, même si docker compose les a changés."""
+    if os.name == "nt" or not sys.stdin.isatty():
+        return
+    import termios
+
+    fd = sys.stdin.fileno()
+    saved = termios.tcgetattr(fd)
+    atexit.register(lambda: termios.tcsetattr(fd, termios.TCSADRAIN, saved))
+
+
+def ask(prompt: str, is_secret: bool = False, env_key: str | None = None) -> str:
+    """Lit une réponse au clavier, ou dans `env_key` quand il n'y a pas de terminal."""
+    if env_key and os.environ.get(env_key):
+        return os.environ[env_key]
+    if not sys.stdin.isatty():
+        raise RuntimeError(
+            f"Entrée interactive impossible (pas de TTY) : définis {env_key or 'la valeur'} "
+            "en variable d'environnement."
+        )
+    return getpass(prompt) if is_secret else input(prompt)
 
 
 def get_local_ip_and_hostname() -> tuple[str, str]:

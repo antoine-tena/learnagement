@@ -4,36 +4,15 @@ import json
 import logging
 import os
 import shlex
-import shutil
 import subprocess
 from pathlib import Path
 
-from launcher.config import GREEN, NC, YELLOW
+from launcher.config import GREEN, NC
 
 logger = logging.getLogger(__name__)
 
 DOCKER_DIR = Path("docker")
 COMPOSE_FILE = DOCKER_DIR / "docker-compose.yml"
-COMPOSE_SKELETON = DOCKER_DIR / "docker-compose.yml.skeleton"
-COMPOSE_VARIABLES = (
-    "INSTANCE_PROTOCOL",
-    "INSTANCE_NAME",
-    "ENV",
-    "PHPMYADMIN_PORT",
-    "PHPMYADMIN_DOCKER_PORT",
-    "BACKEND_PYTHON_PORT",
-    "BACKEND_PYTHON_DOCKER_PORT",
-    "FRONT_PHP_PORT",
-    "FRONT_PHP_DOCKER_PORT",
-    "FRONT_DASH_PORT",
-    "FRONT_DASH_DOCKER_PORT",
-    "FRONT_NEXTAUTH_PORT",
-    "FRONT_NEXTAUTH_DOCKER_PORT",
-    "SSL_INTERNAL_DIR",
-    "SSL_EXTERNAL_DIR",
-    "DOCKER_SSL_INTERNAL_DIR",
-    "DOCKER_SSL_EXTERNAL_DIR",
-)
 
 
 def docker_command() -> list[str]:
@@ -49,28 +28,11 @@ def parse_docker_options(options: str | None) -> list[str]:
     return shlex.split(options) if options else []
 
 
-def write_compose_file() -> None:
-    """Produit docker-compose.yml depuis son modèle, s'il n'existe pas encore."""
-    logger.info("%sDocker configuration%s", GREEN, NC)
-    if COMPOSE_FILE.exists():
-        if COMPOSE_SKELETON.stat().st_mtime > COMPOSE_FILE.stat().st_mtime:
-            logger.warning(
-                "%sdocker-compose.yml.skeleton has been updated, "
-                "your docker-compose.yml can be deprecated%s",
-                YELLOW,
-                NC,
-            )
-        return
-    shutil.copy(COMPOSE_SKELETON, COMPOSE_FILE)
-    content = COMPOSE_FILE.read_text(encoding="utf-8")
-    for name in COMPOSE_VARIABLES:
-        content = content.replace(f"${{{name}}}", os.environ[name])
-    COMPOSE_FILE.write_text(content, encoding="utf-8")
-
-
 def compose_up(options: list[str]) -> None:
     logger.info("%sRun Docker%s", GREEN, NC)
-    subprocess.run([*compose_command(), "up", *options], cwd=DOCKER_DIR, check=True)
+    # COMPOSE_MENU=false : sans le menu interactif de compose, qui dérègle le terminal
+    env = {**os.environ, "COMPOSE_MENU": "false"}
+    subprocess.run([*compose_command(), "up", *options], cwd=DOCKER_DIR, env=env, check=True)
 
 
 def compose_down() -> None:

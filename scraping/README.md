@@ -28,6 +28,21 @@ hôte, `MYSQL_SERVER` doit désigner une adresse joignable.
 `out/` contient des données personnelles : ce dossier est ignoré par git et ne doit pas être
 partagé.
 
+## Scripts autonomes
+
+`scripts/` garde tels quels les scripts de l'équipe, hors du paquet et de ses règles (ruff, mypy),
+pour que leurs auteurs puissent continuer à les faire évoluer. On les lance depuis `scripts/`, et
+leurs sorties (emplois du temps, maquettes, cache) y restent, ignorées par git :
+
+```bash
+cd scraping/scripts
+uv run python scrape_maquette.py -o idu_maquette.json   # catalogue des formations USMB -> JSON
+uv run python ical2json.py fetch <URL ADE ou fichier.ics> --filiere IDU   # -> snapshots/IDU/
+```
+
+`matching_26_27/` compare les heures de la maquette à l'emploi du temps ; ses graphiques demandent
+matplotlib : `uv run --with matplotlib python matching_26_27/visu_barchart.py`.
+
 ## Tests
 
 ```bash
