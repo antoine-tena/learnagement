@@ -1,4 +1,4 @@
-FROM php:8-apache
+FROM php:8-apache@sha256:08af36df144462d84c7f16190557eec06cb9f656882685610b712a15eec54d46
 
 RUN apt-get update && apt-get upgrade -y
 RUN apt-get install sudo unzip wget -y
@@ -33,4 +33,3 @@ EXPOSE 443
 
 # IMPORTANT: use entrypoint, not command
 ENTRYPOINT ["/entrypoint.sh"]
-

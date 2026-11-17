@@ -12,17 +12,17 @@
     "@svgr/webpack": "^8.1.0",
     "@tailwindcss/typography": "^0.5.16",
     "@xyflow/react": "^12.4.1",
-    "axios": "^1.21.0",
+    "axios": "1.21.1",
     "bcryptjs": "^2.4.3",
     "chart.js": "^4.4.7",
     "jwt-decode": "^4.0.0",
-    "next": "16.4.5",
+    "next": "16.4.6",
     "next-auth": "^4.24.15",
     "react": "^19.0.0",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.0.0",
     "zod": "^3.24.4",
-    "zustand": "^5.0.3"
+    "zustand": "5.1.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
@@ -30,8 +30,8 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "9.39.5",
-    "eslint-config-next": "16.4.5",
-    "postcss": "^8.5.32",
+    "eslint-config-next": "16.4.6",
+    "postcss": "8.5.33",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   },

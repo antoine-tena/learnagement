@@ -1,4 +1,4 @@
-FROM python:3.14
+FROM python:3.14@sha256:e5de6bc932256f8138c2353023dc4fd24d010d72f6b5cb06be126f0a4cd53784
 
 COPY --from=ghcr.io/astral-sh/uv:0.12.21 /uv /usr/local/bin/uv
 
@@ -17,5 +17,7 @@ RUN chmod +x /entrypoint.sh \
 EXPOSE 8050
 
 # IMPORTANT: use entrypoint, not command
+RUN useradd --system --create-home --shell /usr/sbin/nologin app
+USER app
 ENTRYPOINT ["/entrypoint.sh"]
 # CMD ["python", "main.py"]
