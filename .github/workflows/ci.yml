@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   backend:
-    uses: antoine-tena/ion-repo/.github/workflows/python.yml@develop
+    uses: antoine-tena/ion-repo/.github/workflows/python.yml@eb0dc112605e3ccda49cc80374ffd3185a96baf7 # develop
     with:
       directory: backend
 
@@ -37,7 +37,7 @@ jobs:
       - run: uv run --no-sync mypy .
 
   frontend:
-    uses: antoine-tena/ion-repo/.github/workflows/pnpm.yml@develop
+    uses: antoine-tena/ion-repo/.github/workflows/pnpm.yml@eb0dc112605e3ccda49cc80374ffd3185a96baf7 # develop
     with:
       scripts: |
         lint
@@ -45,14 +45,14 @@ jobs:
         build
 
   charter:
-    uses: antoine-tena/ion-repo/.github/workflows/charter.yml@develop
+    uses: antoine-tena/ion-repo/.github/workflows/charter.yml@eb0dc112605e3ccda49cc80374ffd3185a96baf7 # develop
 
   # [SECRETS]: gitleaks searches the whole history, with no organisation licence.
   secrets-scan:
-    uses: antoine-tena/ion-repo/.github/workflows/secrets.yml@develop
+    uses: antoine-tena/ion-repo/.github/workflows/secrets.yml@eb0dc112605e3ccda49cc80374ffd3185a96baf7 # develop
 
   security:
-    uses: antoine-tena/ion-repo/.github/workflows/security.yml@develop
+    uses: antoine-tena/ion-repo/.github/workflows/security.yml@eb0dc112605e3ccda49cc80374ffd3185a96baf7 # develop
     with:
       uv: "backend"
       pnpm: "frontend"
