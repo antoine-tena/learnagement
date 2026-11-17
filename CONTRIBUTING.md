@@ -1,0 +1,56 @@
+# Contribuer à Learnagement
+
+Learnagement est à la fois un outil en production, utilisé par les enseignants, les étudiants et
+les administratifs, et un projet où l'on apprend. Ce guide dit comment contribuer aujourd'hui ;
+[l'architecture cible](docs/architecture.md) dit où va le repo, avec un `lab/` pour apprendre
+dans le langage de son choix (T-50).
+
+## Démarrer
+
+1. Installer Docker, Python 3.12 ou plus et [uv](https://docs.astral.sh/uv/getting-started/installation/).
+2. Lancer l'application : `python3 bootstrap.py` (le [README](README.md) détaille les modes).
+3. Installer une fois les vérifications de commit : `uvx pre-commit install`.
+4. Se connecter avec un utilisateur de test du jeu de données libres « small » (liste dans le
+   README) : jamais avec des données réelles.
+
+## Choisir quoi faire
+
+- Le [backlog](docs/backlog/backlog.md) est la seule liste du travail à faire. Un ticket dont
+  l'`Owner` est `—` est libre : y écrire son login GitHub pour le prendre.
+- Avant de nommer quoi que ce soit, lire le [glossaire](docs/glossary.md) : le code parle anglais,
+  avec les mots du métier, et les textes de l'interface restent en français.
+- La carte du repo est dans le [CLAUDE.md](CLAUDE.md) : elle dit où se trouve chaque chose.
+
+## Branches et commits
+
+- Une branche par sujet, partie de `dev`, nommée selon [docs/git.md](docs/git.md) ; jamais de
+  commit direct sur `main`, `prerelease` ou `dev`.
+- Des commits petits et atomiques : 10 fichiers au plus, un titre de 50 caractères au plus,
+  préfixé par son type (`feat:`, `fix:`, `refactor:`, `docs:`, `test:`, `chore:`…), en français.
+- Une migration de base ne se mélange jamais à du code métier dans un même commit.
+
+## Les règles
+
+Les règles de code sont dans la [charte](.claude/rules/kiln/charter.md) et les fichiers voisins
+(Python, FastAPI, Next, sécurité, production). Une partie est vérifiée à chaque commit et en CI :
+
+| Partie | Vérifié aujourd'hui |
+|---|---|
+| `backend/`, `launcher/`, `scraping/` | ruff (lint et mise en forme), charte |
+| `frontend/` | ESLint, charte |
+| `dashboards/` | charte (taille des fichiers) ; T-46 ajoute ruff |
+| `web/` | rien de propre au PHP ; T-46 ajoute PHP-CS-Fixer et PHPStan |
+| tout le repo | gros fichiers, conflits, clés privées, secrets |
+
+En CI s'ajoutent les tests et le typage du backend, le lint, le typage et la compilation du front,
+et l'audit des dépendances.
+
+## Ouvrir une pull request
+
+- Remplir le modèle de PR : quoi, pourquoi, comment tester.
+- Une PR courte, sur un seul sujet ; un bug corrigé arrive avec le test qui l'aurait détecté.
+- Aucun secret ni donnée personnelle réelle dans le diff, les logs ou les captures.
+- Une route de l'API, une variable d'environnement ou une commande du lanceur ne change pas sans
+  une ligne dans la section « Changements d'interface » du README : d'autres étudiants s'en
+  servent.
+- Flavien Vernier relit et merge seul : plus la PR est courte et vérifiée, plus elle passe vite.

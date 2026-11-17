@@ -44,8 +44,10 @@ supprime un dossier, un domaine ou un point d'entrée.
   libres), `tools/` ; `db/data/` et `db/backup/` sont privés et ignorés.
 - `archive/` : le code mort gardé pour mémoire (ancien backend PHP…), hors des règles ; son
   `README.md` dit ce que chaque chose était.
-- `docs/` : la documentation (`README.md` en est l'index), `docs/mobility/` pour le module de
-  mobilité.
+- `docs/` : la documentation (`README.md` en est l'index) ; `architecture.md` (la cible : `app/`
+  pour la production, `lab/` pour apprendre, et ses étapes), `glossary.md` (le nom de chaque mot
+  du métier dans le code), `docs/mobility/` pour le module de mobilité. `CONTRIBUTING.md`, à la
+  racine : comment contribuer aujourd'hui.
 - `docs/backlog/` : le travail à faire ; `charter.toml` : les règles vérifiées ;
   `.claude/rules/kiln/` : les règles de kiln pour Claude.
 
@@ -59,3 +61,5 @@ supprime un dossier, un domaine ou un point d'entrée.
   main dans les sous-dossiers.
 - Des étudiants travaillent sur le repo par promotion : on ne casse pas une interface (route de
   l'API, variable d'environnement, commande du lanceur) sans le signaler dans le README.
+- Un nom dans le code (variable, fonction, fichier, dossier) prend le mot de `docs/glossary.md` ;
+  un mot qui manque y est ajouté dans le même commit.

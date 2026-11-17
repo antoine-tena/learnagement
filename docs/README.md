@@ -4,6 +4,12 @@
 - docs directory architecture follows the app directory
 - each docs sub-directory contains at least one README.md
 
+## [Contribuer](../CONTRIBUTING.md)
+
+## [Architecture cible](architecture.md)
+
+## [Glossaire](glossary.md)
+
 ## Useful tools
 - Existing backend endpoints: 127.0.0.1:```i```4000/docs#/
 - Firefox RESTED extension
