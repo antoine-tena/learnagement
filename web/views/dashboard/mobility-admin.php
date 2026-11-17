@@ -39,7 +39,8 @@ $googleMapsApiKey = getenv('GOOGLE_MAPS_API_KEY') ?: ($_ENV['GOOGLE_MAPS_API_KEY
 
 <!-- Logic map dédiée -->
 <script src="/theme/mobility-map-carousel.js"></script>
-<script src="/theme/mobility-map-streetview.js"></script>
+<script src="/theme/mobility-map-streetview/places.js"></script>
+<script src="/theme/mobility-map-streetview/ui.js"></script>
 
 <!-- ToDo : Déplacer dans un fichier global ex db.js -->
 

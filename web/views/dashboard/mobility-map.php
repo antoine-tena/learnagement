@@ -127,7 +127,8 @@ crossorigin=""/>
 
 <!-- Logic map dédiée -->
 <script src="/theme/mobility-map-carousel.js"></script>
-<script src="/theme/mobility-map-streetview.js"></script>
+<script src="/theme/mobility-map-streetview/places.js"></script>
+<script src="/theme/mobility-map-streetview/ui.js"></script>
 
 <!-- ToDo : Déplacer dans un fichier global ex db.js -->
 <script>
