@@ -23,7 +23,7 @@ details() { # details <titre> <fichier> : les 60 dernières lignes, repliées
 
 rules_section() {
     echo "### Règles"
-    pre-commit run --show-diff-on-failure --color=never --from-ref "$BASE" --to-ref HEAD \
+    pre-commit run --color=never --from-ref "$BASE" --to-ref HEAD \
         >"$LOG_DIR/rules.log" 2>&1
     local status=$?
     verdict "$status" "Les hooks du pré-commit et la charte passent sur les fichiers changés." \
