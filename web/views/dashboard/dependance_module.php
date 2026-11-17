@@ -46,7 +46,9 @@
 <?= $t->startSlot('stylesheet') ?>
     <link href="https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.css" rel="stylesheet">
     <style>
-      <?= $t->stylesheet("dashboard/@stylesheet/dependance_module") ?>
+      <?= $t->stylesheet("dashboard/@stylesheet/dependance_module/filters") ?>
+      <?= $t->stylesheet("dashboard/@stylesheet/dependance_module/controls-gantt") ?>
+      <?= $t->stylesheet("dashboard/@stylesheet/dependance_module/modal-form") ?>
     </style>
 <?php $t->endSlot(); ?>
 
