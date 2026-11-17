@@ -1,7 +1,8 @@
 # Done
 
 The closed tickets of Learnagement, most recent first, one line each:
-`- **YYYY-MM-DD** · T-NN · Title — what was done (branch) · opened YYYY-MM-DD`.
+`- **2026-11-17** · T-31 · Des noms parlants pour les tableaux de bord — pages rangées dans `dashboards/pages/` sans préfixe `appNN_` (paquets découpés compris), clés d'URL inchangées ; `archive/` supprimé, gardé dans l'historique git ; tableaux de bord jamais ouverts dans un navigateur (refactor/tree-cleanup-v2) · opened 2026-10-30
+- **YYYY-MM-DD** · T-NN · Title — what was done (branch) · opened YYYY-MM-DD`.
 
 - **2026-11-17** · T-35 · Le PHP ne parle plus à la base — le SQL des 4 pages était déjà commenté ; routes `POST /modules` (responsable des études, 409 si le code existe) et `GET /enseignants/{id}/rendus` (l'enseignant lui-même) avec 9 tests, appelées par la création de module et la page des rendus ; `POST /modules/create`, qui échouait toujours, retirée (README) ; SQL mort retiré, inscription réduite à sa redirection ; pages jamais ouvertes dans un navigateur (refactor/php-api-routes) · opened 2026-10-30
 - **2026-11-17** · T-18 · Plus de données personnelles dans les logs du front — email, prénom, nom et identifiant de connexion remplacés par l'id dans `route.ts` ; Dash n'écrit plus le jeton ni le profil dans ses logs (fix/front-auth-secrets) · opened 2026-10-30

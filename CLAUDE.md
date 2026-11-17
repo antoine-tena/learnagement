@@ -35,8 +35,8 @@ supprime un dossier, un domaine ou un point d'entrée.
   SQLAlchemy), `tests/` (pytest).
 - `web/` : le front principal, en PHP (Apache) ; `index.php` + `utils/router.php`, `views/`
   (pages, dont `views/dashboard/mobility-admin/`, `views/dashboard/stage/`), `components/`, `scripts/` (`dependance_module/`, `mobility-admin/`, `mobility-map/`, `mobility-map-open/`), `utils/apiProxy.php` (appels à l'API), `theme/` (dont `theme/theme/`, `theme/mobility-map-streetview/`), `assets/`.
-- `dashboards/` : les tableaux de bord Dash (`main.py`, `main_app/`, une app `appNN_*` par vue (dont
-  `app5_module_enseignant_edit/`, `app10_stage_administratif/`, `app14_check_administratif/`) et son `_tools.py`), `apc_dash/` (approche par compétences, dont
+- `dashboards/` : les tableaux de bord Dash (`main.py`, `main_app/`, `pages/` : une page par vue (dont les paquets
+  `modules_enseignant_edit/`, `stages_administratif/`, `checks_administratif/`) et son `_tools.py`), `apc_dash/` (approche par compétences, dont
   `apc20_chatbot_tools/`, `apc20_competence_ac/`, `apc20_heatmap_apc/`, `apc20_ens_contribution/`, `apc20_ens_fiche_module/`, `apc20_ens_reseau_gaps/`, `apc20_metier_orientation/`, `app_reseaupolytech_etudiant/`).
 - `frontend/` : le front Next.js en cours de refonte (`app/`, proxy vers l'API).
 - `scraping/` : le paquet `learnagement_scraping` (commande `learnagement-scraping`) : `parsers.py`
@@ -45,8 +45,6 @@ supprime un dossier, un domaine ou un point d'entrée.
   emplois du temps ADE, `scrape_maquette.py` + `scrape_maquette_lib/` catalogue des formations, `matching_26_27/`).
 - `db/` : `sql/` (schéma, migrations versionnées `VX.Y.Z__*.sql`), `freeData/` (jeux de données
   libres), `tools/` ; `db/data/` et `db/backup/` sont privés et ignorés.
-- `archive/` : le code mort gardé pour mémoire (ancien backend PHP…), hors des règles ; son
-  `README.md` dit ce que chaque chose était.
 - `docs/` : la documentation (`README.md` en est l'index) ; `architecture.md` (la cible : `app/`
   pour la production, `lab/` pour apprendre, et ses étapes), `glossary.md` (le nom de chaque mot
   du métier dans le code), `docs/mobility/` pour le module de mobilité. `CONTRIBUTING.md`, à la
