@@ -66,4 +66,4 @@ rule = "file-size"
 id = "FILE-SIZE"
 files = []
 suffixes = [".php", ".js"]
-budget = 6
+budget = 5
