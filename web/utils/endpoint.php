@@ -120,6 +120,11 @@ function get_polypoints($token, $id_etudiant){
     return get_endpoint($url, $token);
 }
 
+function get_rendus_enseignant($token, $id_enseignant) {
+    $url = get_python_backend_url("enseignants/" . $id_enseignant . "/rendus");
+    return get_endpoint($url, $token);
+}
+
 function get_rendus_etudiant($token, $id_etudiant){
     $url = get_python_backend_url("etudiants/". $id_etudiant . "/rendus/");
     return get_endpoint($url, $token);
@@ -215,7 +220,7 @@ function get_disciplines($token) {
 }
 
 function post_module($data, $token) {
-    $url = get_python_backend_url("modules/create");
+    $url = get_python_backend_url("modules");
     return post_endpoint($url, $data, $token);
 }
 

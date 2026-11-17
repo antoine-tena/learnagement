@@ -7,27 +7,7 @@
     $token = $user["jwt_token"];
     $id = $user['id'];
 
-    /////////////////
-    // WARNING !!!!
-    // Direct SQL queries are deprecated. Use backend API endpoints instead.
-    /////////////////
-    /*$rendus = [];
-    $sql="SELECT r.date, r.description, p.parcour AS promo
-    FROM LNM_rendu_module r 
-        JOIN LNM_rendu_module_as_enseignant e ON r.id_rendu_module = e.id_rendu_module 
-        JOIN LNM_rendu_module_as_etudiant retu ON retu.id_rendu_module = r.id_rendu_module
-        JOIN LNM_etudiant etu ON etu.id_etudiant = retu.id_etudiant
-        JOIN LNM_promo p ON p.id_promo = etu.id_promo
-    WHERE e.id_enseignant = " . $_SESSION['id'] . "
-        AND r.date >= NOW()
-    ORDER BY date ASC";
-    $result = mysqli_query($pdo, $sql);
-    while ($row = mysqli_fetch_assoc($result))
-        $rendus[] = $row;*/
-
-    // ToDo
-    //$rendus = get_rendus_enseignant($token, $id)
-    $rendus = []
+    $rendus = get_rendus_enseignant($token, $id);
 ?>
 
 <div class="p-4 space-y-8">
@@ -52,17 +32,17 @@
 
                 <div class='space-y-1'>
                     <p class='font-semibold text-gray-800'>
-                        <?= $rendu['description'] ?>
+                        <?= htmlspecialchars($rendu['description']) ?>
                     </p>
                     <p class='text-sm text-gray-500'>
-                        Promotion : <?= $rendu['promo'] ?>
+                        Promotion : <?= htmlspecialchars($rendu['promo']) ?>
                     </p>
                 </div>
 
                 <div class='mt-2 md:mt-0'>
                     <span class='inline-block bg-indigo-100 text-indigo-800
                                     px-3 py-1 rounded-full text-sm font-medium'>
-                        À rendre le <?= htmlspecialchars($rendu['date']) ?> 
+                        À rendre le <?= htmlspecialchars($rendu['date']) ?>
                     </span>
                 </div>
             </div>
