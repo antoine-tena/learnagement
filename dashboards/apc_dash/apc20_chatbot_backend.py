@@ -2,6 +2,7 @@
 Backend du chatbot APC — appel API REST Groq (compatible OpenAI) via requests.
 Aucune dépendance externe requise.
 """
+
 import os
 import json
 import logging
@@ -11,7 +12,7 @@ from .apc20_chatbot_tools import GEMINI_TOOLS, execute_tool
 
 
 _API_URL = "https://api.groq.com/openai/v1/chat/completions"
-_MODEL   = "llama-3.3-70b-versatile"
+_MODEL = "llama-3.3-70b-versatile"
 
 _SYSTEM = """Tu es un assistant pédagogique expert en Approche Par Compétences (APC) \
 pour une formation universitaire de type BUT/IUT.
@@ -43,11 +44,14 @@ _MAX_ITERATIONS = 8
 def _groq_tools():
     """Convertit les définitions GEMINI_TOOLS au format OpenAI/Groq."""
     return [
-        {"type": "function", "function": {
-            "name":        t["name"],
-            "description": t["description"],
-            "parameters":  t.get("parameters", {"type": "object", "properties": {}}),
-        }}
+        {
+            "type": "function",
+            "function": {
+                "name": t["name"],
+                "description": t["description"],
+                "parameters": t.get("parameters", {"type": "object", "properties": {}}),
+            },
+        }
         for t in GEMINI_TOOLS
     ]
 
@@ -68,16 +72,16 @@ def process_message(message: str, history: list, token: str) -> str:
 
     headers = {
         "Authorization": f"Bearer {api_key}",
-        "Content-Type":  "application/json",
+        "Content-Type": "application/json",
     }
 
     for iteration in range(_MAX_ITERATIONS):
         body = {
-            "model":       _MODEL,
-            "messages":    messages,
-            "tools":       _groq_tools(),
+            "model": _MODEL,
+            "messages": messages,
+            "tools": _groq_tools(),
             "tool_choice": "auto",
-            "max_tokens":  1500,
+            "max_tokens": 1500,
         }
 
         resp = http.post(_API_URL, headers=headers, json=body, timeout=60)
@@ -93,10 +97,10 @@ def process_message(message: str, history: list, token: str) -> str:
                 detail = resp.text[:200]
             return f"⚠️ Erreur API Groq ({resp.status_code}) : {detail}"
 
-        data        = resp.json()
-        choice      = data["choices"][0]
-        msg_out     = choice["message"]
-        finish      = choice.get("finish_reason", "stop")
+        data = resp.json()
+        choice = data["choices"][0]
+        msg_out = choice["message"]
+        finish = choice.get("finish_reason", "stop")
 
         logging.info(f"[chatbot] iter={iteration} finish_reason={finish}")
 
@@ -111,16 +115,18 @@ def process_message(message: str, history: list, token: str) -> str:
             fn_name = tc["function"]["name"]
             try:
                 fn_args = json.loads(tc["function"]["arguments"])
-            except (json.JSONDecodeError, TypeError):
+            except json.JSONDecodeError, TypeError:
                 fn_args = {}
 
             logging.info(f"[chatbot] tool={fn_name} args={fn_args}")
             result = execute_tool(fn_name, fn_args, token)
 
-            messages.append({
-                "role":         "tool",
-                "tool_call_id": tc["id"],
-                "content":      result,
-            })
+            messages.append(
+                {
+                    "role": "tool",
+                    "tool_call_id": tc["id"],
+                    "content": result,
+                }
+            )
 
     return "Je n'ai pas pu générer une réponse complète. Veuillez reformuler votre question."

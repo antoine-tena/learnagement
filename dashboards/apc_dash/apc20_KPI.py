@@ -15,7 +15,6 @@ apc_layout = html.Div(
                 "fontWeight": "bold",
             },
         ),
-
         html.Div(
             [
                 html.Div(
@@ -38,7 +37,6 @@ apc_layout = html.Div(
                                 "fontWeight": "bold",
                             },
                         ),
-                       
                     ],
                     style={
                         "backgroundColor": "white",
@@ -50,7 +48,6 @@ apc_layout = html.Div(
                         "textAlign": "center",
                     },
                 ),
-
                 html.Div(
                     [
                         html.H4(
@@ -71,7 +68,6 @@ apc_layout = html.Div(
                                 "fontWeight": "bold",
                             },
                         ),
-                      
                     ],
                     style={
                         "backgroundColor": "white",
@@ -83,7 +79,6 @@ apc_layout = html.Div(
                         "textAlign": "center",
                     },
                 ),
-
                 html.Div(
                     [
                         html.H4(
@@ -105,7 +100,7 @@ apc_layout = html.Div(
                             },
                         ),
                         html.P(
-                           "",
+                            "",
                             style={
                                 "fontSize": "14px",
                                 "color": "#777",
@@ -123,7 +118,6 @@ apc_layout = html.Div(
                         "textAlign": "center",
                     },
                 ),
-
                 html.Div(
                     [
                         html.H4(
@@ -144,7 +138,6 @@ apc_layout = html.Div(
                                 "fontWeight": "bold",
                             },
                         ),
-                       
                     ],
                     style={
                         "backgroundColor": "white",
@@ -172,6 +165,7 @@ apc_layout = html.Div(
     },
 )
 
+
 def register_callbacks(app):
 
     @app.callback(
@@ -179,13 +173,12 @@ def register_callbacks(app):
         Output("card_competences", "children"),
         Output("card_modules", "children"),
         Output("card_composantes", "children"),
-        Input('user_id', 'data'),
-        State('token', 'data'),
+        Input("user_id", "data"),
+        State("token", "data"),
     )
-    def update_cards(user_id,token):
+    def update_cards(user_id, token):
 
         url = get_python_backend_url("/acp_kpi/")
-    
 
         data = get_endpoint(url, token)
         print(data)
@@ -195,7 +188,7 @@ def register_callbacks(app):
             return 0, 0, 0, 0
 
         # calcul des KPI
-        
+
         nb_comp = data["nb_competences"][0]["nb_competences"]
         nb_mod = data["nb_module"][0]["nb_module"]
         nb_ac = data["nb_ac"][0]["nb_ac"]

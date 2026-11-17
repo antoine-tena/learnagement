@@ -68,87 +68,105 @@ from apc_dash.apc20_ens_data_loader import register_ens_data_loader
 # 'kpi' n'apparaît PAS ici car il sera affiché en haut de toutes les sous-pages
 # (à intégrer dans une 2e étape)
 SUBPAGES = {
-    'reseau': {
-        'label': 'Réseau Polytech',
-        'icon': 'fa-solid fa-network-wired',
-        'layout': polytech_analysis_layout,
-        'register': register_reseau_polytech_callbacks,
+    "reseau": {
+        "label": "Réseau Polytech",
+        "icon": "fa-solid fa-network-wired",
+        "layout": polytech_analysis_layout,
+        "register": register_reseau_polytech_callbacks,
     },
-    'heatmap': {
-        'label': 'Cartographie des compétences',
-        'icon': 'fa-solid fa-fire',
-        'layout': heatmap_apc_layout,
-        'register': reg_heatmap,
+    "heatmap": {
+        "label": "Cartographie des compétences",
+        "icon": "fa-solid fa-fire",
+        "layout": heatmap_apc_layout,
+        "register": reg_heatmap,
     },
-    'competence': {
-    'label': 'Analyse des compétences',
-    'icon': 'fa-solid fa-graduation-cap',
-    'layout': html.Div([
-        html.Div(kpi_layout, style={
-            "marginBottom": "25px",
-            "padding": "16px",
-            "backgroundColor": "white",
-            "borderRadius": "8px",
-            "boxShadow": "0 1px 4px rgba(0,0,0,0.08)"
-        }),
-
-        html.Div(apc20_competence_ac_layout)
-    ]),
-    'register': reg_competence,
-},
-    'trajectoire': {
-        'label': "Trajectoire d'étude",
-        'icon': 'fa-solid fa-route',
-        'layout': trajectoire_layout,
-        'register': register_trajectoire_callbacks,
+    "competence": {
+        "label": "Analyse des compétences",
+        "icon": "fa-solid fa-graduation-cap",
+        "layout": html.Div(
+            [
+                html.Div(
+                    kpi_layout,
+                    style={
+                        "marginBottom": "25px",
+                        "padding": "16px",
+                        "backgroundColor": "white",
+                        "borderRadius": "8px",
+                        "boxShadow": "0 1px 4px rgba(0,0,0,0.08)",
+                    },
+                ),
+                html.Div(apc20_competence_ac_layout),
+            ]
+        ),
+        "register": reg_competence,
     },
-    'orientation': {
-        'label': 'Orientation par métier',
-        'icon': 'fa-solid fa-briefcase',
-        'layout': apc20_metier_orientation_layout,
-        'register': reg_orientation,
+    "trajectoire": {
+        "label": "Trajectoire d'étude",
+        "icon": "fa-solid fa-route",
+        "layout": trajectoire_layout,
+        "register": register_trajectoire_callbacks,
     },
-    'poids': {
-        'label': 'Poids des modules',
-        'icon': 'fa-solid fa-balance-scale',
-        'layout': audit_poids_modules_layout,
-        'register': register_poids_modules_callbacks,
+    "orientation": {
+        "label": "Orientation par métier",
+        "icon": "fa-solid fa-briefcase",
+        "layout": apc20_metier_orientation_layout,
+        "register": reg_orientation,
     },
-    'fiche_module': {
-    'label': 'Fiche Module',
-    'icon': 'fa-solid fa-file-lines',
-    'layout': fiche_module_content,
-    'register': reg_fiche,
-},
-'couverture_apc': {
-    'label': 'Couverture APC',
-    'icon': 'fa-solid fa-table-cells',
-    'layout': couverture_content,
-    'register': reg_couverture,
-},
-'reseau_trous': {
-    'label': 'Réseau et Trous',
-    'icon': 'fa-solid fa-diagram-project',
-    'layout': reseau_gaps_content,
-    'register': reg_reseau_gaps,
-},
-'ma_contribution': {
-    'label': 'Ma Contribution',
-    'icon': 'fa-solid fa-person-chalkboard',
-    'layout': contribution_content,
-    'register': reg_contribution,
-},
-'orientation_rag': {
-    'label': 'Assistant orientation',
-    'icon': 'fa-solid fa-robot',
-    'layout': create_rag_layout(),
-    'register': reg_rag_orientation,
-},
+    "poids": {
+        "label": "Poids des modules",
+        "icon": "fa-solid fa-balance-scale",
+        "layout": audit_poids_modules_layout,
+        "register": register_poids_modules_callbacks,
+    },
+    "fiche_module": {
+        "label": "Fiche Module",
+        "icon": "fa-solid fa-file-lines",
+        "layout": fiche_module_content,
+        "register": reg_fiche,
+    },
+    "couverture_apc": {
+        "label": "Couverture APC",
+        "icon": "fa-solid fa-table-cells",
+        "layout": couverture_content,
+        "register": reg_couverture,
+    },
+    "reseau_trous": {
+        "label": "Réseau et Trous",
+        "icon": "fa-solid fa-diagram-project",
+        "layout": reseau_gaps_content,
+        "register": reg_reseau_gaps,
+    },
+    "ma_contribution": {
+        "label": "Ma Contribution",
+        "icon": "fa-solid fa-person-chalkboard",
+        "layout": contribution_content,
+        "register": reg_contribution,
+    },
+    "orientation_rag": {
+        "label": "Assistant orientation",
+        "icon": "fa-solid fa-robot",
+        "layout": create_rag_layout(),
+        "register": reg_rag_orientation,
+    },
 }
 ROLE_SUBPAGES = {
-    "etudiant":["reseau","competence", "heatmap", "trajectoire", "orientation","orientation_rag"],
-    "enseignant": ["competence", "poids","fiche_module","couverture_apc","reseau_trous","ma_contribution",],
-    "administratif": ["competence", "poids","couverture_apc","reseau_trous"],
+    "etudiant": [
+        "reseau",
+        "competence",
+        "heatmap",
+        "trajectoire",
+        "orientation",
+        "orientation_rag",
+    ],
+    "enseignant": [
+        "competence",
+        "poids",
+        "fiche_module",
+        "couverture_apc",
+        "reseau_trous",
+        "ma_contribution",
+    ],
+    "administratif": ["competence", "poids", "couverture_apc", "reseau_trous"],
 }
 
 DEFAULT_SUBPAGE_BY_ROLE = {
@@ -160,52 +178,52 @@ DEFAULT_SUBPAGE_BY_ROLE = {
 
 # ── Styles de la navbar interne ───────────────────────────────────────────────
 NAVBAR_STYLE = {
-    'display': 'flex',
-    'alignItems': 'stretch',
-    'gap': '4px',
-    'padding': '0 24px',
-    'height': '48px',
-    'backgroundColor': '#ffffff',
-    'borderBottom': '1px solid #e0e0e0',
-    'boxShadow': '0 1px 3px rgba(0,0,0,0.05)',
-    'overflowX': 'auto',
+    "display": "flex",
+    "alignItems": "stretch",
+    "gap": "4px",
+    "padding": "0 24px",
+    "height": "48px",
+    "backgroundColor": "#ffffff",
+    "borderBottom": "1px solid #e0e0e0",
+    "boxShadow": "0 1px 3px rgba(0,0,0,0.05)",
+    "overflowX": "auto",
 }
 
 TAB_BASE = {
-    'display': 'flex',
-    'alignItems': 'center',
-    'padding': '0 16px',
-    'fontSize': '13px',
-    'textDecoration': 'none',
-    'whiteSpace': 'nowrap',
-    'borderBottom': '3px solid transparent',
+    "display": "flex",
+    "alignItems": "center",
+    "padding": "0 16px",
+    "fontSize": "13px",
+    "textDecoration": "none",
+    "whiteSpace": "nowrap",
+    "borderBottom": "3px solid transparent",
 }
 
 TAB_ACTIVE = {
     **TAB_BASE,
-    'fontWeight': '600',
-    'color': '#0056b3',
-    'borderBottom': '3px solid #0056b3',
+    "fontWeight": "600",
+    "color": "#0056b3",
+    "borderBottom": "3px solid #0056b3",
 }
 
 TAB_INACTIVE = {
     **TAB_BASE,
-    'fontWeight': '400',
-    'color': '#666',
+    "fontWeight": "400",
+    "color": "#666",
 }
 
 
 # ── Layout exposé à l'app principale ──────────────────────────────────────────
-apc_hub_layout = html.Div([
-    # Zone réservée pour le KPI (à brancher dans une 2e étape)
-    # html.Div(id='apc-hub-kpi-banner'),
-
-    # Navbar interne
-    html.Div(id='apc-hub-navbar', style=NAVBAR_STYLE),
-
-    # Contenu de la sous-page
-    html.Div(id='apc-hub-content', style={'minHeight': '80vh'}),
-])
+apc_hub_layout = html.Div(
+    [
+        # Zone réservée pour le KPI (à brancher dans une 2e étape)
+        # html.Div(id='apc-hub-kpi-banner'),
+        # Navbar interne
+        html.Div(id="apc-hub-navbar", style=NAVBAR_STYLE),
+        # Contenu de la sous-page
+        html.Div(id="apc-hub-content", style={"minHeight": "80vh"}),
+    ]
+)
 
 
 # ── Callbacks ─────────────────────────────────────────────────────────────────
@@ -214,23 +232,23 @@ def register_apc_hub_callbacks(app):
     register_ens_data_loader(app)
     # 1) Enregistrer les callbacks de toutes les sous-pages, une seule fois
     for key, page in SUBPAGES.items():
-        if page['register']:
-            page['register'](app)
+        if page["register"]:
+            page["register"](app)
 
     # 2) Callback unique : lit l'URL, met à jour la navbar ET le contenu
     @app.callback(
-        Output('apc-hub-navbar', 'children'),
-        Output('apc-hub-content', 'children'),
-        Input('url', 'pathname'),
-        Input('url', 'search'),
+        Output("apc-hub-navbar", "children"),
+        Output("apc-hub-content", "children"),
+        Input("url", "pathname"),
+        Input("url", "search"),
     )
     def render_apc_hub(pathname, search):
         if not pathname:
             return no_update, no_update
 
-        parts = pathname.strip('/').split('/')
+        parts = pathname.strip("/").split("/")
         # On attend au moins ['<role>', 'apc20_hub']
-        if len(parts) < 2 or parts[1] != 'apc20_hub':
+        if len(parts) < 2 or parts[1] != "apc20_hub":
             return no_update, no_update
 
         role = parts[0]
@@ -251,22 +269,21 @@ def register_apc_hub_callbacks(app):
 
         # Construire la navbar avec dcc.Link (pas de rechargement de page)
         # On préserve la query string des liens
-        query = search or ''
+        query = search or ""
         navbar_children = [
             dcc.Link(
-            children=[
-            html.I(className=page['icon'], style={'marginRight': '8px'}),
-            page['label'],
-            ],
+                children=[
+                    html.I(className=page["icon"], style={"marginRight": "8px"}),
+                    page["label"],
+                ],
                 href=f"/{role}/apc20_hub/{key}{query}",
-            style=TAB_ACTIVE if key == subpage_key else TAB_INACTIVE,
-        )
-    for key, page in SUBPAGES.items()
-    if key in allowed_pages
-]
-
+                style=TAB_ACTIVE if key == subpage_key else TAB_INACTIVE,
+            )
+            for key, page in SUBPAGES.items()
+            if key in allowed_pages
+        ]
 
         # Contenu de la sous-page
-        content = SUBPAGES[subpage_key]['layout']
+        content = SUBPAGES[subpage_key]["layout"]
 
         return navbar_children, content

@@ -15,7 +15,7 @@ class QueryService:
             "techniques": f"Quelles compétences techniques faut-il maîtriser en formation {formation} ?",
             "bonnes_pratiques": f"Quelles sont les bonnes pratiques pour réussir en formation {formation} ?",
             "experiences": f"Quelles expériences pratiques sont utiles pour la formation {formation} ?",
-            "general": f"Donne les informations importantes sur la formation {formation}."
+            "general": f"Donne les informations importantes sur la formation {formation}.",
         }
 
         return templates.get(category, templates["general"])
@@ -27,10 +27,7 @@ class QueryService:
         query = self.build_guided_query(formation, category)
 
         chunks = self.retriever.retrieve(
-            query=query,
-            formation=formation,
-            category=category,
-            top_k=5
+            query=query, formation=formation, category=category, top_k=5
         )
 
         return self.generator.generate(query, chunks)

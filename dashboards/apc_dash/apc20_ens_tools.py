@@ -3,6 +3,7 @@ Fonctions d'accès aux données APC pour le dashboard enseignant.
 Miroir de apc20_heatmap_apc_tools.py — réexporte les mêmes helpers
 pour éviter les imports croisés entre sous-modules.
 """
+
 from .apc20_heatmap_apc_tools import (
     get_apc_competences,
     get_apc_niveaux,

@@ -32,10 +32,8 @@ def register_ens_data_loader(app):
             df_modules = get_apc_modules(token)
             df_composantes = get_apc_composantes(token)
 
-            df_base = (
-                df_apprentissages
-                .merge(df_niveaux, on="id_niveau", how="left")
-                .merge(df_competences, on="id_competence", how="left")
+            df_base = df_apprentissages.merge(df_niveaux, on="id_niveau", how="left").merge(
+                df_competences, on="id_competence", how="left"
             )
 
             if not df_modules.empty and "id_module" in df_modules.columns:
@@ -46,7 +44,9 @@ def register_ens_data_loader(app):
             df_main = df_base.merge(df_ac_mod_full, on="id_apprentissage_critique", how="left")
 
             df_main["competence_label"] = df_main["code_competence"]
-            df_main["niveau_code"] = df_main["competence_label"] + "-N" + df_main["niveau"].astype(str)
+            df_main["niveau_code"] = (
+                df_main["competence_label"] + "-N" + df_main["niveau"].astype(str)
+            )
             df_main["id_module"] = pd.to_numeric(df_main["id_module"], errors="coerce").fillna(0)
             df_main["id_semestre"] = pd.to_numeric(df_main["id_semestre"], errors="coerce")
 
@@ -54,7 +54,11 @@ def register_ens_data_loader(app):
 
             for _, row in df_modules.iterrows():
                 mid = row["id_module"]
-                code = row.get("code_module") if pd.notna(row.get("code_module", float("nan"))) else f"M{mid}"
+                code = (
+                    row.get("code_module")
+                    if pd.notna(row.get("code_module", float("nan")))
+                    else f"M{mid}"
+                )
                 nom = row.get("nom") if pd.notna(row.get("nom", float("nan"))) else "Module"
                 module_names[str(int(float(mid)))] = f"{code} - {nom}"
 

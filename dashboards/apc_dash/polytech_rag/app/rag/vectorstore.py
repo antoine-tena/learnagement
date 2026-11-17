@@ -30,10 +30,7 @@ class FAISSVectorStore:
             if category and chunk.get("category") != category:
                 continue
 
-            results.append({
-                "score": float(score),
-                "chunk": chunk
-            })
+            results.append({"score": float(score), "chunk": chunk})
 
             if len(results) >= top_k:
                 break

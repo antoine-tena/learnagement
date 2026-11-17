@@ -22,5 +22,5 @@ CATEGORY_KEYWORDS = {
     "projets": ["projet", "pratique"],
     "techniques": ["technique", "outils", "technologie"],
     "bonnes_pratiques": ["bonne", "pratique"],
-    "experiences": ["experience", "expérience"]
+    "experiences": ["experience", "expérience"],
 }

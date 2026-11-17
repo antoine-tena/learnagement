@@ -6,6 +6,7 @@ Questions enseignant :
   - "Quels modules travaillent les mêmes compétences que le mien ?"
   - "Y a-t-il des AC ou des modules sans ancrage APC fort ?"
 """
+
 import pandas as pd
 import plotly.graph_objects as go
 import networkx as nx
@@ -20,7 +21,6 @@ from .apc20_layout import COLORS, KNOWN_COMPETENCES, get_competence_color, empty
 reseau_gaps_content = html.Div(
     [
         dcc.Store(id="reseau-selected-node", data=None),
-
         # ── Section Réseau ────────────────────────────────────────
         html.Div(
             [
@@ -41,7 +41,12 @@ reseau_gaps_content = html.Div(
                             [
                                 html.Label(
                                     "Filtrer par compétence",
-                                    style={"fontWeight": "500", "fontSize": "13px", "marginBottom": "6px", "display": "block"},
+                                    style={
+                                        "fontWeight": "500",
+                                        "fontSize": "13px",
+                                        "marginBottom": "6px",
+                                        "display": "block",
+                                    },
                                 ),
                                 dcc.Dropdown(
                                     id="reseau-comp-filter",
@@ -57,7 +62,12 @@ reseau_gaps_content = html.Div(
                             [
                                 html.Label(
                                     "Rechercher un module",
-                                    style={"fontWeight": "500", "fontSize": "13px", "marginBottom": "6px", "display": "block"},
+                                    style={
+                                        "fontWeight": "500",
+                                        "fontSize": "13px",
+                                        "marginBottom": "6px",
+                                        "display": "block",
+                                    },
                                 ),
                                 dcc.Dropdown(
                                     id="reseau-search-module",
@@ -73,7 +83,6 @@ reseau_gaps_content = html.Div(
                     ],
                     style={"display": "flex", "gap": "16px", "marginBottom": "14px"},
                 ),
-
                 # Graphe + bouton reset superposé
                 html.Div(
                     [
@@ -85,43 +94,44 @@ reseau_gaps_content = html.Div(
                         ),
                         html.Button(
                             [
-                                html.I(className="fa-solid fa-arrow-rotate-left",
-                                       style={"marginRight": "6px"}),
+                                html.I(
+                                    className="fa-solid fa-arrow-rotate-left",
+                                    style={"marginRight": "6px"},
+                                ),
                                 "Retour vue globale",
                             ],
                             id="reseau-reset-btn",
                             n_clicks=0,
                             style={
-                                "display":        "none",
-                                "position":       "absolute",
-                                "top":            "14px",
-                                "left":           "14px",
-                                "zIndex":         "10",
+                                "display": "none",
+                                "position": "absolute",
+                                "top": "14px",
+                                "left": "14px",
+                                "zIndex": "10",
                                 "backgroundColor": COLORS["primary"],
-                                "color":          "white",
-                                "border":         "none",
-                                "borderRadius":   "6px",
-                                "padding":        "7px 13px",
-                                "fontSize":       "13px",
-                                "fontWeight":     "600",
-                                "cursor":         "pointer",
-                                "boxShadow":      "0 2px 6px rgba(0,0,0,0.2)",
-                                "fontFamily":     "Inter, sans-serif",
+                                "color": "white",
+                                "border": "none",
+                                "borderRadius": "6px",
+                                "padding": "7px 13px",
+                                "fontSize": "13px",
+                                "fontWeight": "600",
+                                "cursor": "pointer",
+                                "boxShadow": "0 2px 6px rgba(0,0,0,0.2)",
+                                "fontFamily": "Inter, sans-serif",
                             },
                         ),
                     ],
                     style={
-                        "position":        "relative",
+                        "position": "relative",
                         "backgroundColor": "white",
-                        "borderRadius":    "10px",
-                        "boxShadow":       "0 1px 4px rgba(0,0,0,0.08)",
-                        "padding":         "12px",
+                        "borderRadius": "10px",
+                        "boxShadow": "0 1px 4px rgba(0,0,0,0.08)",
+                        "padding": "12px",
                     },
                 ),
             ],
             style={"marginBottom": "28px"},
         ),
-
         # ── Section Gaps ──────────────────────────────────────────
         html.Div(
             [
@@ -136,7 +146,7 @@ reseau_gaps_content = html.Div(
                 ),
                 html.Div(
                     [
-                        html.Div(id="gaps-ac-orphans",     style={"flex": "1"}),
+                        html.Div(id="gaps-ac-orphans", style={"flex": "1"}),
                         html.Div(id="gaps-module-orphans", style={"flex": "1"}),
                     ],
                     style={"display": "flex", "gap": "16px"},
@@ -149,6 +159,7 @@ reseau_gaps_content = html.Div(
 
 
 # ─── Callbacks ────────────────────────────────────────────────────
+
 
 def register_callbacks(app):
 
@@ -171,7 +182,7 @@ def register_callbacks(app):
     # ── Vidage du dropdown sur reset ou changement de filtre ─────
     @app.callback(
         Output("reseau-search-module", "value"),
-        Input("reseau-reset-btn",   "n_clicks"),
+        Input("reseau-reset-btn", "n_clicks"),
         Input("reseau-comp-filter", "value"),
         prevent_initial_call=True,
     )
@@ -181,9 +192,9 @@ def register_callbacks(app):
     # ── Mise à jour du nœud sélectionné (clic, recherche ou reset) ──
     @app.callback(
         Output("reseau-selected-node", "data"),
-        Input("reseau-graph",         "clickData"),
-        Input("reseau-reset-btn",     "n_clicks"),
-        Input("reseau-comp-filter",   "value"),
+        Input("reseau-graph", "clickData"),
+        Input("reseau-reset-btn", "n_clicks"),
+        Input("reseau-comp-filter", "value"),
         Input("reseau-search-module", "value"),
         prevent_initial_call=True,
     )
@@ -200,7 +211,7 @@ def register_callbacks(app):
             if search_value is not None:
                 try:
                     return float(search_value)
-                except (ValueError, TypeError):
+                except ValueError, TypeError:
                     pass
             return None
 
@@ -211,7 +222,7 @@ def register_callbacks(app):
             if cd is not None:
                 try:
                     return float(cd)
-                except (ValueError, TypeError):
+                except ValueError, TypeError:
                     pass
         return None
 
@@ -223,20 +234,20 @@ def register_callbacks(app):
     )
     def toggle_reset_btn(selected):
         base = {
-            "position":        "absolute",
-            "top":             "14px",
-            "left":            "14px",
-            "zIndex":          "10",
+            "position": "absolute",
+            "top": "14px",
+            "left": "14px",
+            "zIndex": "10",
             "backgroundColor": COLORS["primary"],
-            "color":           "white",
-            "border":          "none",
-            "borderRadius":    "6px",
-            "padding":         "7px 13px",
-            "fontSize":        "13px",
-            "fontWeight":      "600",
-            "cursor":          "pointer",
-            "boxShadow":       "0 2px 6px rgba(0,0,0,0.2)",
-            "fontFamily":      "Inter, sans-serif",
+            "color": "white",
+            "border": "none",
+            "borderRadius": "6px",
+            "padding": "7px 13px",
+            "fontSize": "13px",
+            "fontWeight": "600",
+            "cursor": "pointer",
+            "boxShadow": "0 2px 6px rgba(0,0,0,0.2)",
+            "fontFamily": "Inter, sans-serif",
         }
         base["display"] = "flex" if selected is not None else "none"
         base["alignItems"] = "center"
@@ -245,8 +256,8 @@ def register_callbacks(app):
     # ── Viz 3 : Réseau de modules ─────────────────────────────────
     @app.callback(
         Output("reseau-graph", "figure"),
-        Input("reseau-comp-filter",   "value"),
-        Input("apc-ens-raw-store",    "data"),
+        Input("reseau-comp-filter", "value"),
+        Input("apc-ens-raw-store", "data"),
         Input("reseau-selected-node", "data"),
         prevent_initial_call=False,
     )
@@ -254,7 +265,7 @@ def register_callbacks(app):
         if not competences or raw_data is None:
             return empty_fig("Données non disponibles")
 
-        df_main      = pd.read_json(StringIO(raw_data["df_main"]), orient="split")
+        df_main = pd.read_json(StringIO(raw_data["df_main"]), orient="split")
         module_names = raw_data.get("module_names", {})
 
         df_f = df_main[df_main["competence_label"].isin(competences)].copy()
@@ -263,11 +274,7 @@ def register_callbacks(app):
         if df_f.empty:
             return empty_fig("Aucun module pour les compétences sélectionnées")
 
-        mod_acs = (
-            df_f.groupby("id_module")["id_apprentissage_critique"]
-            .apply(set)
-            .to_dict()
-        )
+        mod_acs = df_f.groupby("id_module")["id_apprentissage_critique"].apply(set).to_dict()
 
         mod_dom_comp = (
             df_f.groupby(["id_module", "competence_label"])["id_apprentissage_critique"]
@@ -310,33 +317,53 @@ def register_callbacks(app):
         if clicked_mod is not None:
             dim_x, dim_y, hi_x, hi_y = [], [], [], []
             for u, v in G.edges():
-                x0, y0 = pos[u]; x1, y1 = pos[v]
+                x0, y0 = pos[u]
+                x1, y1 = pos[v]
                 if u == clicked_mod or v == clicked_mod:
-                    hi_x += [x0, x1, None]; hi_y += [y0, y1, None]
+                    hi_x += [x0, x1, None]
+                    hi_y += [y0, y1, None]
                 else:
-                    dim_x += [x0, x1, None]; dim_y += [y0, y1, None]
+                    dim_x += [x0, x1, None]
+                    dim_y += [y0, y1, None]
             if dim_x:
-                edge_traces.append(go.Scatter(
-                    x=dim_x, y=dim_y, mode="lines",
-                    line=dict(width=0.4, color="#EBEBEB"),
-                    hoverinfo="none", showlegend=False,
-                ))
+                edge_traces.append(
+                    go.Scatter(
+                        x=dim_x,
+                        y=dim_y,
+                        mode="lines",
+                        line=dict(width=0.4, color="#EBEBEB"),
+                        hoverinfo="none",
+                        showlegend=False,
+                    )
+                )
             if hi_x:
-                edge_traces.append(go.Scatter(
-                    x=hi_x, y=hi_y, mode="lines",
-                    line=dict(width=2.5, color=COLORS["primary"]),
-                    hoverinfo="none", showlegend=False,
-                ))
+                edge_traces.append(
+                    go.Scatter(
+                        x=hi_x,
+                        y=hi_y,
+                        mode="lines",
+                        line=dict(width=2.5, color=COLORS["primary"]),
+                        hoverinfo="none",
+                        showlegend=False,
+                    )
+                )
         else:
             ex, ey = [], []
             for u, v in G.edges():
-                x0, y0 = pos[u]; x1, y1 = pos[v]
-                ex += [x0, x1, None]; ey += [y0, y1, None]
-            edge_traces.append(go.Scatter(
-                x=ex, y=ey, mode="lines",
-                line=dict(width=0.8, color="#D1D5DB"),
-                hoverinfo="none", showlegend=False,
-            ))
+                x0, y0 = pos[u]
+                x1, y1 = pos[v]
+                ex += [x0, x1, None]
+                ey += [y0, y1, None]
+            edge_traces.append(
+                go.Scatter(
+                    x=ex,
+                    y=ey,
+                    mode="lines",
+                    line=dict(width=0.8, color="#D1D5DB"),
+                    hoverinfo="none",
+                    showlegend=False,
+                )
+            )
 
         # ── Traces de nœuds ───────────────────────────────────────
         seen_comps = set()
@@ -345,17 +372,19 @@ def register_callbacks(app):
         for comp in competences:
             comp_mods = [m for m in G.nodes() if mod_dom_comp.get(m) == comp]
             for m in comp_mods:
-                is_clicked  = clicked_mod is not None and m == clicked_mod
+                is_clicked = clicked_mod is not None and m == clicked_mod
                 is_neighbor = m in neighbors
-                is_dimmed   = clicked_mod is not None and not is_clicked and not is_neighbor
+                is_dimmed = clicked_mod is not None and not is_clicked and not is_neighbor
 
                 base_size = max(14, min(45, G.nodes[m]["n_ac"] * 3))
-                size      = base_size + 14 if is_clicked else base_size
-                opacity   = 0.15 if is_dimmed else 0.88
-                border_w  = 3.5 if is_clicked else (2 if is_neighbor else 1.5)
-                border_c  = "#1D4ED8" if is_clicked else ("white" if not is_neighbor else COLORS["primary"])
+                size = base_size + 14 if is_clicked else base_size
+                opacity = 0.15 if is_dimmed else 0.88
+                border_w = 3.5 if is_clicked else (2 if is_neighbor else 1.5)
+                border_c = (
+                    "#1D4ED8" if is_clicked else ("white" if not is_neighbor else COLORS["primary"])
+                )
                 txt_color = "#D1D5DB" if is_dimmed else "#374151"
-                txt_size  = 11 if is_clicked else 9
+                txt_size = 11 if is_clicked else 9
 
                 hover = (
                     f"<b>{_mod_label(m)}</b><br>"
@@ -374,33 +403,47 @@ def register_callbacks(app):
                 if first_of_comp:
                     seen_comps.add(comp)
 
-                node_traces.append(go.Scatter(
-                    x=[pos[m][0]], y=[pos[m][1]],
-                    mode="markers+text",
-                    marker=dict(
-                        size=size,
-                        color=get_competence_color(comp),
-                        opacity=opacity,
-                        line=dict(width=border_w, color=border_c),
-                    ),
-                    text=[_mod_label(m)],
-                    textposition="top center",
-                    textfont=dict(size=txt_size, color=txt_color),
-                    name=comp,
-                    legendgroup=comp,
-                    showlegend=first_of_comp,
-                    hovertext=[hover],
-                    hoverinfo="text",
-                    customdata=[m],
-                ))
+                node_traces.append(
+                    go.Scatter(
+                        x=[pos[m][0]],
+                        y=[pos[m][1]],
+                        mode="markers+text",
+                        marker=dict(
+                            size=size,
+                            color=get_competence_color(comp),
+                            opacity=opacity,
+                            line=dict(width=border_w, color=border_c),
+                        ),
+                        text=[_mod_label(m)],
+                        textposition="top center",
+                        textfont=dict(size=txt_size, color=txt_color),
+                        name=comp,
+                        legendgroup=comp,
+                        showlegend=first_of_comp,
+                        hovertext=[hover],
+                        hoverinfo="text",
+                        customdata=[m],
+                    )
+                )
 
         # ── Zoom sur le voisinage si nœud sélectionné ─────────────
         if clicked_mod is not None and clicked_mod in pos:
             focus = list(neighbors | {clicked_mod})
-            xs = [pos[n][0] for n in focus]; ys = [pos[n][1] for n in focus]
+            xs = [pos[n][0] for n in focus]
+            ys = [pos[n][1] for n in focus]
             pad = 0.6
-            xaxis_cfg = dict(range=[min(xs)-pad, max(xs)+pad], showgrid=False, zeroline=False, showticklabels=False)
-            yaxis_cfg = dict(range=[min(ys)-pad, max(ys)+pad], showgrid=False, zeroline=False, showticklabels=False)
+            xaxis_cfg = dict(
+                range=[min(xs) - pad, max(xs) + pad],
+                showgrid=False,
+                zeroline=False,
+                showticklabels=False,
+            )
+            yaxis_cfg = dict(
+                range=[min(ys) - pad, max(ys) + pad],
+                showgrid=False,
+                zeroline=False,
+                showticklabels=False,
+            )
             title_text = f"{_mod_label(clicked_mod)} — {G.degree(clicked_mod)} connexion(s)"
         else:
             xaxis_cfg = dict(showgrid=False, zeroline=False, showticklabels=False)
@@ -409,7 +452,12 @@ def register_callbacks(app):
 
         fig = go.Figure(data=edge_traces + node_traces)
         fig.update_layout(
-            title=dict(text=title_text, x=0.5, xanchor="center", font=dict(size=14, family="Inter, sans-serif")),
+            title=dict(
+                text=title_text,
+                x=0.5,
+                xanchor="center",
+                font=dict(size=14, family="Inter, sans-serif"),
+            ),
             showlegend=True,
             legend=dict(title="Compétence dominante", font=dict(size=11)),
             height=560,
@@ -425,9 +473,9 @@ def register_callbacks(app):
 
     # ── Viz 4 : Analyse des trous ─────────────────────────────────
     @app.callback(
-        Output("gaps-ac-orphans",     "children"),
+        Output("gaps-ac-orphans", "children"),
         Output("gaps-module-orphans", "children"),
-        Input("apc-ens-raw-store",    "data"),
+        Input("apc-ens-raw-store", "data"),
         prevent_initial_call=False,
     )
     def update_gaps(raw_data):
@@ -435,36 +483,54 @@ def register_callbacks(app):
         if raw_data is None:
             return _na, _na
 
-        df_main      = pd.read_json(StringIO(raw_data["df_main"]), orient="split")
+        df_main = pd.read_json(StringIO(raw_data["df_main"]), orient="split")
         module_names = raw_data.get("module_names", {})
 
         def _badge(text, color):
-            return html.Span(text, style={
-                "fontSize": "11px", "fontWeight": "600",
-                "color": color, "backgroundColor": color + "22",
-                "borderRadius": "4px", "padding": "2px 7px", "marginRight": "6px",
-            })
+            return html.Span(
+                text,
+                style={
+                    "fontSize": "11px",
+                    "fontWeight": "600",
+                    "color": color,
+                    "backgroundColor": color + "22",
+                    "borderRadius": "4px",
+                    "padding": "2px 7px",
+                    "marginRight": "6px",
+                },
+            )
 
         # ── AC sans aucun module "Requis" ──────────────────────────
         ac_with_requis = set(
             df_main[df_main["type_lien"] == "Requis"]["id_apprentissage_critique"].unique()
         )
-        all_acs    = df_main[["id_apprentissage_critique", "libelle_apprentissage", "competence_label", "niveau"]].drop_duplicates("id_apprentissage_critique")
+        all_acs = df_main[
+            ["id_apprentissage_critique", "libelle_apprentissage", "competence_label", "niveau"]
+        ].drop_duplicates("id_apprentissage_critique")
         ac_orphans = all_acs[~all_acs["id_apprentissage_critique"].isin(ac_with_requis)]
 
         ac_rows = []
-        for _, row in ac_orphans.sort_values(["competence_label", "niveau", "libelle_apprentissage"]).iterrows():
+        for _, row in ac_orphans.sort_values(
+            ["competence_label", "niveau", "libelle_apprentissage"]
+        ).iterrows():
             ac_rows.append(
                 html.Div(
                     [
-                        _badge(str(row["competence_label"]), get_competence_color(str(row["competence_label"]))),
+                        _badge(
+                            str(row["competence_label"]),
+                            get_competence_color(str(row["competence_label"])),
+                        ),
                         _badge(f"N{int(row['niveau'])}", "#6B7280"),
                         html.Span(str(row["libelle_apprentissage"]), style={"fontSize": "13px"}),
                     ],
                     style={
-                        "display": "flex", "alignItems": "center", "flexWrap": "wrap",
-                        "padding": "7px 10px", "borderRadius": "6px",
-                        "backgroundColor": "#FEF2F2", "marginBottom": "4px",
+                        "display": "flex",
+                        "alignItems": "center",
+                        "flexWrap": "wrap",
+                        "padding": "7px 10px",
+                        "borderRadius": "6px",
+                        "backgroundColor": "#FEF2F2",
+                        "marginBottom": "4px",
                         "borderLeft": "3px solid #EF4444",
                     },
                 )
@@ -483,23 +549,33 @@ def register_callbacks(app):
                             style={"fontSize": "12px", "color": "#EF4444", "fontWeight": "600"},
                         ),
                     ],
-                    style={"display": "flex", "justifyContent": "space-between", "alignItems": "center", "marginBottom": "12px"},
+                    style={
+                        "display": "flex",
+                        "justifyContent": "space-between",
+                        "alignItems": "center",
+                        "marginBottom": "12px",
+                    },
                 ),
                 html.Div(
-                    ac_rows or [html.P("Aucun trou détecté.", style={"color": "#10B981", "fontSize": "13px"})],
+                    ac_rows
+                    or [
+                        html.P(
+                            "Aucun trou détecté.", style={"color": "#10B981", "fontSize": "13px"}
+                        )
+                    ],
                     style={"maxHeight": "360px", "overflowY": "auto"},
                 ),
             ],
             style={
-                "backgroundColor": "white", "borderRadius": "10px",
-                "boxShadow": "0 1px 4px rgba(0,0,0,0.08)", "padding": "16px",
+                "backgroundColor": "white",
+                "borderRadius": "10px",
+                "boxShadow": "0 1px 4px rgba(0,0,0,0.08)",
+                "padding": "16px",
             },
         )
 
         # ── Modules sans aucun AC "Requis" ─────────────────────────
-        mod_with_requis = set(
-            df_main[df_main["type_lien"] == "Requis"]["id_module"].unique()
-        )
+        mod_with_requis = set(df_main[df_main["type_lien"] == "Requis"]["id_module"].unique())
         all_modules = df_main[df_main["id_module"] != 0]["id_module"].unique()
         mod_orphans = [m for m in all_modules if m not in mod_with_requis]
 
@@ -510,8 +586,10 @@ def register_callbacks(app):
                 html.Div(
                     html.Span(str(name), style={"fontSize": "13px"}),
                     style={
-                        "padding": "7px 10px", "borderRadius": "6px",
-                        "backgroundColor": "#FFFBEB", "marginBottom": "4px",
+                        "padding": "7px 10px",
+                        "borderRadius": "6px",
+                        "backgroundColor": "#FFFBEB",
+                        "marginBottom": "4px",
                         "borderLeft": "3px solid #F59E0B",
                     },
                 )
@@ -530,16 +608,29 @@ def register_callbacks(app):
                             style={"fontSize": "12px", "color": "#F59E0B", "fontWeight": "600"},
                         ),
                     ],
-                    style={"display": "flex", "justifyContent": "space-between", "alignItems": "center", "marginBottom": "12px"},
+                    style={
+                        "display": "flex",
+                        "justifyContent": "space-between",
+                        "alignItems": "center",
+                        "marginBottom": "12px",
+                    },
                 ),
                 html.Div(
-                    mod_rows or [html.P("Tous les modules ont au moins un AC Requis.", style={"color": "#10B981", "fontSize": "13px"})],
+                    mod_rows
+                    or [
+                        html.P(
+                            "Tous les modules ont au moins un AC Requis.",
+                            style={"color": "#10B981", "fontSize": "13px"},
+                        )
+                    ],
                     style={"maxHeight": "360px", "overflowY": "auto"},
                 ),
             ],
             style={
-                "backgroundColor": "white", "borderRadius": "10px",
-                "boxShadow": "0 1px 4px rgba(0,0,0,0.08)", "padding": "16px",
+                "backgroundColor": "white",
+                "borderRadius": "10px",
+                "boxShadow": "0 1px 4px rgba(0,0,0,0.08)",
+                "padding": "16px",
             },
         )
 
