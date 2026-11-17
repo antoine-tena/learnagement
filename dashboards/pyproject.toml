@@ -91,8 +91,8 @@ module = [
     "apc_dash.apc20_chatbot",
     "apc_dash.apc20_layout",
     "apc_dash.polytech_rag.app.rag.vectorstore",
-    "app10_stage_administratif",
-    "app10_stage_administratif.*",
+    "pages.stages_administratif",
+    "pages.stages_administratif.*",
     "main",
 ]
 disable_error_code = ["arg-type", "attr-defined", "var-annotated"]
