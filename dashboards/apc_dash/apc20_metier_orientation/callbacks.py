@@ -1,121 +1,15 @@
-from dash import html, dcc, Input, Output, State
+"""Callbacks Dash de la vue Orientation par métier."""
+
+from app_tools import get_endpoint, get_python_backend_url
+from dash import Input, Output, State, html
 from dash.exceptions import PreventUpdate
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 
-from app_tools import get_endpoint, get_python_backend_url
-
-
-COLOR_MAP = {
-    "COMP_IDU1": "#FF4E3A",
-    "COMP_IDU2": "#F39C3D",
-    "COMP_IDU3": "#3F7EE8",
-    "COMP_IDU4": "#1FB985",
-}
-
-
-def empty_figure(message="Chargement des données..."):
-    fig = go.Figure()
-    fig.update_layout(
-        xaxis={"visible": False},
-        yaxis={"visible": False},
-        annotations=[
-            {
-                "text": message,
-                "xref": "paper",
-                "yref": "paper",
-                "x": 0.5,
-                "y": 0.5,
-                "showarrow": False,
-                "font": {"size": 16, "color": "#666"},
-            }
-        ],
-        margin=dict(l=20, r=20, t=60, b=20),
-        height=420,
-        plot_bgcolor="white",
-        paper_bgcolor="white",
-    )
-    return fig
-
-
-def default_ac_panel():
-    return html.Div(
-        [
-            html.H4(
-                "Apprentissages critiques par semestre",
-                style={"fontWeight": "bold", "marginBottom": "10px"},
-            ),
-            html.P(
-                "Sélectionnez un semestre dans le graphique pour afficher les apprentissages critiques.",
-                style={"margin": "0", "color": "#555"},
-            ),
-        ]
-    )
-
-
-apc20_metier_orientation_layout = html.Div(
-    [
-        dcc.Store(id="metier-ac-store"),
-        html.H2("Orientation par métier", style={"marginBottom": "10px"}),
-        html.P(
-            "Choisissez un métier pour découvrir les compétences clés, "
-            "les apprentissages critiques et leur progression par semestre.",
-            style={"marginBottom": "25px"},
-        ),
-        html.Div(
-            [
-                html.Label("MÉTIER", style={"fontWeight": "bold", "marginBottom": "8px"}),
-                dcc.Dropdown(
-                    id="metier-dropdown", placeholder="Choisir un métier", clearable=False
-                ),
-            ],
-            style={"marginBottom": "25px"},
-        ),
-        html.Div(
-            [
-                html.Div(
-                    [
-                        dcc.Graph(
-                            id="metier-competence-graph",
-                            figure=empty_figure("Chargement des compétences..."),
-                        )
-                    ],
-                    style={"width": "49%", "display": "inline-block", "verticalAlign": "top"},
-                ),
-                html.Div(
-                    [
-                        dcc.Graph(
-                            id="metier-semestre-graph",
-                            figure=empty_figure("Chargement des semestres..."),
-                        )
-                    ],
-                    style={
-                        "width": "49%",
-                        "display": "inline-block",
-                        "verticalAlign": "top",
-                        "marginLeft": "2%",
-                    },
-                ),
-            ],
-            style={"marginBottom": "30px"},
-        ),
-        html.Div(
-            id="metier-semestre-ac-list",
-            children=default_ac_panel(),
-            style={
-                "padding": "20px",
-                "border": "1px solid #d9d9d9",
-                "borderRadius": "10px",
-                "backgroundColor": "#fafafa",
-            },
-        ),
-    ]
-)
+from .layout import COLOR_MAP, default_ac_panel, empty_figure
 
 
 def register_callbacks(app):
-
     @app.callback(
         Output("metier-dropdown", "options"),
         Output("metier-dropdown", "value"),
@@ -133,7 +27,6 @@ def register_callbacks(app):
             return [], None
 
         df = pd.DataFrame(data) if not isinstance(data, pd.DataFrame) else data.copy()
-
         if df.empty:
             return [], None
 
@@ -144,7 +37,6 @@ def register_callbacks(app):
 
         df["libelle_situation"] = df["libelle_situation"].fillna("").astype(str).str.strip()
         df = df[df["libelle_situation"] != ""]
-
         if df.empty:
             return [], None
 
@@ -153,12 +45,10 @@ def register_callbacks(app):
             .drop_duplicates(subset=["id_situation_professionnelle"])
             .sort_values("libelle_situation")
         )
-
         options = [
             {"label": row["libelle_situation"], "value": row["id_situation_professionnelle"]}
             for _, row in df.iterrows()
         ]
-
         default_value = options[0]["value"] if options else None
         return options, default_value
 
@@ -178,7 +68,6 @@ def register_callbacks(app):
             return []
 
         df = pd.DataFrame(data) if not isinstance(data, pd.DataFrame) else data.copy()
-
         if df.empty:
             return []
 
@@ -207,7 +96,6 @@ def register_callbacks(app):
 
         if df.empty:
             return []
-
         return df.to_dict("records")
 
     @app.callback(
@@ -219,7 +107,6 @@ def register_callbacks(app):
             return empty_figure("Aucune donnée disponible pour ce métier.")
 
         df = pd.DataFrame(stored_data)
-
         if df.empty:
             return empty_figure("Aucune donnée disponible pour ce métier.")
 
@@ -230,7 +117,6 @@ def register_callbacks(app):
             .agg(nb_ac=("id_apprentissage_critique", "nunique"))
             .sort_values("nb_ac", ascending=True)
         )
-
         if graph_df.empty:
             return empty_figure("Aucune compétence trouvée.")
 
@@ -244,12 +130,10 @@ def register_callbacks(app):
             color_discrete_map=COLOR_MAP,
             title="Métier visé – Compétences mobilisées",
         )
-
         fig.update_traces(
             textposition="outside",
             hovertemplate=("Compétence=%{y}<br>Nombre d'AC=%{x}<extra></extra>"),
         )
-
         fig.update_layout(
             xaxis_title="Nombre d'AC",
             yaxis_title="Compétence",
@@ -257,7 +141,6 @@ def register_callbacks(app):
             margin=dict(l=50, r=20, t=70, b=40),
             height=420,
         )
-
         return fig
 
     @app.callback(
@@ -269,7 +152,6 @@ def register_callbacks(app):
             return empty_figure("Aucune donnée disponible pour ce métier.")
 
         df = pd.DataFrame(stored_data)
-
         if df.empty:
             return empty_figure("Aucune donnée disponible pour ce métier.")
 
@@ -280,7 +162,6 @@ def register_callbacks(app):
             .agg(nb_ac=("id_apprentissage_critique", "nunique"))
             .sort_values("id_semestre")
         )
-
         if graph_df.empty:
             return empty_figure("Aucun semestre trouvé.")
 
@@ -292,9 +173,7 @@ def register_callbacks(app):
             custom_data=["id_semestre"],
             title="Métier visé – Nombre d’AC par semestre",
         )
-
         fig.update_traces(hovertemplate=("Semestre=%{x}<br>Nombre d'AC=%{y}<extra></extra>"))
-
         fig.update_layout(
             xaxis_title="Semestre",
             yaxis_title="Nombre d'AC",
@@ -303,7 +182,6 @@ def register_callbacks(app):
             margin=dict(l=50, r=20, t=70, b=40),
             height=420,
         )
-
         return fig
 
     @app.callback(
@@ -321,14 +199,11 @@ def register_callbacks(app):
             return default_ac_panel()
 
         df = pd.DataFrame(stored_data)
-
         if df.empty:
             return default_ac_panel()
 
         selected_semestre = clickData["points"][0]["x"]
-
         df_sem = df[df["semestre"] == selected_semestre].copy()
-
         if df_sem.empty:
             return default_ac_panel()
 
@@ -338,7 +213,6 @@ def register_callbacks(app):
             .drop_duplicates(subset=["id_apprentissage_critique"])
             .sort_values("id_apprentissage_critique")
         )
-
         if ac_df.empty:
             return default_ac_panel()
 
@@ -355,7 +229,6 @@ def register_callbacks(app):
                 style={"fontWeight": "bold", "marginBottom": "12px"},
             )
         ]
-
         if metier_label:
             children.append(
                 html.P(
@@ -363,7 +236,6 @@ def register_callbacks(app):
                     style={"marginBottom": "15px", "color": "#555"},
                 )
             )
-
         children.append(
             html.Ul(
                 [
@@ -376,5 +248,4 @@ def register_callbacks(app):
                 style={"paddingLeft": "22px"},
             )
         )
-
         return html.Div(children)
