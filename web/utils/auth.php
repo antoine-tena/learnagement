@@ -1,6 +1,21 @@
 <?php
     session_start();
 
+    // Cookie lu par Dash : le même hôte sur un autre port, donc le jeton ne passe plus par l'URL
+    const TOKEN_COOKIE = "lnm_token";
+
+    function setTokenCookie(string $jwt, int $expires) {
+        $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || ($_ENV['ENV'] ?? getenv('ENV')) === 'prod';
+        setcookie(TOKEN_COOKIE, $jwt, [
+            'expires' => $expires,
+            'path' => '/',
+            'secure' => $isHttps,
+            'httponly' => true,
+            'samesite' => 'Strict',
+        ]);
+    }
+
     function requireAuth($user, $router) {
         if (!$user) {
             $router->redirect('login');
@@ -70,11 +85,12 @@
     }
 
     function login(int $id, string $email, string $type, string $jwt) {
-        $_SESSION["connecte"] = true; 
+        $_SESSION["connecte"] = true;
         $_SESSION["email"] = $email;
         $_SESSION["type"] = $type;
         $_SESSION["id"] = $id;
         $_SESSION["jwt_token"] = $jwt;
+        setTokenCookie($jwt, 0);
     }
 
     function loginFromCas(array $userFromDb): void {
@@ -91,10 +107,11 @@
 
     function logout() {
         if (isset($_SESSION)){
-            $_SESSION["connecte"] = false; 
+            $_SESSION["connecte"] = false;
             $_SESSION["email"] = null;
             $_SESSION["type"] = null;
             $_SESSION["id"] = null;
+            setTokenCookie('', time() - 3600);
 
             $cookieFile = '/tmp/intranet_cookies_' . session_id() . '.txt';
 

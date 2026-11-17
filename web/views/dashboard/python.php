@@ -12,8 +12,9 @@
 
 <?php
     $protocol = $_ENV['ENV'] === 'prod' ? 'https' : 'http';
-    $dash_url = $protocol . '://' . $_SERVER['SERVER_NAME'] . ':' . $_ENV['FRONT_DASH_PORT'] . '/' . $type . '/?jwt_token=' . $_SESSION["jwt_token"];
+    $dash_url = $protocol . '://' . $_SERVER['SERVER_NAME'] . ':' . $_ENV['FRONT_DASH_PORT'] . '/' . $type . '/';
 
+    setTokenCookie($_SESSION["jwt_token"], 0);
     header("Location: " . $dash_url);
     exit();
 ?>
