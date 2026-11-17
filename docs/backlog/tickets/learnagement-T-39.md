@@ -1,4 +1,4 @@
-# T-39 · La base passe de MySQL à Postgres
+# learnagement#T-39 · La base passe de MySQL à Postgres
 - **Type**: improvement
 - **Priority**: 🟡 normal
 - **Status**: todo
@@ -8,7 +8,7 @@
 
 Flavien veut passer à Postgres : un schéma par domaine (`docs/glossary.md`), la protection des
 données personnelles ligne par ligne, des copies en lecture si la charge l'exige, et le moment de
-renommer les tables. Ce qui sature le serveur aujourd'hui se mesure d'abord (T-52). Remplace T-26
+renommer les tables. Ce qui sature le serveur aujourd'hui se mesure d'abord (learnagement#T-52). Remplace learnagement#T-26
 (mise à jour de MySQL).
 
 - [ ] Un schéma Postgres par domaine, les tables renommées d'après le glossaire
