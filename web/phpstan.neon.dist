@@ -11,7 +11,8 @@ parameters:
     excludePaths:
         - vendor
         - tools
-        - node_modules
+        # Absent tant que pnpm install n'a pas tourné dans web/.
+        - node_modules (?)
     # Les pages incluent leurs fonctions par require : PHPStan les lit sans les exécuter.
     scanDirectories:
         - utils
