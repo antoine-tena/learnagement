@@ -4,7 +4,7 @@
 - **Status**: todo
 - **Opened**: 2026-10-30
 - **Effort**: S · **Owner**: — · **Due**: —
-- **Origin**: charte LOGGING (exception temporaire dans `kiln-waivers.toml`)
+- **Origin**: charte LOGGING (exception temporaire dans `waivers.toml`)
 
 `logging.getLogger` dans 15 modules de `backend/` et `print()` dans `app.py`, `init.py`,
 `system/access_auth.py` : un `structlog` configuré dans `core/logging.py`, des événements

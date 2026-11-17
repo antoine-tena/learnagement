@@ -17,9 +17,9 @@ les phases suivantes se relisent vite. Rien n'est déplacé ici.
 - [ ] Les couches vérifiées : import-linter en Python, deptrac en PHP
 - [ ] `openapi.json` exporté et versionné, vérifié en CI (le workflow `api-contract.yml`
   d'ion-repo, avec une commande d'export FastAPI) ; les routes cassées détectées (oasdiff), à
-  proposer à ion-repo s'il ne le fait pas ([REPORT-TO-KILN])
+  proposer à ion-repo s'il ne le fait pas ([REPORT-TO-ION-REPO])
 - [x] Les hooks de pré-commit installés par `bootstrap.py`
 - [ ] `no-commit-to-branch` protège `main` et `develop`, qui n'existe pas ici, mais ni `dev` ni
-  `prerelease` : défaut d'un fichier généré, à corriger dans ion-repo ([REPORT-TO-KILN])
+  `prerelease` : défaut d'un fichier généré, à corriger dans ion-repo ([REPORT-TO-ION-REPO])
 - [ ] La CI poste un commentaire par PR : règles, tests, routes cassées ou non, migrations,
   nouvelles dépendances
