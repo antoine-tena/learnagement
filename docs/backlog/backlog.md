@@ -79,19 +79,6 @@ plus. `nextjs.php` force encore `http`, mais seule la connexion de Next y transi
 - [x] Transmettre l'authentification autrement : cookie `HttpOnly` et `Secure` sur un même domaine.
 - [ ] Servir Next en HTTPS.
 
-### T-35 · Le PHP ne parle plus à la base
-- **Type**: improvement
-- **Status**: todo
-- **Opened**: 2026-10-30
-- **Effort**: M · **Owner**: — · **Due**: —
-- **Origin**: revue de l'architecture
-
-Quatre fichiers de `web/` exécutent du SQL par `mysqli`, hors de l'API : `views/base/@post/inscription.php`,
-`views/dashboard/@post/dependance_module.php`, `views/dashboard/create_stage.php`,
-`views/dashboard/rendus-enseignant.php`. Créer les routes manquantes dans le backend, avec leurs
-tests et leurs droits, puis les appeler par `utils/apiProxy.php`. C'est le premier pas vers un
-seul backend, et il ne dépend pas de T-12.
-
 ### T-19 · Zod 4 et audit des dépendances du front
 - **Type**: bug
 - **Status**: todo
