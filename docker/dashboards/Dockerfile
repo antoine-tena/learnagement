@@ -1,5 +1,7 @@
 FROM python:3.14
 
+COPY --from=ghcr.io/astral-sh/uv:0.12.21 /uv /usr/local/bin/uv
+
 # Define container app directory
 RUN mkdir /app
 WORKDIR /app/

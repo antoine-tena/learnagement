@@ -6,23 +6,16 @@ Avant le premier lancement de l'application, assurez-vous que tout les fichiers 
 
 ## **Installation**
 
-### Creer un envirronement virtuel Python 3.10 ou supérieur
+### Installer uv
 
-```bash
-python3 -m venv myenv
-source myenv/bin/activate  # Sur Windows: myenv\Scripts\activate
-```
-
-### Installer les dépendances
-
-```bash
-pip install -r requirements.txt
-```
+Suivre le [guide d'installation de uv](https://docs.astral.sh/uv/getting-started/installation/). Il faut Python 3.12 ou supérieur.
 
 ### Lancement de l'application
 
+`uv run` crée l'environnement et installe les dépendances au premier lancement.
+
 ```bash
-python.exe .\Learnagement.py
+uv run python Learnagement.py
 ```
 
 ### **Configuration de la base de données**

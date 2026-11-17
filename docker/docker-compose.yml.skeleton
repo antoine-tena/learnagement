@@ -45,7 +45,7 @@ services:
     backend_python_${INSTANCE_NAME}:
         container_name: learnagement_backend_python_${INSTANCE_NAME}
         build: ./backend/
-        restart: no
+        restart: "no"
         networks:
             - learnagement_back_${INSTANCE_NAME}
             - learnagement_front_${INSTANCE_NAME}

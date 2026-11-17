@@ -8,20 +8,10 @@ apt-get update && apt-get install -y \
     libsasl2-dev \
     libssl-dev
 
-python -m venv docker_venv
+# L'environnement reste à côté du code monté, distinct du .venv de la machine hôte
+UV_PROJECT_ENVIRONMENT=docker_venv uv sync --frozen
 
 . docker_venv/bin/activate
-
-# Vérifier si l'installation a déjà été effectuée
-if [ ! -f "docker_venv/.installed" ] || [ "requirements.txt" -nt "docker_venv/.installed" ] || [ "requirements-dev.txt" -nt "docker_venv/.installed" ]; then
-    echo "Première installation des dépendances..."
-    pip install --upgrade pip
-    pip install -r requirements.txt
-    pip install -r requirements-dev.txt
-    touch docker_venv/.installed
-else
-    echo "Dépendances déjà installées, on passe..."
-fi
 
 if [ "$ENV" = "prod" ]; then
     # Following command must be run only if prod env ans main branch

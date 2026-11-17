@@ -16,9 +16,11 @@ supprime un dossier, un domaine ou un point d'entrée.
 
 - `Learnagement.py` : point d'entrée du lanceur (`python Learnagement.py start`, `stop`,
   `generate-env`, `backupdb`…), dont le code est dans `launcher/` : `cli.py` (les commandes
-  click), `env.py` (génération et propagation des `.env`), `config.py` (conteneurs,
-  environnements), `security.py` (certificats : `python -m launcher.security`), `tools.py`.
-  `bootstrap.py` crée le venv et lance `Learnagement.py`.
+  click), `docker.py` (compose), `db.py` (initialisation, administrateur, sauvegardes), `env.py`
+  (génération et propagation des `.env`), `config.py` (conteneurs, environnements), `security.py`
+  (certificats : `python -m launcher.security`), `tools.py`, `tests/`.
+  `bootstrap.py` lance `Learnagement.py` avec `uv run`. Chaque composant Python (la racine pour
+  le lanceur, `backend/`, `dashboards/`, `scraping/`) a son `pyproject.toml` et son `uv.lock`.
 - `docker/` : un dossier par conteneur (`backend/`, `web/`, `frontend/`, `dashboards/`,
   `phpmyadmin/` : Dockerfile, entrypoint) et `docker-compose.yml.skeleton`, d'où le lanceur
   produit `docker/docker-compose.yml` (ignoré).

@@ -11,7 +11,7 @@ def get_local_ip_and_hostname() -> tuple[str, str]:
         # Ne se connecte pas vraiment, juste pour déterminer l'interface sortante
         s.connect(("8.8.8.8", 80))
         ip = s.getsockname()[0]
-    except Exception:
+    except OSError:
         ip = "127.0.0.1"
     finally:
         s.close()
@@ -25,19 +25,13 @@ def get_local_ip_and_hostname() -> tuple[str, str]:
     return ip, hostname
 
 
-def __generate_secret__(info: str) -> bytes:
+def generate_secret(info: str) -> bytes:
+    """Génère une clé dérivée compatible avec NextAuth à partir d'un secret de base."""
     base_secret = os.urandom(32).hex()
-    """
-    Génère une clé dérivée compatible avec NextAuth à partir d'un secret de base.
-    """
-
     hkdf = HKDF(
         algorithm=hashes.SHA256(),
         length=32,  # 32 octets pour une clé symétrique
-        salt=b"",    # pas de sel ici, mais peut être personnalisé
-        info=info.encode('utf-8')
+        salt=b"",  # pas de sel ici, mais peut être personnalisé
+        info=info.encode("utf-8"),
     )
-    derived_key = hkdf.derive(base_secret.encode('utf-8'))
-    return derived_key
-
-
+    return hkdf.derive(base_secret.encode("utf-8"))

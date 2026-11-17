@@ -10,13 +10,14 @@ L'App Web s'organise autour de différents objectifs enrichis par les axes de d�
 ## Prérequis
 OS X, Unix or Windows,
 Docker desktop,
-Python 3.
+Python 3.12 ou plus,
+[uv](https://docs.astral.sh/uv/getting-started/installation/).
 
 ## Installation et lancement
 
 ### Dev Mode (Bootstrap)
 
-Création de l'environnement, installation ou mise à jour des requirements, lancement de l'app
+Création de l'environnement, installation ou mise à jour des dépendances, lancement de l'app
 ```bash
 python3 bootstrap.py
 ```
@@ -24,35 +25,26 @@ L'environnement sera créé dans /.venv
 
 ### Dev Mode (a la mano)
 
-Initialisation de l'environnement à ne faire qu'une seule fois
+L'app se lance avec docker (pensez à lancer docker-desktop) ; `uv run` prépare l'environnement :
 ```bash
-python3 -m venv venv
-source ./venv/bin/activate
-pip install -r requirements.txt
-```
-
-
-L'app se lance avec docker (pensez à lancer docker-desktop):
-```bash
-source ./venv/bin/activate
-python Learnagement.py start
+uv run python Learnagement.py start
 ```
 
 To configure your instance, edit specific ".env_XXX.env" files and restarts the app with:
 ```bash
-python Learnagement.py start --env XXX
+uv run python Learnagement.py start --env XXX
 ```
 
 For any help
 ```bash
-python Learnagement.py --help
+uv run python Learnagement.py --help
 ```
 
 ### Production Mode
 
 Generate self certificate:
 ```bash
-python -m launcher.security
+uv run python -m launcher.security
 ```
 
 Generate environment
@@ -64,8 +56,7 @@ Edit the .env file to configure your instance.
 
 Run with prod environnement (secure):
 ```bash
-source .venv/bin/activate
-python Learnagement.py start --env prod
+uv run python Learnagement.py start --env prod
 ```
 Note, containers will rebuild.
 
