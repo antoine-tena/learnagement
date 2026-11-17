@@ -1,0 +1,12 @@
+volumes:
+    learnagement_persistent_db_${INSTANCE_NAME}:
+    learnagement_persistent_backup_state_${INSTANCE_NAME}:
+networks:
+    # network to access to fronts (only fronts and backends on this network)
+    learnagement_front_${INSTANCE_NAME}:
+        name: learnagement_front_${INSTANCE_NAME}
+        driver: bridge
+    # network to access to back (only backends and data storages on this network)
+    learnagement_back_${INSTANCE_NAME}:
+        name: learnagement_back_${INSTANCE_NAME}
+        driver: bridge

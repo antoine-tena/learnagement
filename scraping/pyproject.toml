@@ -9,6 +9,7 @@ dependencies = [
     "lxml==6.1.3",
     "mysql-connector-python==26.10.0",
     "python-dotenv==1.2.4",
+    "requests==2.34.2",
     "selenium==4.52.0",
 ]
 
@@ -34,6 +35,8 @@ dev = [
 [tool.ruff]
 line-length = 100
 target-version = "py314"
+# scripts/ : les scripts autonomes de l'équipe, gardés tels quels pour suivre leurs auteurs
+extend-exclude = ["scripts"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP", "B", "SIM", "RUF", "ANN"]

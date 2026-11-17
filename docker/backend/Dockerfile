@@ -2,6 +2,9 @@ FROM python:3.14
 
 COPY --from=ghcr.io/astral-sh/uv:0.12.21 /uv /usr/local/bin/uv
 
+# Bibliothèques système installées une fois, à la création de l'image
+RUN apt-get update && apt-get install -y libldap2-dev libsasl2-dev libssl-dev && rm -rf /var/lib/apt/lists/*
+
 # Define container app directory
 RUN mkdir /app
 WORKDIR /app/

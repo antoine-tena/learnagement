@@ -3,11 +3,8 @@
 import asyncio
 import logging
 import os
-import shutil
 import signal
-import subprocess
 import sys
-from datetime import UTC, datetime
 from pathlib import Path
 from types import FrameType
 
@@ -15,49 +12,26 @@ import click
 import dotenv
 from click_default_group import DefaultGroup
 
-from launcher import db, docker
-from launcher.config import (
-    GREEN,
-    NC,
-    RED,
-    YELLOW,
-    containers_dev,
-    containers_prod,
-    containers_system,
-    envs,
-)
-from launcher.env import (
-    apply_env_file,
-    generate_base_env,
-    load_env_file,
-    propagate_env,
-    save_env_file,
-)
+from launcher import compose, db, docker, instance
+from launcher.config import CONTAINERS, GREEN, NC, RED, YELLOW, envs
+from launcher.env import load_env
+from launcher.git import get_branch
+from launcher.tools import protect_tty
 
-logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
+logging.basicConfig(
+    format=f"{RED}Learnagement [%(filename)s:%(lineno)d] |{NC}  "
+    "%(asctime)s,%(msecs)03d - %(levelname)s - %(message)s",
+    level=logging.INFO,
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
 logger = logging.getLogger(__name__)
 
 ENV_CHOICES = click.Choice(sorted(envs))
 ENV_HELP = "Environment to use: " + ", ".join(sorted(envs))
-CONFIRM_RESET = (
-    "Are you sure (YES/NO)? NO INITIAL DATA OR CUSTOMIZED CONFIGURATION CAN BE RECOVERED! "
-)
-CONFIRM_RESET_AGAIN = "Are you realy sure(YES/NO)? don't cry if you've lost anything! "
-
-
-def _git_branch() -> str | None:
-    try:
-        return subprocess.check_output(
-            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
-            stderr=subprocess.DEVNULL,
-            text=True,
-        ).strip()
-    except (subprocess.CalledProcessError, FileNotFoundError):
-        return None
 
 
 def _security_check() -> None:
-    branch = _git_branch()
+    branch = get_branch()
     env = os.environ["ENV"]
     if branch == "main" and env != "prod":
         logger.error(
@@ -78,72 +52,17 @@ def _security_check() -> None:
         logger.info("%sApp run from '%s' branch with '%s' environment%s", GREEN, branch, env, NC)
 
 
-def _generate_env(env: str = "dev") -> None:
-    if not Path(".env").exists():
-        for name in ("dev", "prod"):
-            if not Path(f".env_{name}.env").exists():
-                shutil.copy(f"config/env.{name}", f".env_{name}.env")
-
-        logger.warning(
-            "%senv file doesn't exist, generate it with '%s' environnement %s", YELLOW, env, NC
-        )
-        env_vars = generate_base_env()
-        if not Path(f".env_{env}.env").exists():
-            logger.error("%sSpecific env file '.env_%s.env' doesn't exist%s", RED, env, NC)
-            sys.exit(1)
-        save_env_file(apply_env_file(env_vars, f".env_{env}.env"), ".env")
-
-    propagate_env()
-    dotenv.load_dotenv()
-
-
-def _switch_env(env: str) -> None:
-    """Applique un environnement à l'instance et oublie le compose qui en dépendait."""
-    _generate_env()
-    logger.info("%sSwitch to env: %s%s", GREEN, env, NC)
-    docker.COMPOSE_FILE.unlink(missing_ok=True)
-    env_file = ".env_prod.env" if env == "prod" else ".env_dev.env"
-    save_env_file(apply_env_file(load_env_file(".env"), env_file), ".env")
-    propagate_env()
-
-
-def _reset_instance() -> None:
-    dotenv.load_dotenv()
-    project = os.environ["COMPOSE_PROJECT_NAME"]
-    if docker.is_compose_running(project):
-        logger.warning("%sInstance running, it cannot be reset from scratch%s", YELLOW, NC)
-        return
-
-    logger.warning("%sClean up App from scratch%s", RED, NC)
-    logger.warning("%sThe application must be stopped%s", RED, NC)
-    if input(CONFIRM_RESET) != "YES" or input(CONFIRM_RESET_AGAIN) != "YES":
-        return
-
-    volume = f"{project}_learnagement_persistent_db_{os.environ['INSTANCE_NAME']}"
-    try:
-        subprocess.run([*docker.docker_command(), "volume", "rm", volume], check=True)
-    except subprocess.CalledProcessError:
-        logger.exception("Volume %s not removed", volume)
-
-    shutil.rmtree(db.DATA_DIR, ignore_errors=True)
-    shutil.rmtree(db.INIT_DIR, ignore_errors=True)
-    generated = [docker.COMPOSE_FILE, Path(".env"), Path(".env_dev.env"), Path(".env_prod.env")]
-    containers = containers_system + containers_dev + containers_prod
-    for path in [*generated, *(Path(container) / ".env" for container in containers)]:
-        path.unlink(missing_ok=True)
-    logger.info("%sThe application was reset to its initial state.%s", GREEN, NC)
-
-
 async def _setup_administrator() -> None:
+    """Ajoute l'administrateur dès que la base répond, puis attend tous les conteneurs."""
     await db.wait_for_mysql_healthy()
     await db.create_administrator_with_retry()
-    logger.info("%sWeb Apps will run on: %s%s", GREEN, os.environ["INSTANCE_URL"], NC)
+    await compose.wait_for_all_ready()
+    web_url = f"{os.environ['INSTANCE_PROTOCOL']}://{os.environ['INSTANCE_URL']}"
+    logger.info("%sWeb Apps runs on: %s:%s%s", GREEN, web_url, os.environ["FRONT_PHP_PORT"], NC)
     logger.info(
-        "%sPHPMyAdmin will run on: http://127.0.0.1:%s%s",
-        GREEN,
-        os.environ["PHPMYADMIN_PORT"],
-        NC,
+        "%sPHPMyAdmin runs on: http://127.0.0.1:%s%s", GREEN, os.environ["PHPMYADMIN_PORT"], NC
     )
+    logger.info("%sAdmin is deactivated by default%s", GREEN, NC)
 
 
 async def _run_instance(options: list[str]) -> None:
@@ -160,17 +79,19 @@ async def _run_instance(options: list[str]) -> None:
 
 def _start(options: list[str]) -> None:
     dotenv.load_dotenv()
-    project = os.environ.get("COMPOSE_PROJECT_NAME")
-    if project and docker.is_compose_running(project):
+    if instance.is_running():
         logger.warning("%sInstance already running%s", YELLOW, NC)
         return
 
-    _generate_env()
+    load_env()
     db.prepare_init_files()
     db.prepare_initial_data()
-    docker.write_compose_file()
+    compose.write_compose_file(CONTAINERS[os.environ["ENV"]])
     _security_check()
-    asyncio.run(_run_instance(options))
+    try:
+        asyncio.run(_run_instance(options))
+    finally:
+        docker.compose_down()
 
 
 @click.group(cls=DefaultGroup, default="start", default_if_no_args=True)
@@ -181,7 +102,7 @@ def cli() -> None:
 @cli.command(help="Generate environment without starting the application")
 @click.option("--env", type=ENV_CHOICES, default="dev", help=ENV_HELP)
 def generate_env(env: str) -> None:
-    _generate_env(env)
+    load_env(env)
 
 
 @cli.command(help="Start the application")
@@ -216,10 +137,10 @@ def start(
         docker.compose_down()
 
     if from_scratch:
-        _reset_instance()
+        instance.reset()
 
     if env:
-        _switch_env(env)
+        instance.switch_env(env)
         rebuild = True
 
     if test:
@@ -237,37 +158,14 @@ def backup_db(backup_folder: Path) -> None:
 @cli.command(name="exportinstance", help="Export the current instance as a zip archive")
 def export_instance() -> None:
     dotenv.load_dotenv()
-    stamp = datetime.now(UTC).strftime("%Y%m%d%H%M%S%f")
-    export_dir = Path(f"Learnagement_{os.environ['INSTANCE_NAME']}_{stamp}")
-    export_dir.mkdir()
-    try:
-        db.backup(export_dir / "sql")
-        shutil.copy(docker.COMPOSE_FILE, export_dir)
-        shutil.copy(".env", export_dir / "env")
-        shutil.make_archive(str(export_dir), "zip", ".", str(export_dir))
-    finally:
-        shutil.rmtree(export_dir)
+    instance.export()
 
 
 @cli.command(help="Import an instance from a zip archive")
 @click.option("--file", "archive", required=True, type=click.Path(exists=True, path_type=Path))
 def import_instance(archive: Path) -> None:
     dotenv.load_dotenv()
-    project = os.environ.get("COMPOSE_PROJECT_NAME")
-    if project and docker.is_compose_running(project):
-        logger.warning("%sInstance running, you cannot import new instance%s", YELLOW, NC)
-        return
-
-    import_dir = Path(archive.stem)
-    shutil.unpack_archive(archive)
-    shutil.copy(import_dir / "env", ".env")
-    propagate_env()
-    shutil.copy(import_dir / "docker-compose.yml", docker.DOCKER_DIR)
-    db.DATA_DIR.mkdir(exist_ok=True)  # So that Learnagement does not ask for free data
-    for sql_file in db.SQL_DIR.iterdir():
-        sql_file.unlink()
-    shutil.copytree(import_dir / "sql", db.SQL_DIR, dirs_exist_ok=True)
-    shutil.rmtree(import_dir)
+    instance.import_archive(archive)
 
 
 @cli.command(help="Stop application")
@@ -289,12 +187,12 @@ def gui() -> None:
 
 
 def handle_signal(_signum: int, _frame: FrameType | None) -> None:
-    dotenv.load_dotenv()
-    docker.compose_down()
-    sys.exit(0)
+    """Interrompt le lancement : l'arrêt des conteneurs se fait dans `_start`."""
+    raise KeyboardInterrupt
 
 
 def main() -> None:
     signal.signal(signal.SIGTERM, handle_signal)
     signal.signal(signal.SIGINT, handle_signal)
+    protect_tty()
     cli()

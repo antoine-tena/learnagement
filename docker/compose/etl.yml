@@ -1,0 +1,12 @@
+    # ETL Mage AI, premier essai : dans aucun environnement tant qu'il n'est pas configuré.
+    etl_${INSTANCE_NAME}:
+        container_name: learnagement_etl_${INSTANCE_NAME}
+        image: mageai/mageai:latest
+        restart: always
+        networks:
+            - learnagement_back_${INSTANCE_NAME}
+        ports:
+            - ${FRONT_ETL_PORT}:${FRONT_ETL_DOCKER_PORT}
+        depends_on:
+            backend_python_${INSTANCE_NAME}:
+                condition: service_healthy

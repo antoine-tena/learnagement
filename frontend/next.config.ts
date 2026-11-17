@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  logging: {
+    incomingRequests: {
+      ignore: [/^\/health$/],
+    },
+  },
   watchOptions: {
     pollIntervalMs: 1000, // Vérifie les changements toutes les secondes
   },

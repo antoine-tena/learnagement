@@ -12,7 +12,7 @@ from pathlib import Path
 from pwdlib import PasswordHash
 from pwdlib.hashers.bcrypt import BcryptHasher
 
-from launcher.config import GREEN, NC
+from launcher.config import GREEN, NC, RED
 from launcher.docker import docker_command
 
 logger = logging.getLogger(__name__)
@@ -33,7 +33,7 @@ password_hash = PasswordHash((BcryptHasher(),))
 
 
 def mysql_container() -> str:
-    return f"learnagement_mysql_{os.environ['INSTANCE_NAME']}"
+    return os.environ["MYSQL_SERVER"]
 
 
 def _client_env() -> dict[str, str]:
@@ -96,11 +96,13 @@ def create_administrator() -> None:
         check=False,
     )
     if result.returncode == 0:
+        logger.info("%sAdministrator added%s", GREEN, NC)
         return
     error = result.stderr.strip()
     if "1062" in error or "Duplicate entry" in error:
-        print("L'administrateur existe déjà, aucune action nécessaire.")
+        logger.info("%sL'administrateur existe déjà, aucune action nécessaire.%s", GREEN, NC)
         return
+    logger.info("%sAdd administrator: %s%s", RED, error, NC)
     raise RuntimeError(error)
 
 
@@ -114,6 +116,7 @@ async def wait_for_mysql_healthy(timeout: int = 300, poll_interval: int = 2) -> 
             subprocess.run, command, capture_output=True, text=True, check=False
         )
         status = result.stdout.strip()
+        logger.info("%s health: %r", container, status)
         if status == "healthy":
             return
         if status == "unhealthy":
@@ -127,7 +130,7 @@ async def create_administrator_with_retry(max_retries: int = 10, retry_delay: in
     """Réessaie tant que la base répond par une erreur transitoire de démarrage."""
     last_error: RuntimeError | None = None
     for attempt in range(1, max_retries + 1):
-        print("Tentative d'ajout de l'Administrateur")
+        logger.info("Tentative d'ajout de l'Administrateur")
         try:
             await asyncio.to_thread(create_administrator)
         except RuntimeError as error:
@@ -145,21 +148,27 @@ async def create_administrator_with_retry(max_retries: int = 10, retry_delay: in
 
 
 def _dump(target: Path, *options: str) -> None:
-    with target.open("wb") as file:
-        subprocess.run(
-            [
-                *_exec_in_mysql(),
-                "mysqldump",
-                "-u",
-                os.environ["MYSQL_USER_LOGIN"],
-                *DUMP_OPTIONS,
-                *options,
-                os.environ["MYSQL_DB"],
-            ],
-            stdout=file,
-            env=_client_env(),
-            check=True,
-        )
+    """mysqldump dans `target`, écrit d'un coup : jamais de sauvegarde à moitié écrite."""
+    part = target.with_name(target.name + ".part")
+    try:
+        with part.open("wb") as file:
+            subprocess.run(
+                [
+                    *_exec_in_mysql(),
+                    "mysqldump",
+                    "-u",
+                    os.environ["MYSQL_USER_LOGIN"],
+                    *DUMP_OPTIONS,
+                    *options,
+                    os.environ["MYSQL_DB"],
+                ],
+                stdout=file,
+                env=_client_env(),
+                check=True,
+            )
+        part.replace(target)
+    finally:
+        part.unlink(missing_ok=True)
 
 
 def backup(folder: Path) -> None:

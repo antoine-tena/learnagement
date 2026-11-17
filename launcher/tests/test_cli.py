@@ -81,7 +81,7 @@ def test_backup_keeps_the_password_out_of_the_arguments(
 ) -> None:
     secret = "not-a-real-password"
     monkeypatch.setenv("DOCKER_COMMAND", "docker")
-    monkeypatch.setenv("INSTANCE_NAME", "test")
+    monkeypatch.setenv("MYSQL_SERVER", "learnagement_data_mysql_test")
     monkeypatch.setenv("MYSQL_USER_LOGIN", "user")
     monkeypatch.setenv("MYSQL_USER_PASSWORD", secret)
     monkeypatch.setenv("MYSQL_DB", "learnagement")

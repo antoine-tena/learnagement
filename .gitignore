@@ -51,3 +51,9 @@ Thumbs.db
 # scraping exports: personal data
 scraping/out/
 *.tsbuildinfo
+
+# Sorties des scripts de scraping : emplois du temps (noms d'enseignants), maquettes, cache HTML
+scraping/scripts/snapshots/
+scraping/scripts/.cache_formations/
+scraping/scripts/**/*.json
+scraping/scripts/**/*.png

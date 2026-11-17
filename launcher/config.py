@@ -7,15 +7,25 @@ RED = "\033[0;31m"
 GREEN = "\033[0;32m"
 YELLOW = "\033[0;33m"
 NC = "\033[0m"  # No color
-containers_system = [
-    "docker",
-    "backend",
-]  # system docker
-containers_prod = [
-    "web",
-    "dashboards",
-]  # available in prod and dev
-containers_dev = [
-    "frontend",
-]  # available only in dev
+
+# Les conteneurs de chaque environnement, un fragment `docker/compose/<conteneur>.yml` chacun.
+# Dans aucune liste pour l'instant : `data_mysql_backup` (sauvegarde planifiée), qui attend son
+# script, et `etl` (Mage AI), premier essai.
+CONTAINERS = {
+    "dev": ["data_mysql", "phpmyadmin", "backend", "web", "dashboards", "frontend"],
+    "prod": ["data_mysql", "phpmyadmin", "backend", "web", "dashboards"],
+}
+# Le dossier où chaque conteneur lit son .env (None : il n'en lit pas)
+CONTAINER_APP_DIRS: dict[str, str | None] = {
+    "data_mysql": "db",
+    "data_mysql_backup": None,
+    "etl": None,
+    "phpmyadmin": None,
+    "backend": "backend",
+    "web": "web",
+    "dashboards": "dashboards",
+    "frontend": "frontend",
+}
+# docker compose lit aussi son .env, pour les variables qu'il interpole
+COMPOSE_DIR = "docker"
 envs = {"dev", "prod"}

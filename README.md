@@ -21,7 +21,8 @@ Création de l'environnement, installation ou mise à jour des dépendances, lan
 ```bash
 python3 bootstrap.py
 ```
-L'environnement sera créé dans /.venv
+L'environnement sera créé dans /.venv. Le bootstrap installe aussi des hooks git (post-commit,
+post-merge, post-rewrite) qui écrivent le commit courant dans `.env.git` (`GIT_COMMIT`).
 
 ### Dev Mode (a la mano)
 
@@ -34,6 +35,15 @@ To configure your instance, edit specific ".env_XXX.env" files and restarts the 
 ```bash
 uv run python Learnagement.py start --env XXX
 ```
+
+Au lancement, le lanceur écrit `docker/docker-compose.yml` à partir des fragments de
+`docker/compose/` (un par conteneur, Next seulement en dev), attend que chaque conteneur réponde à
+sa sonde `/health`, puis arrête l'instance quand `docker compose up` se termine. Sans terminal
+interactif, il refuse de demander les mots de passe.
+
+**Changement d'interface (novembre 2026)** : le conteneur MySQL s'appelle désormais
+`learnagement_data_mysql_<instance>`. Une instance existante corrige `MYSQL_SERVER` dans son `.env`
+(ou régénère son environnement), et son `docker/docker-compose.yml` est réécrit à chaque lancement.
 
 For any help
 ```bash

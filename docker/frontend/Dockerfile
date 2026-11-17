@@ -1,5 +1,5 @@
 # Utiliser l'image officielle de Node.js
-FROM node:24-alpine
+FROM node:26-alpine
 
 #RUN apk add --no-cache --upgrade bash
 

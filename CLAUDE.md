@@ -16,14 +16,17 @@ supprime un dossier, un domaine ou un point d'entrée.
 
 - `Learnagement.py` : point d'entrée du lanceur (`python Learnagement.py start`, `stop`,
   `generate-env`, `backupdb`…), dont le code est dans `launcher/` : `cli.py` (les commandes
-  click), `docker.py` (compose), `db.py` (initialisation, administrateur, sauvegardes), `env.py`
-  (génération et propagation des `.env`), `config.py` (conteneurs, environnements), `security.py`
-  (certificats : `python -m launcher.security`), `tools.py`, `tests/`.
+  click), `instance.py` (changer d'environnement, remise à zéro, export, import), `docker.py` et
+  `compose.py` (commandes compose, `docker-compose.yml` assemblé, attente des sondes), `db.py`
+  (initialisation, administrateur, sauvegardes), `backup/` (sauvegarde planifiée, pas encore
+  branchée), `env.py` (génération et propagation des `.env`), `git.py` (commit dans `.env.git`),
+  `config.py` (conteneurs par environnement), `security.py` (certificats :
+  `python -m launcher.security`), `tools.py`, `tests/`.
   `bootstrap.py` lance `Learnagement.py` avec `uv run`. Chaque composant Python (la racine pour
   le lanceur, `backend/`, `dashboards/`, `scraping/`) a son `pyproject.toml` et son `uv.lock`.
 - `docker/` : un dossier par conteneur (`backend/`, `web/`, `frontend/`, `dashboards/`,
-  `phpmyadmin/` : Dockerfile, entrypoint) et `docker-compose.yml.skeleton`, d'où le lanceur
-  produit `docker/docker-compose.yml` (ignoré).
+  `phpmyadmin/` : Dockerfile, entrypoint) et `compose/` (un fragment par conteneur), d'où le
+  lanceur produit `docker/docker-compose.yml` (ignoré).
 - `backend/` : l'API FastAPI (`app.py`) ; `api/` (routes, `dependencies.py`), `auth/` (LNM et
   CAS), `access_control/` (règles, prédicats, responsabilités), `domains/` (requêtes métier par
   domaine : `lnm_university.py`, `maquette_module.py`…, en snake_case ; les tables SQL gardent leur casse), `models/`, `db/` (connexion
@@ -35,6 +38,8 @@ supprime un dossier, un domaine ou un point d'entrée.
 - `frontend/` : le front Next.js en cours de refonte (`app/`, proxy vers l'API).
 - `scraping/` : le paquet `learnagement_scraping` (commande `learnagement-scraping`) : `parsers.py`
   (HTML vers données), `browser.py` (Selenium), `db.py` (écritures), `cli.py` ; `out/` est ignoré.
+  `scraping/scripts/` : les scripts autonomes de l'équipe, gardés tels quels (`ical2json.py`
+  emplois du temps ADE, `scrape_maquette.py` catalogue des formations, `matching_26_27/`).
 - `db/` : `sql/` (schéma, migrations versionnées `VX.Y.Z__*.sql`), `freeData/` (jeux de données
   libres), `tools/` ; `db/data/` et `db/backup/` sont privés et ignorés.
 - `archive/` : le code mort gardé pour mémoire (ancien backend PHP…), hors des règles ; son
