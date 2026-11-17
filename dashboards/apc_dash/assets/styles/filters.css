@@ -1,0 +1,159 @@
+/* FILTRES */
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filter-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: hsl(var(--foreground));
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.filter-input {
+    width: 100%;
+    font-size: 13px;
+}
+
+.Select-control {
+    border-radius: var(--radius) !important;
+    border-color: hsl(var(--border)) !important;
+    min-height: 36px !important;
+    box-shadow: none !important;
+    transition: all 150ms ease !important;
+}
+
+.Select-control:hover {
+    border-color: #94a3b8 !important;
+}
+
+.is-focused > .Select-control {
+    border-color: hsl(var(--ring)) !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+.Select-placeholder,
+.Select--single > .Select-control .Select-value-label {
+    font-size: 13px;
+    color: hsl(var(--muted-foreground));
+}
+
+.Select-multi-value-wrapper {
+    gap: 4px;
+}
+
+.Select-value {
+    background: hsl(var(--primary)) !important;
+    color: white !important;
+    border-radius: 4px !important;
+    padding: 2px 8px !important;
+    font-size: 12px !important;
+}
+
+.level-filter-container {
+    background: hsl(var(--muted));
+    padding: var(--spacing-md);
+    border-radius: var(--radius);
+}
+
+.level-checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.level-checklist label {
+    display: flex !important;
+    align-items: center;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 6px;
+    background: white;
+    border: 2px solid hsl(var(--border));
+    transition: all 150ms ease;
+    margin: 0 !important;
+}
+
+.level-checklist label:hover {
+    border-color: hsl(var(--ring));
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+    transform: translateY(-1px);
+}
+
+.level-checklist input[type="checkbox"] {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid hsl(var(--border));
+    border-radius: 4px;
+    margin-right: 10px;
+    cursor: pointer;
+    position: relative;
+    transition: all 150ms ease;
+    flex-shrink: 0;
+}
+
+.level-checklist input[type="checkbox"]:checked {
+    background: hsl(var(--primary));
+    border-color: hsl(var(--primary));
+}
+
+.level-checklist input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.level-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+
+.level-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 12px;
+    color: white;
+}
+
+.level-badge.level-n { background: #BFDBFE; color: #1e40af; }
+.level-badge.level-a { background: #60A5FA; color: white; }
+.level-badge.level-m { background: #2563EB; color: white; }
+.level-badge.level-e { background: #1E40AF; color: white; }
+
+.level-text {
+    font-size: 13px;
+    font-weight: 500;
+    color: hsl(var(--foreground));
+}
+
+.filter-footer {
+    margin-top: auto;
+    padding-top: var(--spacing-md);
+    border-top: 1px solid hsl(var(--border));
+}
+
+.filter-status {
+    margin-top: 10px;
+    font-size: 11px;
+    color: hsl(var(--muted-foreground));
+    text-align: center;
+    padding: 6px 10px;
+    background: hsl(var(--muted));
+    border-radius: 4px;
+}
