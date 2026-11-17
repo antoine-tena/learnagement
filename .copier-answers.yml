@@ -20,6 +20,9 @@ owner: FlavienVernier
 podman: false
 prod_health_url: ''
 project_type: app
+protected_branches:
+- dev
+- prerelease
 serena: false
 size: medium
 statusline_ci: true
