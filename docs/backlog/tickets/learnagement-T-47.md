@@ -1,7 +1,7 @@
-# T-47 · Phase B : la nouvelle arborescence
+# learnagement#T-47 · Phase B : la nouvelle arborescence
 - **Type**: improvement
 - **Priority**: 🟠 important
-- **Status**: blocked — waiting for T-46
+- **Status**: blocked — waiting for learnagement#T-46
 - **Opened**: 2026-11-17
 - **Effort**: M · **Owner**: — · **Due**: —
 - **Origin**: architecture cible (`docs/architecture.md`)
@@ -15,8 +15,8 @@ fait valider par Flavien (`urgent.md`) : refusée, elle coûterait toute la phas
 - [ ] `db/` → `database/` (`migrations/`, `open-data/`, `tools/`)
 - [ ] `Containerfile` et `compose.yaml` dans le dossier de chaque application ;
   `docker/compose/` et `config/` → `deploy/`
-- [ ] `frontend/` → `lab/javascript/nextjs/`, si T-12 le retient
+- [ ] `frontend/` → `lab/javascript/nextjs/`, si learnagement#T-12 le retient
 - [ ] Le lanceur, la CI, le pre-commit et `charter.toml` suivent les nouveaux chemins
 - [ ] `docs/moved.md` : chaque ancien chemin et le nouveau, pour les branches en cours
 - [ ] README, `CONTRIBUTING.md`, carte du `CLAUDE.md` à jour ; CODEOWNERS par zone
-- [ ] Prévenir les contributeurs avant (T-33)
+- [ ] Prévenir les contributeurs avant (learnagement#T-33)

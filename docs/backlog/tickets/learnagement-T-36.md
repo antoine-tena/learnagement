@@ -1,7 +1,7 @@
-# T-36 · Les appels de Next visent des routes qui existent
+# learnagement#T-36 · Les appels de Next visent des routes qui existent
 - **Type**: bug
 - **Priority**: 🟡 normal
-- **Status**: blocked — waiting for T-40
+- **Status**: blocked — waiting for learnagement#T-40
 - **Opened**: 2026-10-30
 - **Effort**: M · **Owner**: — · **Due**: —
 - **Origin**: revue de l'architecture

@@ -1,4 +1,4 @@
-# T-33 · Prévenir les contributeurs du refacto du fork
+# learnagement#T-33 · Prévenir les contributeurs du refacto du fork
 - **Type**: task
 - **Priority**: 🟠 important
 - **Status**: blocked — waiting for @antoine-tena : à lancer seulement sur sa demande
@@ -6,10 +6,10 @@
 - **Effort**: XS · **Owner**: @antoine-tena · **Due**: —
 - **Origin**: demande d'Antoine, pour que les travaux en cours ne divergent pas du fork
 
-À faire avant T-11 et T-29 : au 2026-10-30, le fork a 70 commits d'avance et 532 fichiers
+À faire avant learnagement#T-11 et learnagement#T-29 : au 2026-10-30, le fork a 70 commits d'avance et 532 fichiers
 modifiés par rapport à `dev`, et Flavien travaille surtout dans le backend, sous les anciens
 chemins (`backend_python/`). Déplacer encore des fichiers rendrait la PR plus difficile à
-intégrer. Lui signaler aussi T-34 et décider avec lui de T-12.
+intégrer. Lui signaler aussi learnagement#T-34 et décider avec lui de learnagement#T-12.
 
 - [ ] En parler d'abord à Flavien : c'est son repo, et le fork lui propose ses changements par
   PR vers `dev`. Il est le seul à pouvoir prévenir les étudiants de cette année qui n'ont encore

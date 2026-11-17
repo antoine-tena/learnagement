@@ -1,4 +1,4 @@
-# T-43 · Le proxy CAS seulement en développement
+# learnagement#T-43 · Le proxy CAS seulement en développement
 - **Type**: task
 - **Priority**: 🟡 normal
 - **Status**: to verify — `backend/auth/`, `config/`

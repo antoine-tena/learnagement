@@ -1,7 +1,7 @@
-# T-50 · Le lab : apprendre dans le langage de son choix
+# learnagement#T-50 · Le lab : apprendre dans le langage de son choix
 - **Type**: idea
 - **Priority**: 🟡 normal
-- **Status**: blocked — waiting for T-47, T-51
+- **Status**: blocked — waiting for learnagement#T-47, learnagement#T-51
 - **Opened**: 2026-11-17
 - **Effort**: L · **Owner**: — · **Due**: —
 - **Origin**: architecture cible (`docs/architecture.md`)

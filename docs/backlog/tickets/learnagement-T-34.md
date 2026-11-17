@@ -1,4 +1,4 @@
-# T-34 · Plus de JWT dans les URL
+# learnagement#T-34 · Plus de JWT dans les URL
 - **Type**: bug
 - **Priority**: 🟠 important
 - **Status**: in progress — fix/front-auth-secrets
