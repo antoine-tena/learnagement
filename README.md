@@ -23,6 +23,9 @@ python3 bootstrap.py
 ```
 L'environnement sera créé dans /.venv. Le bootstrap installe aussi des hooks git (post-commit,
 post-merge, post-rewrite) qui écrivent le commit courant dans `.env.git` (`GIT_COMMIT`).
+Hors production, il installe aussi le hook de pré-commit (avec `uv tool install` : `pre-commit`
+et `ion-repo`, qui fournit `charter`) : avant chaque commit, la mise en forme est corrigée et les
+règles de `charter.toml` vérifiées sur les fichiers commités.
 
 ### Dev Mode (a la mano)
 

@@ -20,7 +20,8 @@ supprime un dossier, un domaine ou un point d'entrée.
   `compose.py` (commandes compose, `docker-compose.yml` assemblé, attente des sondes), `db.py`
   (initialisation, administrateur, sauvegardes), `backups/` (ancienne sauvegarde planifiée en Python,
   pas branchée), `env.py` (génération et propagation des `.env`), `git.py` (commit dans `.env.git`),
-  `config.py` (conteneurs par environnement), `security.py` (certificats :
+  `config.py` (conteneurs par environnement), `dev_hooks.py` (hooks de pré-commit, posés par
+  `bootstrap.py`), `security.py` (certificats :
   `python -m launcher.security`), `tools.py`, `tests/`.
   `bootstrap.py` lance `Learnagement.py` avec `uv run`. Chaque composant Python (la racine pour
   le lanceur, `backend/`, `dashboards/`, `scraping/`) a son `pyproject.toml` et son `uv.lock`.
