@@ -12,14 +12,15 @@ les phases suivantes se relisent vite. Rien n'est déplacé ici.
 - [x] La charte compte aussi le `.php` et le `.js` ([FILE-SIZE]), budget au niveau actuel (6)
 - [x] ruff (lint et mise en forme) et mypy sur `dashboards/`, dans le pre-commit et la CI ; la
   dette, règle par règle et module par module, dans `dashboards/pyproject.toml`
-- [ ] PHP-CS-Fixer et PHPStan sur `web/`, au niveau qui passe aujourd'hui, relevé ensuite
-- [ ] Prettier et ESLint sur le JS de `web/`
-- [ ] Les couches vérifiées : import-linter en Python, deptrac en PHP
-- [ ] `openapi.json` exporté et versionné, vérifié en CI (le workflow `api-contract.yml`
+- [x] PHP-CS-Fixer et PHPStan sur `web/`, au niveau qui passe aujourd'hui, relevé ensuite
+- [x] Prettier et ESLint sur le JS de `web/`
+- [x] Les couches vérifiées : import-linter en Python, deptrac en PHP
+- [x] `openapi.json` exporté et versionné, vérifié en CI (le workflow `api-contract.yml`
   d'ion-repo, avec une commande d'export FastAPI) ; les routes cassées détectées (oasdiff), à
-  proposer à ion-repo s'il ne le fait pas ([REPORT-TO-ION-REPO])
+  proposer à ion-repo s'il ne le fait pas ([REPORT-TO-ION-REPO]) : oasdiff tourne ici (job
+  `api-breaking`, rapport de PR), la proposition à ion-repo reste à faire
 - [x] Les hooks de pré-commit installés par `bootstrap.py`
 - [ ] `no-commit-to-branch` protège `main` et `develop`, qui n'existe pas ici, mais ni `dev` ni
   `prerelease` : défaut d'un fichier généré, à corriger dans ion-repo ([REPORT-TO-ION-REPO])
-- [ ] La CI poste un commentaire par PR : règles, tests, routes cassées ou non, migrations,
+- [x] La CI poste un commentaire par PR : règles, tests, routes cassées ou non, migrations,
   nouvelles dépendances
