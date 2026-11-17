@@ -6,13 +6,16 @@ echo "PHP container starting..."
 
 cd /var/www/html
 
-# Install dependencies only once
+# Les dépendances aux versions de composer.lock, jamais mises à jour au démarrage. En production,
+# sans les outils de vérification (require-dev) ; ailleurs, vendor/ est partagé avec la machine
+# du développeur, qui s'en sert pour vérifier le PHP (web/tools/run.sh).
 if [ -f composer.json ] ; then
     echo "Installing Composer dependencies..."
-    composer update
-    composer install --no-interaction
-else
-    echo "Composer dependencies already installed. Just update"
+    if [ "$ENV" = "prod" ]; then
+        composer install --no-interaction --no-dev --optimize-autoloader
+    else
+        composer install --no-interaction
+    fi
 fi
 
 # Activer le vhost SSL uniquement en production
