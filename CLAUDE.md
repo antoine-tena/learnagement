@@ -45,8 +45,6 @@ supprime un dossier, un domaine ou un point d'entrée.
   emplois du temps ADE, `scrape_maquette.py` + `scrape_maquette_lib/` catalogue des formations, `matching_26_27/`).
 - `db/` : `sql/` (schéma, migrations versionnées `VX.Y.Z__*.sql`), `freeData/` (jeux de données
   libres), `tools/` ; `db/data/` et `db/backup/` sont privés et ignorés.
-- `archive/` : le code mort gardé pour mémoire (ancien backend PHP…), hors des règles ; son
-  `README.md` dit ce que chaque chose était.
 - `docs/` : la documentation (`README.md` en est l'index) ; `architecture.md` (la cible : `app/`
   pour la production, `lab/` pour apprendre, et ses étapes), `glossary.md` (le nom de chaque mot
   du métier dans le code), `docs/mobility/` pour le module de mobilité. `CONTRIBUTING.md`, à la
