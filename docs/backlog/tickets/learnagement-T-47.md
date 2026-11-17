@@ -1,7 +1,7 @@
 # learnagement#T-47 · Phase B : la nouvelle arborescence
 - **Type**: improvement
 - **Priority**: 🟠 important
-- **Status**: blocked — waiting for learnagement#T-46
+- **Status**: todo
 - **Opened**: 2026-11-17
 - **Effort**: M · **Owner**: — · **Due**: —
 - **Origin**: architecture cible (`docs/architecture.md`)
@@ -9,6 +9,9 @@
 Les dossiers prennent leur place cible (`app/`, `lab/`, `database/`, `deploy/`) par déplacements
 purs (`git mv`) : une application par commit, sans changer ce que fait le code. L'arborescence se
 fait valider par Flavien (`urgent.md`) : refusée, elle coûterait toute la phase.
+
+Les règles de learnagement#T-46 sont en place ; sa dernière case (`no-commit-to-branch` sur `dev`
+et `prerelease`) se corrige dans ion-repo et ne touche aucun déplacement.
 
 - [ ] `backend/` → `app/api/`, `web/` → `app/web/`, `dashboards/` → `app/dashboards/`,
   `scraping/` → `app/importers/`
