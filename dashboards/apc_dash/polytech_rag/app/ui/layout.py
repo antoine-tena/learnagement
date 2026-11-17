@@ -4,14 +4,7 @@ import dash_bootstrap_components as dbc
 
 FORMATIONS = ["idu", "eit", "meca", "sni", "bee"]
 
-CATEGORIES = [
-    "competences",
-    "metiers",
-    "projets",
-    "techniques",
-    "bonnes_pratiques",
-    "experiences"
-]
+CATEGORIES = ["competences", "metiers", "projets", "techniques", "bonnes_pratiques", "experiences"]
 
 LEVELS = ["tous", "débutant", "intermédiaire", "avancé"]
 
@@ -28,10 +21,12 @@ def create_layout():
                         children=[
                             html.Div("🎓", className="brand-icon"),
                             html.H3("Polytech Assistant", className="brand-title"),
-                            html.P("Orientation intelligente basée sur tes PDF", className="brand-subtitle"),
+                            html.P(
+                                "Orientation intelligente basée sur tes PDF",
+                                className="brand-subtitle",
+                            ),
                         ],
                     ),
-
                     html.Div(
                         className="form-card",
                         children=[
@@ -43,7 +38,6 @@ def create_layout():
                                 clearable=False,
                                 className="custom-dropdown",
                             ),
-
                             html.Label("Catégorie", className="form-label mt-3"),
                             dcc.Dropdown(
                                 id="rag-category-dropdown",
@@ -55,7 +49,6 @@ def create_layout():
                                 clearable=False,
                                 className="custom-dropdown",
                             ),
-
                             html.Div(
                                 id="rag-project-filters",
                                 children=[
@@ -67,7 +60,6 @@ def create_layout():
                                         clearable=False,
                                         className="custom-dropdown",
                                     ),
-
                                     html.Label("Mot-clé", className="form-label mt-3"),
                                     dbc.Input(
                                         id="rag-keyword-input",
@@ -77,7 +69,6 @@ def create_layout():
                                     ),
                                 ],
                             ),
-
                             dbc.Button(
                                 "Générer la réponse",
                                 id="rag-generate-button",
@@ -86,7 +77,6 @@ def create_layout():
                             ),
                         ],
                     ),
-
                     html.Div(
                         className="hint-box",
                         children=[
@@ -98,7 +88,6 @@ def create_layout():
                     ),
                 ],
             ),
-
             html.Div(
                 className="main-content",
                 children=[
@@ -106,10 +95,11 @@ def create_layout():
                         className="top-header",
                         children=[
                             html.H1("Assistant d’orientation Polytech"),
-                            html.P("Sélectionne une formation, puis explore les métiers, compétences, projets et ressources."),
+                            html.P(
+                                "Sélectionne une formation, puis explore les métiers, compétences, projets et ressources."
+                            ),
                         ],
                     ),
-
                     html.Div(
                         className="chat-panel",
                         children=[
@@ -123,7 +113,6 @@ def create_layout():
                                     )
                                 ],
                             ),
-
                             html.Div(
                                 className="answer-card",
                                 children=[

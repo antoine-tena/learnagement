@@ -17,25 +17,40 @@ class ProjectService:
 
             context = self.extract_between(clean, "Contexte", "Objectifs")
             objectives = self.extract_objectives(clean)
-            tools = self.extract_between_any(clean, ["Outils", "Stack technique", "Stack"], ["Livrable"])
+            tools = self.extract_between_any(
+                clean, ["Outils", "Stack technique", "Stack"], ["Livrable"]
+            )
             deliverable = self.extract_between(clean, "Livrable", "Bonus")
             bonus = self.extract_between_any(clean, ["Bonus"], ["ACs", "Blocs", "Bloc", "Projet #"])
-            skills = self.extract_after_any(clean, ["ACs IDU", "ACs EIT", "ACs SNI", "Blocs BEE", "Bloc MECA", "Blocs MECA", "Bloc SNI"])
+            skills = self.extract_after_any(
+                clean,
+                [
+                    "ACs IDU",
+                    "ACs EIT",
+                    "ACs SNI",
+                    "Blocs BEE",
+                    "Bloc MECA",
+                    "Blocs MECA",
+                    "Bloc SNI",
+                ],
+            )
 
             domain = self.detect_domain(clean)
 
-            projects.append({
-                "title": title,
-                "duration": duration,
-                "level": level,
-                "domain": domain,
-                "context": context,
-                "objectives": objectives,
-                "tools": tools,
-                "deliverable": deliverable,
-                "bonus": bonus,
-                "skills": skills
-            })
+            projects.append(
+                {
+                    "title": title,
+                    "duration": duration,
+                    "level": level,
+                    "domain": domain,
+                    "context": context,
+                    "objectives": objectives,
+                    "tools": tools,
+                    "deliverable": deliverable,
+                    "bonus": bonus,
+                    "skills": skills,
+                }
+            )
 
         return projects
 
@@ -43,22 +58,26 @@ class ProjectService:
         results = projects
 
         if level and level.lower() != "tous":
-            results = [
-                p for p in results
-                if p["level"].lower() == level.lower()
-            ]
+            results = [p for p in results if p["level"].lower() == level.lower()]
 
         if keyword:
             keyword = keyword.lower()
             results = [
-                p for p in results
-                if keyword in (
-                    p["title"] + " " +
-                    p["domain"] + " " +
-                    p["context"] + " " +
-                    p["tools"] + " " +
-                    p["deliverable"] + " " +
-                    p["skills"]
+                p
+                for p in results
+                if keyword
+                in (
+                    p["title"]
+                    + " "
+                    + p["domain"]
+                    + " "
+                    + p["context"]
+                    + " "
+                    + p["tools"]
+                    + " "
+                    + p["deliverable"]
+                    + " "
+                    + p["skills"]
                 ).lower()
             ]
 
@@ -105,7 +124,9 @@ class ProjectService:
         return response
 
     def extract_title(self, text):
-        match = re.search(r"(Projet #\d+)\s+(.*?)(?:\s+[■I]\s+|\s+\d+\s*[–-]?\s*\d*\s*semaines?|$)", text)
+        match = re.search(
+            r"(Projet #\d+)\s+(.*?)(?:\s+[■I]\s+|\s+\d+\s*[–-]?\s*\d*\s*semaines?|$)", text
+        )
         if match:
             return f"{match.group(1)} — {match.group(2).strip()}"
         return text[:80]
@@ -142,11 +163,55 @@ class ProjectService:
         text = text.lower()
 
         domains = {
-            "Data / IA": ["data", "machine learning", "ia", "ml", "classification", "rag", "spark", "kafka"],
-            "BIM / Bâtiment": ["bim", "revit", "re2020", "thermique", "chantier", "cvc", "acv bâtiment"],
-            "Écologie / EIT": ["territoire", "flux", "déchets", "eit", "symbiose", "bilan carbone", "eau"],
-            "Mécanique / CAO": ["cao", "solidworks", "catia", "fea", "ansys", "mécanique", "composite", "usinage"],
-            "SNI / Embarqué": ["arduino", "stm32", "capteur", "iot", "signal", "pid", "raspberry", "freertos", "embarqué"]
+            "Data / IA": [
+                "data",
+                "machine learning",
+                "ia",
+                "ml",
+                "classification",
+                "rag",
+                "spark",
+                "kafka",
+            ],
+            "BIM / Bâtiment": [
+                "bim",
+                "revit",
+                "re2020",
+                "thermique",
+                "chantier",
+                "cvc",
+                "acv bâtiment",
+            ],
+            "Écologie / EIT": [
+                "territoire",
+                "flux",
+                "déchets",
+                "eit",
+                "symbiose",
+                "bilan carbone",
+                "eau",
+            ],
+            "Mécanique / CAO": [
+                "cao",
+                "solidworks",
+                "catia",
+                "fea",
+                "ansys",
+                "mécanique",
+                "composite",
+                "usinage",
+            ],
+            "SNI / Embarqué": [
+                "arduino",
+                "stm32",
+                "capteur",
+                "iot",
+                "signal",
+                "pid",
+                "raspberry",
+                "freertos",
+                "embarqué",
+            ],
         }
 
         found = []
@@ -180,9 +245,7 @@ class ProjectService:
 
     def extract_objectives(self, text):
         objectives_text = self.extract_between_any(
-            text,
-            ["Objectifs"],
-            ["Outils", "Stack technique", "Stack", "Livrable"]
+            text, ["Objectifs"], ["Outils", "Stack technique", "Stack", "Livrable"]
         )
 
         if not objectives_text:

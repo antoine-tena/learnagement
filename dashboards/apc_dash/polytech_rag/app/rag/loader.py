@@ -11,13 +11,15 @@ class PDFLoader:
         for page_number, page in enumerate(doc, start=1):
             text = page.get_text()
 
-            pages.append({
-                "formation": formation,
-                "source": str(pdf_path),
-                "file_name": pdf_path.name,
-                "page": page_number,
-                "text": text
-            })
+            pages.append(
+                {
+                    "formation": formation,
+                    "source": str(pdf_path),
+                    "file_name": pdf_path.name,
+                    "page": page_number,
+                    "text": text,
+                }
+            )
 
         doc.close()
         return pages

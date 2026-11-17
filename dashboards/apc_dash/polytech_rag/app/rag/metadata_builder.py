@@ -18,10 +18,7 @@ class MetadataBuilder:
         for chunk in chunks:
             category = self.detect_category(chunk["file_name"])
 
-            new_chunk = {
-                **chunk,
-                "category": category
-            }
+            new_chunk = {**chunk, "category": category}
 
             enriched.append(new_chunk)
 

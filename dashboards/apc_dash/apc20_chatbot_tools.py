@@ -3,6 +3,7 @@ Outils disponibles pour le chatbot APC.
 Chaque outil correspond à une fonction Python qui interroge la BD via l'API,
 et à un schéma JSON que l'API Gemini utilise pour savoir quand l'appeler.
 """
+
 import pandas as pd
 from .apc20_heatmap_apc_tools import (
     get_apc_competences,
@@ -121,17 +122,16 @@ GEMINI_TOOLS = [
 
 # ── Construction du DataFrame principal ───────────────────────────
 
-def _build_df_main(token):
-    df_comp  = get_apc_competences(token)
-    df_niv   = get_apc_niveaux(token)
-    df_ac    = get_apc_apprentissages(token)
-    df_acmod = get_apc_ac_modules(token)
-    df_mod   = get_apc_modules(token)
 
-    df_base = (
-        df_ac
-        .merge(df_niv,  on="id_niveau",     how="left")
-        .merge(df_comp, on="id_competence", how="left")
+def _build_df_main(token):
+    df_comp = get_apc_competences(token)
+    df_niv = get_apc_niveaux(token)
+    df_ac = get_apc_apprentissages(token)
+    df_acmod = get_apc_ac_modules(token)
+    df_mod = get_apc_modules(token)
+
+    df_base = df_ac.merge(df_niv, on="id_niveau", how="left").merge(
+        df_comp, on="id_competence", how="left"
     )
 
     if not df_mod.empty and "id_module" in df_mod.columns:
@@ -148,6 +148,7 @@ def _build_df_main(token):
 
 
 # ── Routeur d'exécution ───────────────────────────────────────────
+
 
 def execute_tool(name: str, inputs: dict, token: str) -> str:
     try:
@@ -177,6 +178,7 @@ def execute_tool(name: str, inputs: dict, token: str) -> str:
 
 # ── Implémentations ───────────────────────────────────────────────
 
+
 def _lister_modules(token):
     df = get_apc_modules(token)
     if df.empty:
@@ -184,7 +186,7 @@ def _lister_modules(token):
     rows = []
     for _, r in df.iterrows():
         code = r.get("code_module", f"M{r['id_module']}")
-        nom  = r.get("nom", "")
+        nom = r.get("nom", "")
         rows.append(f"- id={int(r['id_module'])} | {code} — {nom}")
     return f"{len(df)} modules disponibles :\n" + "\n".join(rows)
 
@@ -194,20 +196,17 @@ def _lister_competences(token):
     if df.empty:
         return "Aucune compétence trouvée."
     rows = [
-        f"- {r['code_competence']} : {r.get('libelle_competence', '')}"
-        for _, r in df.iterrows()
+        f"- {r['code_competence']} : {r.get('libelle_competence', '')}" for _, r in df.iterrows()
     ]
     return f"{len(df)} compétences :\n" + "\n".join(rows)
 
 
 def _lister_ac(token):
-    df_ac  = get_apc_apprentissages(token)
+    df_ac = get_apc_apprentissages(token)
     df_niv = get_apc_niveaux(token)
     df_com = get_apc_competences(token)
-    df = (
-        df_ac
-        .merge(df_niv, on="id_niveau",     how="left")
-        .merge(df_com, on="id_competence", how="left")
+    df = df_ac.merge(df_niv, on="id_niveau", how="left").merge(
+        df_com, on="id_competence", how="left"
     )
     if df.empty:
         return "Aucun apprentissage critique trouvé."
@@ -222,14 +221,18 @@ def _lister_ac(token):
 
 def _lister_ac_du_module(token, id_module):
     df_main, _, _ = _build_df_main(token)
-    df = df_main[df_main["id_module"] == float(id_module)].drop_duplicates("id_apprentissage_critique")
+    df = df_main[df_main["id_module"] == float(id_module)].drop_duplicates(
+        "id_apprentissage_critique"
+    )
     if df.empty:
         return f"Aucun AC trouvé pour le module id={id_module}."
     mod_name = df.iloc[0].get("nom", f"Module {id_module}")
     rows = []
     for _, r in df.sort_values(["code_competence", "niveau"]).iterrows():
         lien = r.get("type_lien", "?")
-        rows.append(f"- [{lien}] {r['code_competence']} N{int(r['niveau'])} : {r['libelle_apprentissage']}")
+        rows.append(
+            f"- [{lien}] {r['code_competence']} N{int(r['niveau'])} : {r['libelle_apprentissage']}"
+        )
     return f"Module '{mod_name}' — {len(df)} AC couverts :\n" + "\n".join(rows)
 
 
@@ -242,7 +245,7 @@ def _lister_modules_dun_ac(token, id_ac):
     ac_label = df.iloc[0].get("libelle_apprentissage", f"AC {id_ac}")
     rows = []
     for _, r in df.iterrows():
-        nom  = r.get("nom", f"Module {int(r['id_module'])}")
+        nom = r.get("nom", f"Module {int(r['id_module'])}")
         code = r.get("code_module", "")
         lien = r.get("type_lien", "?")
         rows.append(f"- [{lien}] {code} — {nom}")
@@ -252,10 +255,10 @@ def _lister_modules_dun_ac(token, id_ac):
 def _ac_sans_module_requis(token):
     df_main, _, _ = _build_df_main(token)
     ac_requis = set(df_main[df_main["type_lien"] == "Requis"]["id_apprentissage_critique"])
-    all_acs   = df_main[
+    all_acs = df_main[
         ["id_apprentissage_critique", "libelle_apprentissage", "code_competence", "niveau"]
     ].drop_duplicates("id_apprentissage_critique")
-    orphans   = all_acs[~all_acs["id_apprentissage_critique"].isin(ac_requis)]
+    orphans = all_acs[~all_acs["id_apprentissage_critique"].isin(ac_requis)]
     if orphans.empty:
         return "Tous les AC ont au moins un module avec lien 'Requis'. Aucun trou détecté."
     rows = []
@@ -266,16 +269,16 @@ def _ac_sans_module_requis(token):
 
 def _modules_sans_ac_requis(token):
     df_main, df_mod, _ = _build_df_main(token)
-    mod_requis  = set(df_main[df_main["type_lien"] == "Requis"]["id_module"])
+    mod_requis = set(df_main[df_main["type_lien"] == "Requis"]["id_module"])
     all_modules = df_main[df_main["id_module"] != 0]["id_module"].unique()
-    orphans     = [m for m in all_modules if m not in mod_requis]
+    orphans = [m for m in all_modules if m not in mod_requis]
     if not orphans:
         return "Tous les modules ont au moins un AC avec lien 'Requis'."
     rows = []
     for m in sorted(orphans):
         row = df_mod[df_mod["id_module"] == m] if not df_mod.empty else pd.DataFrame()
         if not row.empty:
-            nom  = row.iloc[0].get("nom", f"Module {int(m)}")
+            nom = row.iloc[0].get("nom", f"Module {int(m)}")
             code = row.iloc[0].get("code_module", "")
             rows.append(f"- {code} — {nom}")
         else:
@@ -285,17 +288,19 @@ def _modules_sans_ac_requis(token):
 
 def _statistiques_globales(token):
     df_main, _, df_comp = _build_df_main(token)
-    nb_modules  = int(df_main[df_main["id_module"] != 0]["id_module"].nunique())
+    nb_modules = int(df_main[df_main["id_module"] != 0]["id_module"].nunique())
     nb_ac_total = int(df_main["id_apprentissage_critique"].nunique())
-    nb_comp     = len(df_comp)
-    nb_requis   = int(df_main[df_main["type_lien"] == "Requis"]["id_apprentissage_critique"].nunique())
-    pct_requis  = round(nb_requis / nb_ac_total * 100) if nb_ac_total else 0
+    nb_comp = len(df_comp)
+    nb_requis = int(
+        df_main[df_main["type_lien"] == "Requis"]["id_apprentissage_critique"].nunique()
+    )
+    pct_requis = round(nb_requis / nb_ac_total * 100) if nb_ac_total else 0
 
-    ac_requis_set   = set(df_main[df_main["type_lien"] == "Requis"]["id_apprentissage_critique"])
+    ac_requis_set = set(df_main[df_main["type_lien"] == "Requis"]["id_apprentissage_critique"])
     nb_ac_orphelins = nb_ac_total - len(ac_requis_set)
 
-    mod_requis_set   = set(df_main[df_main["type_lien"] == "Requis"]["id_module"])
-    all_mods         = df_main[df_main["id_module"] != 0]["id_module"].unique()
+    mod_requis_set = set(df_main[df_main["type_lien"] == "Requis"]["id_module"])
+    all_mods = df_main[df_main["id_module"] != 0]["id_module"].unique()
     nb_mod_orphelins = len([m for m in all_mods if m not in mod_requis_set])
 
     return (
@@ -320,8 +325,8 @@ def _couverture_competence(token, code_competence):
         rows.append(f"\n  Niveau N{int(niveau)} — {len(df_niv)} AC :")
         for _, r in df_niv.iterrows():
             nb_modules = df_main[
-                (df_main["id_apprentissage_critique"] == r["id_apprentissage_critique"]) &
-                (df_main["id_module"] != 0)
+                (df_main["id_apprentissage_critique"] == r["id_apprentissage_critique"])
+                & (df_main["id_module"] != 0)
             ]["id_module"].nunique()
             rows.append(f"    • {r['libelle_apprentissage']} ({nb_modules} module(s))")
     return "\n".join(rows)

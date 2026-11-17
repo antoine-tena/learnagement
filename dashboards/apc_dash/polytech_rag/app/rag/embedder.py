@@ -9,11 +9,7 @@ class TextEmbedder:
         self.model = SentenceTransformer(EMBEDDING_MODEL_NAME)
 
     def embed_texts(self, texts):
-        embeddings = self.model.encode(
-            texts,
-            convert_to_numpy=True,
-            normalize_embeddings=True
-        )
+        embeddings = self.model.encode(texts, convert_to_numpy=True, normalize_embeddings=True)
 
         return embeddings.astype("float32")
 

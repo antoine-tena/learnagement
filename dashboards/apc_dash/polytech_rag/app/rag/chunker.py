@@ -28,14 +28,16 @@ class TextChunker:
             text_chunks = self.chunk_text(page["text"])
 
             for chunk_text in text_chunks:
-                all_chunks.append({
-                    "chunk_id": f"chunk_{chunk_id}",
-                    "formation": page["formation"],
-                    "source": page["source"],
-                    "file_name": page["file_name"],
-                    "page": page["page"],
-                    "text": chunk_text
-                })
+                all_chunks.append(
+                    {
+                        "chunk_id": f"chunk_{chunk_id}",
+                        "formation": page["formation"],
+                        "source": page["source"],
+                        "file_name": page["file_name"],
+                        "page": page["page"],
+                        "text": chunk_text,
+                    }
+                )
 
                 chunk_id += 1
 

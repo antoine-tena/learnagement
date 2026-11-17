@@ -6,6 +6,7 @@ from numpy.strings import title
 from apc_dash.polytech_rag.app.config import RAW_PDF_DIR
 from apc_dash.polytech_rag.app.services.project_service import ProjectService
 
+
 class FileService:
     def read_pdf(self, formation, category):
         formation = formation.lower()
@@ -125,12 +126,14 @@ class FileService:
             description = content.split("Compétences clés")[0].strip()
             description = self.clean_text(description)
 
-            jobs.append({
-                "title": title,
-                "description": description[:450],
-                "competences": competences[:300],
-                "salary": salary
-            })
+            jobs.append(
+                {
+                    "title": title,
+                    "description": description[:450],
+                    "competences": competences[:300],
+                    "salary": salary,
+                }
+            )
 
         if not jobs:
             return response + self.clean_text(text[:2500])
@@ -162,11 +165,7 @@ class FileService:
 
         response = f"## Compétences principales — {formation.upper()}\n\n"
 
-        acs = re.findall(
-            r"(AC\s*\d+\.\d+\s+.*?)(?=AC\s*\d+\.\d+|$)",
-            text,
-            flags=re.DOTALL
-        )
+        acs = re.findall(r"(AC\s*\d+\.\d+\s+.*?)(?=AC\s*\d+\.\d+|$)", text, flags=re.DOTALL)
 
         if not acs:
             return self.answer_sections(text, formation, "Compétences principales")
@@ -197,11 +196,11 @@ class FileService:
 
         blocks = [
             "Concevoir des produits manufacturés",
-        "Industrialiser des produits manufacturés",
-        "Gérer un projet dans le domaine industriel",
-        "Optimiser les procédés de fabrication",
-        "Concevoir des systèmes mécatroniques",
-        "Concevoir des produits en matériaux composites"
+            "Industrialiser des produits manufacturés",
+            "Gérer un projet dans le domaine industriel",
+            "Optimiser les procédés de fabrication",
+            "Concevoir des systèmes mécatroniques",
+            "Concevoir des produits en matériaux composites",
         ]
 
         for title in blocks:
@@ -236,10 +235,10 @@ class FileService:
         clean_text = "\n".join(clean_lines)
 
         blocks = [
-        "CONCEVOIR LE SYSTÈME CONSTRUCTIF",
-        "GARANTIR LA PERFORMANCE",
-        "INTÉGRER DES SOLUTIONS DURABLES ADAPTÉES",
-        "PILOTER UN PROJET DE BÂTIMENT"
+            "CONCEVOIR LE SYSTÈME CONSTRUCTIF",
+            "GARANTIR LA PERFORMANCE",
+            "INTÉGRER DES SOLUTIONS DURABLES ADAPTÉES",
+            "PILOTER UN PROJET DE BÂTIMENT",
         ]
 
         for title in blocks:
@@ -295,15 +294,11 @@ class FileService:
             response += f"### {title}\n\n"
 
             situations = self.extract_items_between(
-                section,
-                "Situations professionnelles",
-                "Composantes essentielles"
+                section, "Situations professionnelles", "Composantes essentielles"
             )
 
             composantes = self.extract_items_between(
-                section,
-                "Composantes essentielles",
-                "APPRENTISSAGES"
+                section, "Composantes essentielles", "APPRENTISSAGES"
             )
 
             if not situations:
@@ -375,10 +370,7 @@ class FileService:
         for line in lines:
             if pattern.match(line):
                 if current_title:
-                    sections.append({
-                        "title": current_title,
-                        "content": "\n".join(current_content)
-                    })
+                    sections.append({"title": current_title, "content": "\n".join(current_content)})
 
                 current_title = line
                 current_content = []
@@ -387,10 +379,7 @@ class FileService:
                     current_content.append(line)
 
         if current_title:
-            sections.append({
-                "title": current_title,
-                "content": "\n".join(current_content)
-            })
+            sections.append({"title": current_title, "content": "\n".join(current_content)})
 
         return sections
 
@@ -435,16 +424,13 @@ class FileService:
         return self.clean_text(match.group(1))
 
     def extract_salary(self, text):
-        match = re.search(
-            r"(Junior\s*:\s*[^€]+€\s*Senior\s*:\s*[^€]+€)",
-            text,
-            flags=re.IGNORECASE
-        )
+        match = re.search(r"(Junior\s*:\s*[^€]+€\s*Senior\s*:\s*[^€]+€)", text, flags=re.IGNORECASE)
 
         if match:
             return self.clean_text(match.group(1))
 
         return ""
+
     def extract_section_around_title(self, text, title, all_titles):
         lower_text = text.lower()
         title_lower = title.lower()

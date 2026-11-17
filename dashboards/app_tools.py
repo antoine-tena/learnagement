@@ -13,7 +13,10 @@ from requests import HTTPError, Timeout, RequestException
 
 load_dotenv()
 
-INTERNAL_CERT_PATH = os.path.join(os.getenv("DOCKER_SSL_INTERNAL_DIR", "/etc/ssl/learnagement-internal/"), "cert.pem")
+INTERNAL_CERT_PATH = os.path.join(
+    os.getenv("DOCKER_SSL_INTERNAL_DIR", "/etc/ssl/learnagement-internal/"), "cert.pem"
+)
+
 
 def get_python_backend_url(endpoint):
     protocol = os.getenv("INSTANCE_PROTOCOL")
@@ -22,17 +25,22 @@ def get_python_backend_url(endpoint):
     url = f"{protocol}://{base_url}:{port}/{endpoint.lstrip('/').rstrip('/')}"
     return url
 
+
 def get_endpoint(url, token, data=None):
-    return python_endpoint('get', url, data, token)
+    return python_endpoint("get", url, data, token)
+
 
 def patch_endpoint(url, data, token):
-    return python_endpoint('patch', url, data, token)
+    return python_endpoint("patch", url, data, token)
+
 
 def post_endpoint(url, data, token):
-    return python_endpoint('post', url, data, token)
+    return python_endpoint("post", url, data, token)
+
 
 def delete_endpoint(url, token):
-    return python_endpoint('delete', url, None, token)
+    return python_endpoint("delete", url, None, token)
+
 
 def python_endpoint(method, url, data, token):
     """
@@ -55,28 +63,28 @@ def python_endpoint(method, url, data, token):
         else:
             logging.info(f"Calling {method} {url}")
         # Appel au "endpoint" (pas besoin de body car tout est dans la dépendance)
-        if method == 'get':
+        if method == "get":
             headers = {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': f'Bearer {token}'
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": f"Bearer {token}",
             }
-            resp = requests.get(url, headers=headers, params=data, timeout=30, verify=INTERNAL_CERT_PATH)
-        elif method == 'patch':
+            resp = requests.get(
+                url, headers=headers, params=data, timeout=30, verify=INTERNAL_CERT_PATH
+            )
+        elif method == "patch":
+            headers = {"Content-Type": "application/json", "Authorization": f"Bearer {token}"}
+            resp = requests.patch(
+                url, headers=headers, json=data, timeout=30, verify=INTERNAL_CERT_PATH
+            )
+        elif method == "post":
+            headers = {"Content-Type": "application/json", "Authorization": f"Bearer {token}"}
+            resp = requests.post(
+                url, headers=headers, json=data, timeout=30, verify=INTERNAL_CERT_PATH
+            )
+        elif method == "delete":
             headers = {
-                'Content-Type': 'application/json',
-                'Authorization': f'Bearer {token}'
-            }
-            resp = requests.patch(url, headers=headers, json=data, timeout=30, verify=INTERNAL_CERT_PATH)
-        elif method == 'post':
-            headers = {
-                'Content-Type': 'application/json',
-                'Authorization': f'Bearer {token}'
-            }
-            resp = requests.post(url, headers=headers, json=data, timeout=30, verify=INTERNAL_CERT_PATH)
-        elif method == 'delete':
-            headers = {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': f'Bearer {token}'
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": f"Bearer {token}",
             }
             resp = requests.delete(url, headers=headers, timeout=30, verify=INTERNAL_CERT_PATH)
         else:
@@ -92,12 +100,12 @@ def python_endpoint(method, url, data, token):
         resp.raise_for_status()
 
         # Parser la réponse received as string en DataFrame
-        #json_string = resp.content.decode('utf-8')
-        #print(json_string, flush=True)
-        #f json_string != "[]":
+        # json_string = resp.content.decode('utf-8')
+        # print(json_string, flush=True)
+        # f json_string != "[]":
         #    url_data = json.loads(json_string)
         #    return pd.read_json(io.StringIO(url_data))
-        #else:
+        # else:
         #    return pd.DataFrame()
 
         # Parser la réponse JSON
@@ -110,25 +118,24 @@ def python_endpoint(method, url, data, token):
         else:
             return pd.DataFrame()
 
-
     except Timeout as e:
         logging.exception(f"Timeout lors de l'appel à {url}")
-        #return pd.DataFrame()
+        # return pd.DataFrame()
         raise e
 
     except RequestException as e:
         logging.exception(f"Erreur de connexion: {e}")
-        #return pd.DataFrame()
+        # return pd.DataFrame()
         raise e
 
     except ValueError as e:
         logging.exception(f"Erreur lors du parsing de la réponse JSON: {e}")
-        #return pd.DataFrame()
+        # return pd.DataFrame()
         raise e
 
     except Exception as e:
         logging.exception(f"Erreur inattendue: {e}")
-        #return pd.DataFrame()
+        # return pd.DataFrame()
         raise e
 
 
@@ -137,30 +144,36 @@ def get_enseignants(token):
     df = get_endpoint(url, token=token)
     return df
 
+
 def get_etudiants(token):
     url = get_python_backend_url("/etudiants")
     df = get_endpoint(url, token=token)
     return df
+
 
 def get_filieres(token):
     url = get_python_backend_url("/filieres")
     df = get_endpoint(url, token=token)
     return df
 
+
 def get_statuts(token):
     url = get_python_backend_url("/statuts")
     df = get_endpoint(url, token=token)
     return df
+
 
 def get_promos(token):
     url = get_python_backend_url("/promos")
     df = get_endpoint(url, token=token)
     return df
 
+
 def get_groupe_types(token):
     url = get_python_backend_url("/groupe_types")
     df = get_endpoint(url, token=token)
     return df
+
 
 def get_seance_types(token):
     url = get_python_backend_url("/seance_types")

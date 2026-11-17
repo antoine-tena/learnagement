@@ -4,7 +4,8 @@ Bootstrap script: lance l'application avec uv, qui prépare l'environnement Pyth
 
 Ce script :
 1. Vérifie que uv est installé.
-2. Installe les hooks git qui tiennent `.env.git` (le commit de l'instance) à jour.
+2. Installe les hooks git qui tiennent `.env.git` (le commit de l'instance) à jour, et ceux de
+   pré-commit (règles et mise en forme), sauf en production.
 3. Crée ou met à jour `.venv` depuis `uv.lock`, sans le modifier.
 4. Lance l'application avec les arguments fournis.
 
@@ -16,6 +17,7 @@ import shutil
 import subprocess
 import sys
 
+from launcher.dev_hooks import install_dev_hooks
 from launcher.git import install_hooks, write_commit_file
 
 APP_MODULE = "Learnagement"
@@ -38,6 +40,7 @@ def main() -> None:
     if uv is None:
         sys.exit(f"!! uv est introuvable, installez-le : {UV_INSTALL_URL}")
     configure_git()
+    print(f">> {install_dev_hooks(uv)}")
     sys.exit(subprocess.call([uv, "run", "--frozen", "python", "-m", APP_MODULE, *sys.argv[1:]]))
 
 

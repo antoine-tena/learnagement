@@ -12,7 +12,7 @@ def main():
         "projets",
         "techniques",
         "bonnes_pratiques",
-        "experiences"
+        "experiences",
     ]
 
     print("=== Assistant d'orientation Polytech ===")
@@ -53,10 +53,7 @@ def main():
     print("\nGénération de la réponse...\n")
 
     answer = service.generate_answer(
-        formation=formation,
-        category=category,
-        level=level,
-        keyword=keyword
+        formation=formation, category=category, level=level, keyword=keyword
     )
 
     print(answer)
@@ -64,4 +61,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    

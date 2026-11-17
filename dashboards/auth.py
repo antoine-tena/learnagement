@@ -6,9 +6,12 @@ from datetime import datetime, timezone, timedelta
 from functools import wraps
 
 from flask import redirect, request, session, jsonify
-from dash import Dash,  Input, Output, State
+from dash import Dash, Input, Output, State
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(filename)s:%(funcName)s:%(lineno)d - %(message)s')
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(filename)s:%(funcName)s:%(lineno)d - %(message)s",
+)
 
 # Cookie posé par le front PHP sur le même hôte : le jeton ne passe pas par l'URL
 TOKEN_COOKIE = "lnm_token"
@@ -37,6 +40,7 @@ def is_token_valid(token, leeway=30):
     except:
         return False
 
+
 def decode_token(token, leeway=30):
     """
     Décode le token s'il est valide et non expiré
@@ -57,15 +61,9 @@ def decode_token(token, leeway=30):
         return False
     secret_key = os.getenv("JWT_SIGNING_KEY")
     try:
-        decode_options = {
-            "verify_signature": bool(secret_key),
-            "verify_exp": True
-        }
+        decode_options = {"verify_signature": bool(secret_key), "verify_exp": True}
 
-        decode_kwargs = {
-            "options": decode_options,
-            "leeway": timedelta(seconds=leeway)
-        }
+        decode_kwargs = {"options": decode_options, "leeway": timedelta(seconds=leeway)}
 
         if secret_key:
             decode_kwargs["key"] = secret_key
@@ -84,6 +82,7 @@ def decode_token(token, leeway=30):
         logging.exception(f"Token invalide")
         raise
 
+
 class FlaskAuth(Dash):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -94,19 +93,18 @@ class FlaskAuth(Dash):
             from flask import request
 
             # Vérifier si c'est un callback Dash
-            if request.path == '/_dash-update-component':
+            if request.path == "/_dash-update-component":
                 data = request.get_json(silent=True)
 
                 if data and "output" in data:
-
                     # Autoriser le callback qui écrit dans 'token'
                     if "token.data" in data["output"]:
                         return  # on laisse passer
 
-                token = session.get('token')
+                token = session.get("token")
 
                 if not is_token_valid(token):
-                    session.pop('token', None)
-                    #print("Redirection-", flush=True)
+                    session.pop("token", None)
+                    # print("Redirection-", flush=True)
                     logging.info(f"destroy token")
                     return

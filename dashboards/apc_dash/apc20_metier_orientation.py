@@ -11,7 +11,7 @@ COLOR_MAP = {
     "COMP_IDU1": "#FF4E3A",
     "COMP_IDU2": "#F39C3D",
     "COMP_IDU3": "#3F7EE8",
-    "COMP_IDU4": "#1FB985"
+    "COMP_IDU4": "#1FB985",
 }
 
 
@@ -28,86 +28,90 @@ def empty_figure(message="Chargement des données..."):
                 "x": 0.5,
                 "y": 0.5,
                 "showarrow": False,
-                "font": {"size": 16, "color": "#666"}
+                "font": {"size": 16, "color": "#666"},
             }
         ],
         margin=dict(l=20, r=20, t=60, b=20),
         height=420,
         plot_bgcolor="white",
-        paper_bgcolor="white"
+        paper_bgcolor="white",
     )
     return fig
 
 
 def default_ac_panel():
-    return html.Div([
-        html.H4(
-            "Apprentissages critiques par semestre",
-            style={"fontWeight": "bold", "marginBottom": "10px"}
-        ),
-        html.P(
-            "Sélectionnez un semestre dans le graphique pour afficher les apprentissages critiques.",
-            style={"margin": "0", "color": "#555"}
-        )
-    ])
-
-
-apc20_metier_orientation_layout = html.Div([
-    dcc.Store(id="metier-ac-store"),
-
-    html.H2("Orientation par métier", style={"marginBottom": "10px"}),
-
-    html.P(
-        "Choisissez un métier pour découvrir les compétences clés, "
-        "les apprentissages critiques et leur progression par semestre.",
-        style={"marginBottom": "25px"}
-    ),
-
-    html.Div([
-        html.Label("MÉTIER", style={"fontWeight": "bold", "marginBottom": "8px"}),
-        dcc.Dropdown(
-            id="metier-dropdown",
-            placeholder="Choisir un métier",
-            clearable=False
-        ),
-    ], style={"marginBottom": "25px"}),
-
-    html.Div([
-        html.Div([
-            dcc.Graph(
-                id="metier-competence-graph",
-                figure=empty_figure("Chargement des compétences...")
-            )
-        ], style={
-            "width": "49%",
-            "display": "inline-block",
-            "verticalAlign": "top"
-        }),
-
-        html.Div([
-            dcc.Graph(
-                id="metier-semestre-graph",
-                figure=empty_figure("Chargement des semestres...")
-            )
-        ], style={
-            "width": "49%",
-            "display": "inline-block",
-            "verticalAlign": "top",
-            "marginLeft": "2%"
-        }),
-    ], style={"marginBottom": "30px"}),
-
-    html.Div(
-        id="metier-semestre-ac-list",
-        children=default_ac_panel(),
-        style={
-            "padding": "20px",
-            "border": "1px solid #d9d9d9",
-            "borderRadius": "10px",
-            "backgroundColor": "#fafafa"
-        }
+    return html.Div(
+        [
+            html.H4(
+                "Apprentissages critiques par semestre",
+                style={"fontWeight": "bold", "marginBottom": "10px"},
+            ),
+            html.P(
+                "Sélectionnez un semestre dans le graphique pour afficher les apprentissages critiques.",
+                style={"margin": "0", "color": "#555"},
+            ),
+        ]
     )
-])
+
+
+apc20_metier_orientation_layout = html.Div(
+    [
+        dcc.Store(id="metier-ac-store"),
+        html.H2("Orientation par métier", style={"marginBottom": "10px"}),
+        html.P(
+            "Choisissez un métier pour découvrir les compétences clés, "
+            "les apprentissages critiques et leur progression par semestre.",
+            style={"marginBottom": "25px"},
+        ),
+        html.Div(
+            [
+                html.Label("MÉTIER", style={"fontWeight": "bold", "marginBottom": "8px"}),
+                dcc.Dropdown(
+                    id="metier-dropdown", placeholder="Choisir un métier", clearable=False
+                ),
+            ],
+            style={"marginBottom": "25px"},
+        ),
+        html.Div(
+            [
+                html.Div(
+                    [
+                        dcc.Graph(
+                            id="metier-competence-graph",
+                            figure=empty_figure("Chargement des compétences..."),
+                        )
+                    ],
+                    style={"width": "49%", "display": "inline-block", "verticalAlign": "top"},
+                ),
+                html.Div(
+                    [
+                        dcc.Graph(
+                            id="metier-semestre-graph",
+                            figure=empty_figure("Chargement des semestres..."),
+                        )
+                    ],
+                    style={
+                        "width": "49%",
+                        "display": "inline-block",
+                        "verticalAlign": "top",
+                        "marginLeft": "2%",
+                    },
+                ),
+            ],
+            style={"marginBottom": "30px"},
+        ),
+        html.Div(
+            id="metier-semestre-ac-list",
+            children=default_ac_panel(),
+            style={
+                "padding": "20px",
+                "border": "1px solid #d9d9d9",
+                "borderRadius": "10px",
+                "backgroundColor": "#fafafa",
+            },
+        ),
+    ]
+)
 
 
 def register_callbacks(app):
@@ -151,16 +155,12 @@ def register_callbacks(app):
         )
 
         options = [
-            {
-                "label": row["libelle_situation"],
-                "value": row["id_situation_professionnelle"]
-            }
+            {"label": row["libelle_situation"], "value": row["id_situation_professionnelle"]}
             for _, row in df.iterrows()
         ]
 
         default_value = options[0]["value"] if options else None
         return options, default_value
-
 
     @app.callback(
         Output("metier-ac-store", "data"),
@@ -190,7 +190,7 @@ def register_callbacks(app):
             "id_apprentissage_critique",
             "libelle_apprentissage",
             "id_competence",
-            "code_competence"
+            "code_competence",
         ]
         for col in required_cols:
             if col not in df.columns:
@@ -209,7 +209,6 @@ def register_callbacks(app):
             return []
 
         return df.to_dict("records")
-
 
     @app.callback(
         Output("metier-competence-graph", "figure"),
@@ -243,15 +242,12 @@ def register_callbacks(app):
             text="nb_ac",
             color="code_competence",
             color_discrete_map=COLOR_MAP,
-            title="Métier visé – Compétences mobilisées"
+            title="Métier visé – Compétences mobilisées",
         )
 
         fig.update_traces(
             textposition="outside",
-            hovertemplate=(
-                "Compétence=%{y}<br>"
-                "Nombre d'AC=%{x}<extra></extra>"
-            )
+            hovertemplate=("Compétence=%{y}<br>Nombre d'AC=%{x}<extra></extra>"),
         )
 
         fig.update_layout(
@@ -259,11 +255,10 @@ def register_callbacks(app):
             yaxis_title="Compétence",
             showlegend=False,
             margin=dict(l=50, r=20, t=70, b=40),
-            height=420
+            height=420,
         )
 
         return fig
-
 
     @app.callback(
         Output("metier-semestre-graph", "figure"),
@@ -295,15 +290,10 @@ def register_callbacks(app):
             y="nb_ac",
             text="nb_ac",
             custom_data=["id_semestre"],
-            title="Métier visé – Nombre d’AC par semestre"
+            title="Métier visé – Nombre d’AC par semestre",
         )
 
-        fig.update_traces(
-            hovertemplate=(
-                "Semestre=%{x}<br>"
-                "Nombre d'AC=%{y}<extra></extra>"
-            )
-        )
+        fig.update_traces(hovertemplate=("Semestre=%{x}<br>Nombre d'AC=%{y}<extra></extra>"))
 
         fig.update_layout(
             xaxis_title="Semestre",
@@ -311,11 +301,10 @@ def register_callbacks(app):
             clickmode="event+select",
             showlegend=False,
             margin=dict(l=50, r=20, t=70, b=40),
-            height=420
+            height=420,
         )
 
         return fig
-
 
     @app.callback(
         Output("metier-semestre-ac-list", "children"),
@@ -363,7 +352,7 @@ def register_callbacks(app):
         children = [
             html.H4(
                 f"Semestre {selected_semestre} — Apprentissages critiques",
-                style={"fontWeight": "bold", "marginBottom": "12px"}
+                style={"fontWeight": "bold", "marginBottom": "12px"},
             )
         ]
 
@@ -371,18 +360,21 @@ def register_callbacks(app):
             children.append(
                 html.P(
                     f"Métier sélectionné : {metier_label}",
-                    style={"marginBottom": "15px", "color": "#555"}
+                    style={"marginBottom": "15px", "color": "#555"},
                 )
             )
 
         children.append(
-            html.Ul([
-                html.Li(
-                    f"{row['code_competence']} — {row['libelle_apprentissage']}",
-                    style={"marginBottom": "10px"}
-                )
-                for _, row in ac_df.iterrows()
-            ], style={"paddingLeft": "22px"})
+            html.Ul(
+                [
+                    html.Li(
+                        f"{row['code_competence']} — {row['libelle_apprentissage']}",
+                        style={"marginBottom": "10px"},
+                    )
+                    for _, row in ac_df.iterrows()
+                ],
+                style={"paddingLeft": "22px"},
+            )
         )
 
         return html.Div(children)
