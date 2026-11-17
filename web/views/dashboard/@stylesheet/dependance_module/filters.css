@@ -1,0 +1,269 @@
+/* ===================== FILTERS SECTION ===================== */
+
+/* Le conteneur des filtres */
+body .dependance-module-container .main-content #filters-section,
+body .dependance-module-container #filters-section {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: flex-end !important;
+    gap: 16px !important;
+    padding: 14px 16px !important;
+    background: var(--surface) !important;
+    border: 0.5px solid var(--border) !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow-sm) !important;
+    margin-bottom: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Chaque input-wrap dans les filtres prend sa place naturellement */
+body .dependance-module-container #filters-section .input-wrap {
+    width: auto !important;
+    flex: 1 1 220px !important;
+    min-width: 180px !important;
+    max-width: 340px !important;
+}
+
+/* Le select lui-même */
+body .dependance-module-container #filters-section .input-wrap .select-wrap .select {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    width: 100% !important;
+    padding: 9px 36px 9px 12px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: var(--text-primary) !important;
+    background-color: var(--surface) !important;
+    background-image: none !important;
+    border: 1.5px solid var(--border) !important;
+    border-radius: var(--radius-lg) !important;
+    cursor: pointer !important;
+    outline: none !important;
+    line-height: 1.5 !important;
+    transition: border-color var(--transition), box-shadow var(--transition), background-color var(--transition) !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+body .dependance-module-container #filters-section .input-wrap .select-wrap .select:hover {
+    border-color: var(--border-strong) !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
+body .dependance-module-container #filters-section .input-wrap .select-wrap .select:focus {
+    border-color: var(--border-strong) !important;
+    box-shadow: var(--focus-ring) !important;
+    background-color: var(--surface-subtle) !important;
+}
+
+/* Chevron dans les filtres */
+body .dependance-module-container #filters-section .input-wrap .select-wrap .select-chevron {
+    position: absolute !important;
+    right: 11px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    color: var(--text-primary) !important;
+    font-size: 15px !important;
+    pointer-events: none !important;
+    transition: transform var(--transition) !important;
+    line-height: 1 !important;
+}
+
+body .dependance-module-container #filters-section .input-wrap .select-wrap:focus-within .select-chevron {
+    transform: translateY(-50%) rotate(180deg) !important;
+}
+
+body .dependance-module-container .tags-container {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    min-height: 0 !important;
+    margin-bottom: 10px !important;
+}
+
+body .dependance-module-container .tags-container:empty {
+    display: none !important;
+}
+
+body .dependance-module-container .input-wrap {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px;
+    width: 30%;
+}
+
+/* ── Label ── */
+body .dependance-module-container .input-wrap .input-label {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: var(--text-primary) !important;
+    letter-spacing: 0.3px !important;
+}
+
+/* ── Select-wrap ── */
+body .dependance-module-container .input-wrap .select-wrap {
+    position: relative !important;
+    width: 100% !important;
+}
+
+/* ── Le <select> ── */
+body .dependance-module-container .input-wrap .select-wrap .select {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    display: block !important;
+    width: 100% !important;
+    padding: 10px 38px 10px 14px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: var(--text-primary) !important;
+    background-color: var(--surface) !important;
+    background-image: none !important;
+    border: 1.5px solid var(--border) !important;
+    border-radius: var(--radius-lg) !important;
+    cursor: pointer !important;
+    outline: none !important;
+    line-height: 1.5 !important;
+    transition: border-color var(--transition), box-shadow var(--transition), background-color var(--transition) !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+/* Tailles variables */
+body .dependance-module-container .input-wrap .select-wrap .select-sm {
+    padding: 6px 34px 6px 10px !important;
+    font-size: 12px !important;
+    border-radius: var(--radius-md) !important;
+}
+body .dependance-module-container .input-wrap .select-wrap .select-lg {
+    padding: 13px 42px 13px 16px !important;
+    font-size: 15px !important;
+    border-radius: var(--radius-xl) !important;
+}
+
+/* Hover */
+body .dependance-module-container .input-wrap .select-wrap .select:hover {
+    border-color: var(--border-strong) !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
+/* Focus */
+body .dependance-module-container .input-wrap .select-wrap .select:focus {
+    border-color: var(--border-strong) !important;
+    box-shadow: var(--focus-ring) !important;
+    background-color: var(--surface-subtle) !important;
+}
+
+/* ── Chevron ── */
+body .dependance-module-container .input-wrap .select-wrap .select-chevron {
+    position: absolute !important;
+    right: 13px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    color: var(--text-primary) !important;
+    font-size: 16px !important;
+    pointer-events: none !important;
+    transition: transform var(--transition) !important;
+    line-height: 1 !important;
+}
+
+body .dependance-module-container .input-wrap .select-wrap:focus-within .select-chevron {
+    transform: translateY(-50%) rotate(180deg) !important;
+}
+
+/* ── Options ── */
+body .dependance-module-container .input-wrap .select-wrap .select option {
+    background-color: var(--surface) !important;
+    color: var(--text-primary) !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+}
+
+body .dependance-module-container .input-wrap .select-wrap .select option:checked {
+    background-color: var(--primary) !important;
+    color: var(--on-primary) !important;
+}
+
+/* ===================== FILTER TAGS ===================== */
+
+body .dependance-module-container .tags-container {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    min-height: 0 !important;
+    margin-bottom: 10px !important;
+    transition: all var(--transition) !important;
+}
+
+body .dependance-module-container .tags-container:empty {
+    display: none !important;
+    margin-bottom: 0 !important;
+}
+
+/* Tag individuel */
+body .dependance-module-container .tags-container .filter-tag {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 4px 10px 4px 12px !important;
+    background-color: color-mix(in srgb, var(--primary) 10%, var(--surface)) !important;
+    border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent) !important;
+    border-radius: var(--radius-pill) !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    color: var(--text-primary) !important;
+    transition: all var(--transition) !important;
+    animation: tag-in 0.2s ease !important;
+}
+
+body .dependance-module-container .tags-container .filter-tag:hover {
+    background-color: color-mix(in srgb, var(--primary) 18%, var(--surface)) !important;
+    border-color: var(--primary) !important;
+}
+
+/* Texte du tag */
+body .dependance-module-container .tags-container .filter-tag .tag-text {
+    line-height: 1 !important;
+    white-space: nowrap !important;
+}
+
+/* Bouton × */
+body .dependance-module-container .tags-container .filter-tag .remove-tag {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 16px !important;
+    height: 16px !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 50% !important;
+    background: color-mix(in srgb, var(--primary) 20%, transparent) !important;
+    color: var(--text-primary) !important;
+    font-size: 13px !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    transition: all var(--transition) !important;
+    flex-shrink: 0 !important;
+}
+
+body .dependance-module-container .tags-container .filter-tag .remove-tag:hover {
+    background: var(--primary) !important;
+    color: var(--on-primary) !important;
+    transform: scale(1.15) !important;
+}
+
+/* Animation d'apparition */
+@keyframes tag-in {
+    from { opacity: 0; transform: scale(0.8) translateY(-4px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Animation de disparition (via JS : tag.classList.add('removing')) */
+body .dependance-module-container .tags-container .filter-tag.removing {
+    animation: tag-out 0.18s ease forwards !important;
+}
+
+@keyframes tag-out {
+    from { opacity: 1; transform: scale(1); }
+    to   { opacity: 0; transform: scale(0.7); }
+}
