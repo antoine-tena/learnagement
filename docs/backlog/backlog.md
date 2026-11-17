@@ -93,24 +93,6 @@ fait valider par Flavien (`urgent.md`) : refusée, elle coûterait toute la phas
 - [ ] README, `CONTRIBUTING.md`, carte du `CLAUDE.md` à jour ; CODEOWNERS par zone
 - [ ] Prévenir les contributeurs avant (T-33)
 
-### T-39 · La base passe de MySQL à Postgres et tient la charge de septembre
-- **Type**: improvement
-- **Status**: todo
-- **Opened**: 2026-11-17
-- **Effort**: L · **Owner**: — · **Due**: —
-- **Origin**: réunion avec Flavien Vernier, 2026-11-17
-
-Environ 50 utilisateurs peu actifs aujourd'hui, environ 200 étudiants actifs en septembre (stages,
-puis mobilité, environ 400). Le serveur qui porte tous les conteneurs sature déjà. Postgres se
-réplique pour répartir la lecture ; remplace T-26 (mise à jour de MySQL).
-
-- [ ] Mesurer la charge actuelle (conteneur par conteneur) pour savoir ce qui sature
-- [ ] Migrer le schéma et les migrations `db/sql/` vers Postgres, puis les données
-- [ ] Adapter `launcher/db.py` (sauvegardes, initialisation) et le fragment `docker/compose/data_mysql*.yml`
-- [ ] Décider d'un cache (Redis) et d'une réplique en lecture selon la mesure
-- [ ] Coordonner avec les étudiants qui travaillent sur le déploiement automatique
-- [ ] Signaler le changement dans le README (variables d'environnement, commandes du lanceur)
-
 ### T-38 · Le RAG hors de l'image Dash
 - **Type**: improvement
 - **Status**: todo
@@ -306,6 +288,26 @@ dans les conteneurs.
 - [ ] OpenTelemetry pour les traces et les métriques, journaux structurés (T-13)
 - [ ] Une limite de mémoire par conteneur, des sondes de santé (T-06)
 
+### T-39 · La base passe de MySQL à Postgres
+- **Type**: improvement
+- **Status**: todo
+- **Opened**: 2026-11-17
+- **Effort**: L · **Owner**: — · **Due**: —
+- **Origin**: réunion avec Flavien Vernier, 2026-11-17 ; architecture cible (`docs/architecture.md`)
+
+Flavien veut passer à Postgres : un schéma par domaine (`docs/glossary.md`), la protection des
+données personnelles ligne par ligne, des copies en lecture si la charge l'exige, et le moment de
+renommer les tables. Ce qui sature le serveur aujourd'hui se mesure d'abord (T-52). Remplace T-26
+(mise à jour de MySQL).
+
+- [ ] Un schéma Postgres par domaine, les tables renommées d'après le glossaire
+- [ ] SQLAlchemy et Alembic à la place des migrations `VX.Y.Z__*.sql` ([ORM], [MIGRATIONS]), à
+  décider avec Flavien : ses conventions de base (`docs/db/README.md`) changent
+- [ ] Migrer les données (pgloader), sur une copie d'abord
+- [ ] Adapter le lanceur (`launcher/db.py` : initialisation, sauvegardes) et les fragments compose
+- [ ] Coordonner avec les étudiants qui travaillent sur le déploiement automatique
+- [ ] Signaler le changement dans le README (variables d'environnement, commandes du lanceur)
+
 ### T-40 · Le conteneur Next redémarre
 - **Type**: bug
 - **Status**: to verify — `frontend/`, `docker/frontend/`
@@ -317,6 +319,7 @@ Selon Flavien, le front Next ne démarre plus depuis une montée de version ; il
 développement et ne va pas en production. À réparer avant T-36, T-20, T-09 et T-19, qui n'ont de
 sens que sur un front qui tourne.
 
+Si T-12 retient la porte d'entrée, Next part dans le lab (T-47) et se répare là.
 ### T-43 · Le proxy CAS seulement en développement
 - **Type**: task
 - **Status**: to verify — `backend/auth/`, `config/`
@@ -381,6 +384,7 @@ mobilité presque identiques (`mobility-map.php`, `mobility-map_open.php`). Un m
 tests d'abord (`/kiln:modernize`), sans changer les routes. Le backend attend T-33 ;
 `mobility-admin.php` est migré en dernier (T-12).
 
+Fait partie des phases C et D (T-48, T-49).
 ### T-13 · Logs de l'API en structlog
 - **Type**: improvement
 - **Status**: todo
@@ -432,6 +436,7 @@ règles [ROUTERS] et [SERVICES]), avec T-11, sans changer les routes. Pas d'arch
 hexagonale : seule la logique complexe, comme l'affectation des mobilités, est isolée pour être
 testée sans base.
 
+Fait partie de la phase C (T-48).
 ### T-31 · Des noms parlants pour les tableaux de bord
 - **Type**: improvement
 - **Status**: todo
@@ -442,6 +447,7 @@ testée sans base.
 Les préfixes `appNN_` ne disent rien, et `app11_dag_dependance_new.py` côtoie son ancienne
 version. À décider après T-12, qui peut faire disparaître ces apps.
 
+Fait partie de la phase C (T-48) : un dossier par domaine, un fichier par rôle.
 ### T-32 · Des tests pour le front et les tableaux de bord
 - **Type**: improvement
 - **Status**: todo
@@ -461,6 +467,8 @@ retenu par T-12.
 
 Tout passer en anglais, sauf l'interface. À décider avec Flavien.
 
+Le glossaire (`docs/glossary.md`) fixe le nom de chaque mot du métier ; fait partie de la
+phase C (T-48).
 ### T-22 · Interface multilingue
 - **Type**: idea
 - **Status**: todo
@@ -506,6 +514,7 @@ Vérifier qu'un utilisateur n'est présent qu'une fois parmi administratif, ense
 
 L'ancienne liste demandait de revoir le nommage : vérifier ce qu'il reste après T-04.
 
+Fait partie de la phase C (T-48).
 ### T-28 · Connexion des tableaux de bord au standard LNM
 - **Type**: improvement
 - **Status**: to verify — `dashboards/`
@@ -525,9 +534,11 @@ Vérifier que la connexion à la base des tableaux de bord suit le standard LNM.
 Trois fronts (PHP, Dash, Next) pour une seule application : Dash 11 233 lignes, PHP 9 720, Next
 2 235. Flavien a une branche `refactor/nextJS_front` : décider avec lui la cible et le calendrier.
 
-Proposition : Next remplace le PHP page par page, sans réécriture d'un coup, `mobility-admin.php`
-en dernier. Les écrans de saisie de Dash passent à Next (T-37), les graphiques en lecture seule y
-restent tant que rien ne pousse à les déplacer. Préalables : T-34, T-35, T-36.
+Proposition (`docs/architecture.md`) : aucun front ne remplace les autres. Une porte d'entrée
+(T-41) les réunit sous un domaine et une session ; le PHP et Dash restent en production ; Next,
+absent de la production, part dans le lab (`lab/javascript/nextjs/`), d'où ses pages pourront
+monter une à une. L'ancienne proposition (Next remplace le PHP page par page, T-37) reste possible
+si Flavien la préfère.
 
 ### T-37 · Les écrans de saisie de Dash passent à Next
 - **Type**: idea
@@ -539,22 +550,25 @@ restent tant que rien ne pousse à les déplacer. Préalables : T-34, T-35, T-36
 Recenser les vues Dash qui écrivent (`app5_module_enseignant_edit.py`, par exemple) et les migrer
 une à une. Réécrire les graphiques en React coûterait cher pour peu de gain : ils restent en Dash.
 
-### T-41 · Un front unique fait de widgets, chacun dans son langage
+Inutile si T-12 retient la porte d'entrée (T-41) : les écrans de saisie restent en Dash.
+### T-41 · La porte d'entrée : un domaine, une session, toutes les pages
 - **Type**: idea
 - **Status**: blocked — waiting for T-12
 - **Opened**: 2026-11-17
 - **Effort**: L · **Owner**: — · **Due**: —
-- **Origin**: réunion avec Flavien Vernier, 2026-11-17
+- **Origin**: réunion avec Flavien Vernier, 2026-11-17 ; architecture cible (`docs/architecture.md`)
 
-Idée de Flavien : un seul front qui affiche des widgets, chacun écrit dans le langage que
-l'étudiant veut apprendre (comme les apps Dash aujourd'hui), tous passant par l'API. Le repo reste
-un projet où l'on apprend : chacun contribue dans son langage.
+Idée de Flavien : un seul front, où chacun contribue dans son langage. La cible la réalise en deux
+parties : la porte d'entrée, ici, et le lab (T-50). Aujourd'hui, le PHP redirige vers Dash et Next
+sur un autre port en posant un cookie (`web/views/dashboard/python.php`).
 
-Piste : une coquille (authentification CAS, menu, mise en page) lit un registre des widgets
-(nom, URL, rôles) et les affiche ; chaque widget est un conteneur servi sous `/widgets/<nom>/`
-par le reverse proxy, avec un modèle de départ par langage. Une seule API possède la base :
-les autres langages n'écrivent jamais en base directement. À décider avec T-12.
-
+- [ ] Un proxy (Caddy) : un seul domaine, des chemins au lieu de ports (`/`, `/api/`,
+  `/dashboards/`, `/assistant/`)
+- [ ] La session CAS ouverte une fois, par l'API ; le proxy la vérifie avant de servir une page et
+  transmet le jeton de l'utilisateur ([COOKIES])
+- [ ] Les pages de Dash, puis celles du lab passées en production, affichées dans le cadre du web
+- [ ] L'API revérifie les droits à chaque appel
+- [ ] Plus tard : un jeton limité à ce qu'une page déclare lire, et LTI 1.3
 ### T-42 · Des projets extérieurs lisent les données par l'API
 - **Type**: idea
 - **Status**: todo
