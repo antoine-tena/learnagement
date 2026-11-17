@@ -36,7 +36,7 @@ supprime un dossier, un domaine ou un point d'entrée.
 - `web/` : le front principal, en PHP (Apache) ; `index.php` + `utils/router.php`, `views/`
   (pages, dont `views/dashboard/mobility-admin/`), `components/`, `scripts/` (`mobility-admin/`, `mobility-map/`, `mobility-map-open/`), `utils/apiProxy.php` (appels à l'API), `theme/` (dont `theme/theme/`), `assets/`.
 - `dashboards/` : les tableaux de bord Dash (`main.py`, une app `appNN_*` par vue (dont
-  `app10_stage_administratif/`) et son `_tools.py`), `apc_dash/` (approche par compétences, dont
+  `app5_module_enseignant_edit/`, `app10_stage_administratif/`) et son `_tools.py`), `apc_dash/` (approche par compétences, dont
   `apc20_heatmap_apc/`).
 - `frontend/` : le front Next.js en cours de refonte (`app/`, proxy vers l'API).
 - `scraping/` : le paquet `learnagement_scraping` (commande `learnagement-scraping`) : `parsers.py`
