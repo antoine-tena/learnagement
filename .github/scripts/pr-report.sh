@@ -49,7 +49,7 @@ routes_section() {
     fi
     (cd backend && uv run python -m tools.export_openapi --output "$LOG_DIR/openapi-head.json") \
         >/dev/null 2>"$LOG_DIR/export.log"
-    podman run --rm -v "$LOG_DIR:/specs:Z" "$OASDIFF_IMAGE" breaking \
+    podman run --rm --quiet -v "$LOG_DIR:/specs:Z" "$OASDIFF_IMAGE" breaking \
         /specs/openapi-base.json /specs/openapi-head.json --fail-on ERR >"$LOG_DIR/routes.log" 2>&1
     local status=$?
     verdict "$status" "Aucune route cassée." \
