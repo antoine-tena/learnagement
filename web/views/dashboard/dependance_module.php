@@ -18,7 +18,7 @@
   foreach ($dataGantt as $item) {
       if (!empty($item['prv_semestre'])) $semestres_bruts[] = $item['prv_semestre'];
       if (!empty($item['nxt_semestre'])) $semestres_bruts[] = $item['nxt_semestre'];
-      
+
       if (!empty($item['prv_nom'])) $modules_bruts[] = $item['prv_nom'];
       if (!empty($item['nxt_nom'])) $modules_bruts[] = $item['nxt_nom'];
 
@@ -30,7 +30,7 @@
   $options_modules = array_unique($modules_bruts);
   $options_filieres = array_unique($filieres);
 
-  sort($options_semestres); 
+  sort($options_semestres);
   sort($options_modules);
   sort($options_filieres);
 
@@ -62,7 +62,10 @@
   </script>
 
   <script>
-      <?= $t->script("dependance_module") ?>
+      <?= $t->script("dependance_module/transform") ?>
+      <?= $t->script("dependance_module/gantt") ?>
+      <?= $t->script("dependance_module/filters") ?>
+      <?= $t->script("dependance_module/modal") ?>
   </script>
 <?php $t->endSlot(); ?>
 
@@ -71,7 +74,7 @@
 <div class="dependance-module-container">
 
     <section class="main-content">
-        
+
       <div class="filters-section" id="filters-section">
           <?php if ($user_type === 'enseignant') { ?>
             <?= $t->component("select", props: [
@@ -88,7 +91,7 @@
                   "id" => "periode-filter",
                   "defaultText" => "Année complète"
                 ]); ?>
-          
+
           <?= $t->component("select", props: [
                   "label" => "Module",
                   "minWidth" => 300,
@@ -102,23 +105,23 @@
             <div class="button-section">
                 <!--
                 <?= $t->component("button", props: [
-                    "id" => "btn-add-module", 
-                    "label" => "Ajouter module", 
-                    "variant" => "primary", 
+                    "id" => "btn-add-module",
+                    "label" => "Ajouter module",
+                    "variant" => "primary",
                     "size" => "sm"
                 ]); ?>
 
                 <?= $t->component("button", props: [
-                    "id" => "btn-add-sequence", 
-                    "label" => "Ajouter séquence", 
-                    "variant" => "primary", 
+                    "id" => "btn-add-sequence",
+                    "label" => "Ajouter séquence",
+                    "variant" => "primary",
                     "size" => "sm"
                 ]); ?>
                 -->
             </div>
           <?php } ?>
           <div id = "gantt-chart" class="gantt-chart"></div>
-          
+
       </div>
     </section>
 
@@ -150,7 +153,7 @@
             <input type="number" name="hProjet" placeholder="Projet" min="0" step="0.5">
             <input type="number" name="hPerso" placeholder="Perso" min="0" step="0.5">
             <input type="number" name="ECTS" placeholder="ECTS" min="0" step="0.5">
-            
+
           </div>
         </div>
 
@@ -202,7 +205,7 @@
             <?php } ?>
 
           </select>
-          
+
         </div>
 
       </div>

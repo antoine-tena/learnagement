@@ -34,7 +34,7 @@ supprime un dossier, un domaine ou un point d'entrée.
   domaine : `lnm_university/`, `maquette_module/`, `lnm_etudiant/`, `lnm_mobility_assignment/`…, en snake_case ; les tables SQL gardent leur casse), `models/`, `db/` (connexion
   SQLAlchemy), `tests/` (pytest).
 - `web/` : le front principal, en PHP (Apache) ; `index.php` + `utils/router.php`, `views/`
-  (pages, dont `views/dashboard/mobility-admin/`, `views/dashboard/stage/`), `components/`, `scripts/` (`mobility-admin/`, `mobility-map/`, `mobility-map-open/`), `utils/apiProxy.php` (appels à l'API), `theme/` (dont `theme/theme/`), `assets/`.
+  (pages, dont `views/dashboard/mobility-admin/`, `views/dashboard/stage/`), `components/`, `scripts/` (`dependance_module/`, `mobility-admin/`, `mobility-map/`, `mobility-map-open/`), `utils/apiProxy.php` (appels à l'API), `theme/` (dont `theme/theme/`), `assets/`.
 - `dashboards/` : les tableaux de bord Dash (`main.py`, `main_app/`, une app `appNN_*` par vue (dont
   `app5_module_enseignant_edit/`, `app10_stage_administratif/`, `app14_check_administratif/`) et son `_tools.py`), `apc_dash/` (approche par compétences, dont
   `apc20_competence_ac/`, `apc20_heatmap_apc/`, `apc20_ens_reseau_gaps/`, `app_reseaupolytech_etudiant/`).
