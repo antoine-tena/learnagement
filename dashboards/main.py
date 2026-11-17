@@ -8,9 +8,7 @@ import jwt
 import dash_bootstrap_components as dbc
 from flask import session, jsonify
 from dash import Input, Output, dcc, html, State
-from urllib.parse import urlparse
-from urllib.parse import parse_qs
-from auth import FlaskAuth, decode_token
+from auth import FlaskAuth, decode_token, token_from_cookie
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(filename)s:%(funcName)s:%(lineno)d - %(message)s')
 
@@ -64,7 +62,7 @@ def import_apps():
     from app11_dag_dependance import app11_layout, register_callbacks as register_callbacks_app11
     from app11_dag_dependance_new import app11_new_layout, register_callbacks as register_callbacks_app11_new
     from app13_mccc_administratif import app13_administratif_layout, register_callbacks as register_callbacks_app13_administratif
-    from app14_check_administratif import app14_administratif_layout, register_callbacks as register_callbacks_app14_administratif    
+    from app14_check_administratif import app14_administratif_layout, register_callbacks as register_callbacks_app14_administratif
     from apc_dash.apc_hub import apc_hub_layout, register_apc_hub_callbacks
 
     return {
@@ -116,7 +114,7 @@ menu_items = {
         ('Charge de travail', 'app7_enseignant'),
         ('Tutorat stages', 'app10_enseignant'),
         ('Approche par compétences', 'apc20_hub'),
-      
+
     ],
     'etudiant': [
         ('Stages', 'app10_etudiant'),
@@ -136,7 +134,7 @@ if environment == "dev":
 
 #SECRET_KEY = os.getenv("INSTANCE_SECRET").encode()
 
-def render_sidebar(section, token_arg, status):
+def render_sidebar(section, status):
     # AJOUTE CES DEUX LIGNES POUR LE DÉBOGAGE :
     print(f"====== CRÉATION DU MENU POUR : {section} ======", flush=True)
     print(f"====== CONTENU DU MENU : {menu_items[section]} ======", flush=True)
@@ -150,7 +148,7 @@ def render_sidebar(section, token_arg, status):
     # Navigation
     navs = []
     for label, key in menu_items[section]:
-        href = f"/{section}/{key}?" + token_arg 
+        href = f"/{section}/{key}"
         icon_class = icon_map.get(key, 'fa-solid fa-circle')  # icône par défaut si manquante
         navs.append(
             dbc.NavLink([
@@ -213,13 +211,12 @@ app.layout = html.Div([
 )
 def update_sidebar(url, pathname, status):
     logging.info("update_sidebar")
-    token_arg = url.strip().split('?')[1]
     if pathname and pathname.startswith('/enseignant'):
-        return render_sidebar('enseignant', token_arg, status)
+        return render_sidebar('enseignant', status)
     elif pathname and pathname.startswith('/etudiant'):
-        return render_sidebar('etudiant', token_arg, status)
+        return render_sidebar('etudiant', status)
     elif pathname and pathname.startswith('/administratif'):
-        return render_sidebar('administratif', token_arg, status)
+        return render_sidebar('administratif', status)
     else:
         # Chemin non reconnu : sidebar vide ou message par défaut
         return html.Div([
@@ -259,13 +256,11 @@ def render_page(url, pathname, token):
 def check_auth_token(url):
     logging.info("check_auth_token")
     # print(url, flush=True)
-    parsed_url = urlparse(url)
     instance_protocol = os.getenv("INSTANCE_PROTOCOL")
     instance_url = os.getenv("INSTANCE_URL")
     front_php_port = os.getenv("FRONT_PHP_PORT")
 
-    jwt_token = parse_qs(parsed_url.query)['jwt_token'][0]
-    # print(jwt_token, flush=True)
+    jwt_token = token_from_cookie()
 
     session['token'] = jwt_token
 
@@ -276,7 +271,7 @@ def check_auth_token(url):
         return "-1", "none", "none", "no token"
     #try:
     payload = decode_token(jwt_token)
-    print(payload, flush=True)
+    logging.info("user %s connected", payload["id"])
     # Attach user info to the Flask global context
     if 'enseignant' in payload["roles"]:
         return jwt_token, payload['id'], "enseignant", "Connected"
@@ -290,7 +285,7 @@ def check_auth_token(url):
 
 
 def render_page_content(url, pathname, token):
-    logging.info("render_page_content " + token)
+    logging.info("render_page_content")
 
     parts = pathname.strip('/').split('/')  # ['enseignant', 'app2'] ou ['etudiant','app7'] ou ['enseignant'] etc.
     if len(parts) == 1:

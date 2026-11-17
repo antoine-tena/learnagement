@@ -5,10 +5,19 @@ from datetime import datetime, timezone, timedelta
 
 from functools import wraps
 
-from flask import redirect, session, jsonify
+from flask import redirect, request, session, jsonify
 from dash import Dash,  Input, Output, State
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(filename)s:%(funcName)s:%(lineno)d - %(message)s')
+
+# Cookie posé par le front PHP sur le même hôte : le jeton ne passe pas par l'URL
+TOKEN_COOKIE = "lnm_token"
+
+
+def token_from_cookie() -> str | None:
+    """Le jeton de la requête en cours, ou None s'il n'y en a pas."""
+    return request.cookies.get(TOKEN_COOKIE) or None
+
 
 def is_token_valid(token, leeway=30):
     """
@@ -95,7 +104,6 @@ class FlaskAuth(Dash):
                         return  # on laisse passer
 
                 token = session.get('token')
-                logging.info(f"Token: {token}")
 
                 if not is_token_valid(token):
                     session.pop('token', None)
