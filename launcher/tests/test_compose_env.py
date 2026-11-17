@@ -58,3 +58,10 @@ def test_next_backup_is_today_or_tomorrow() -> None:
     assert parse_backup_at("22h30") == time(22, 30)
     assert seconds_until(time(9, 0), morning) == 3600
     assert seconds_until(time(7, 0), morning) == 23 * 3600
+
+
+def test_production_is_backed_up_with_a_health_check() -> None:
+    services = yaml.safe_load(compose.render_compose(CONTAINERS["prod"], VARIABLES))["services"]
+    backup = services["data_mysql_backup_test"]
+    assert backup["healthcheck"]["test"][-1] == "health"
+    assert "${MYSQL_USER_PASSWORD}" in str(backup["environment"])
