@@ -22,3 +22,5 @@
 ## [Front NextJS](frontend/README.md)
 
 [Back](../README.md)
+
+<!-- Test du rapport de PR, à ne pas merger. -->
