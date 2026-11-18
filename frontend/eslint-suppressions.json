@@ -25,34 +25,6 @@
       "count": 1
     }
   },
-  "app/modules/maquetteModule/customNode.tsx": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 3
-    }
-  },
-  "app/modules/maquetteModule/floatingConnectionLine.tsx": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 5
-    }
-  },
-  "app/modules/maquetteModule/floatingEdge.tsx": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 5
-    }
-  },
-  "app/modules/maquetteModule/maquetteFlow.tsx": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 6
-    }
-  },
-  "app/modules/maquetteModule/maquetteModule.tsx": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 4
-    },
-    "react-hooks/rules-of-hooks": {
-      "count": 7
-    }
-  },
   "app/page.tsx": {
     "react-hooks/set-state-in-effect": {
       "count": 1
