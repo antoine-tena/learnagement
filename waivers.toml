@@ -4,7 +4,7 @@
 
 [[waiver]]
 rule = "UV-PODMAN"
-paths = ["scraping/scripts/**"]
+paths = ["app/importers/scripts/**"]
 reason = "Scripts de l'équipe gardés tels quels"
 by = "antoine-tena"
 since = 2026-11-17
