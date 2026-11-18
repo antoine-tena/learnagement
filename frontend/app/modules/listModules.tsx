@@ -24,17 +24,11 @@ import axios from "axios";
  */
 export default function ListModule(){
     const {listModules} = useListModulesStore()
-    const [moduleClicked, setModuleClicked] = useState(-1)
     const [idModulesHasApc, setIdModulesHasApc] = useState<string[]>([])
 
     const searchParams = useSearchParams()
     const  id_module = searchParams.get("id_module")
-
-    useEffect(() => {
-        if (id_module != undefined){
-            setModuleClicked(parseInt(id_module))
-        }
-    }, [searchParams]);
+    const moduleClicked = id_module != undefined ? parseInt(id_module) : -1
 
     useEffect(() => {
         const form_data = new FormData
