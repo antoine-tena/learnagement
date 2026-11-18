@@ -124,6 +124,10 @@ Actuellement 4 instances en parallèle sont possibles.
 
 ## Changements d'interface
 
+- **2026-11-18** : nouvelle variable `TRUSTED_PROXIES` (`config/env.skeleton`) : les proxys dont
+  l'API croit l'en-tête `X-Forwarded-For`, par défaut les réseaux des conteneurs. La limite de
+  débit de `/token` et de l'activation compte ainsi par client réel derrière le front PHP ; le
+  front PHP transmet l'adresse du client. Le front Next ne la transmet pas encore.
 - **2026-11-18** : nouvelle commande du lanceur, `fake-data`, et nouvelle question au premier
   lancement hors production : un jeu fictif (`small` par défaut) ou vos propres fichiers
   (`none`, l'ancien comportement). La production ne change pas.
