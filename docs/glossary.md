@@ -38,6 +38,7 @@ qu'il prend dans le code et la table qui le porte aujourd'hui.
 | étudiant | `student` | `LNM_etudiant` |
 | enseignant | `teacher` | `LNM_enseignant` |
 | administratif | `staff` | `LNM_administratif` |
+| personne, dans une seule des trois tables (login, mail) | `person` | `LNM_etudiant`, `LNM_enseignant`, `LNM_administratif` |
 | utilisateur connecté, quel que soit son rôle | `user` | (modèle `User`) |
 | rôle | `role` | `LNM_role`, `LNM_*_as_role` |
 | groupe (CM, TD, TP) | `student_group` | `LNM_groupe`, `LNM_etudiant_as_groupe` |

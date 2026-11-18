@@ -1,6 +1,76 @@
 {
   "components": {
     "schemas": {
+      "ActivationConfirm": {
+        "additionalProperties": false,
+        "properties": {
+          "password": {
+            "maxLength": 72,
+            "minLength": 12,
+            "title": "Password",
+            "type": "string"
+          },
+          "token": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "password"
+        ],
+        "title": "ActivationConfirm",
+        "type": "object"
+      },
+      "ActivationDone": {
+        "properties": {
+          "is_activated": {
+            "title": "Is Activated",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "is_activated"
+        ],
+        "title": "ActivationDone",
+        "type": "object"
+      },
+      "ActivationLink": {
+        "properties": {
+          "expires_at": {
+            "title": "Expires At",
+            "type": "string"
+          },
+          "token": {
+            "title": "Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "expires_at"
+        ],
+        "title": "ActivationLink",
+        "type": "object"
+      },
+      "ActivationRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "login": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Login",
+            "type": "string"
+          }
+        },
+        "required": [
+          "login"
+        ],
+        "title": "ActivationRequest",
+        "type": "object"
+      },
       "AssignmentRunPayload": {
         "properties": {
           "annee_eligible": {
@@ -644,6 +714,95 @@
         "tags": [
           "check",
           "tree"
+        ]
+      }
+    },
+    "/account-activation": {
+      "post": {
+        "description": "Un lien d'activation pour un compte interne, créé par un administratif.",
+        "operationId": "create_activation_link_account_activation_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivationLink"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Create Activation Link",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/account-activation/confirm": {
+      "post": {
+        "description": "Pose le mot de passe choisi, haché par l'API.",
+        "operationId": "confirm_activation_account_activation_confirm_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivationConfirm"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivationDone"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Confirm Activation",
+        "tags": [
+          "auth"
         ]
       }
     },

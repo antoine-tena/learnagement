@@ -158,6 +158,13 @@ def backup_db(backup_folder: Path) -> None:
     db.backup(backup_folder)
 
 
+@cli.command(name="structuredb", help="Extract the database structure with its comments")
+@click.option("--output", default="db/backup/structure.sql", type=click.Path(path_type=Path))
+def structure_db(output: Path) -> None:
+    dotenv.load_dotenv()
+    db.extract_structure(output)
+
+
 @cli.command(name="exportinstance", help="Export the current instance as a zip archive")
 def export_instance() -> None:
     dotenv.load_dotenv()

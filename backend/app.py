@@ -8,6 +8,7 @@ import init
 from auth import authenticate
 from core.logging import logger, uvicorn_log_config
 from domains import (
+    account_activation,
     apc_competence,
     apc_data,
     apc_kpi_competence,
@@ -53,6 +54,7 @@ app.include_router(apc_kpi_competence.router)
 app.include_router(apc_competence.router)
 app.include_router(lnm_calendar.router)
 app.include_router(lnm_mobility_assignment.router)
+app.include_router(account_activation.router)
 
 
 # Classical health
