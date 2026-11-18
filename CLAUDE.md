@@ -18,7 +18,8 @@ supprime un dossier, un domaine ou un point d'entrée.
   `generate-env`, `backupdb`…), dont le code est dans `launcher/` : `cli.py` (les commandes
   click), `instance.py` (changer d'environnement, remise à zéro, export, import), `docker.py` et
   `compose.py` (commandes compose, `compose.yaml` assemblé, attente des sondes), `db.py`
-  (initialisation, administrateur, sauvegardes), `backups/` (ancienne sauvegarde planifiée en Python,
+  (initialisation, administrateur, sauvegardes), `fake_data/` (le générateur de données fictives,
+  commande `fake-data`, proposé au premier lancement hors production), `backups/` (ancienne sauvegarde planifiée en Python,
   pas branchée), `env.py` (génération et propagation des `.env`), `git.py` (commit dans `.env.git`),
   `config.py` (conteneurs par environnement), `dev_hooks.py` (hooks de pré-commit, posés par
   `bootstrap.py`), `security.py` (certificats :

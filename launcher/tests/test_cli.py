@@ -21,6 +21,7 @@ def test_command_names_stay_stable() -> None:
     assert set(cli_module.cli.commands) == {
         "backupdb",
         "exportinstance",
+        "fake-data",
         "generate-env",
         "gui",
         "import-instance",
