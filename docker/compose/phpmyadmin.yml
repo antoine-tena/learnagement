@@ -8,11 +8,11 @@
             - ${PHPMYADMIN_PORT}:${PHPMYADMIN_DOCKER_PORT}
         environment:
             - PMA_HOST=data_mysql_${INSTANCE_NAME}
-            - RELATIONA_DISPLAY=D
+            - RELATIONAL_DISPLAY=D
             - APACHE_HTTP_PORT_NUMBER=${PHPMYADMIN_DOCKER_PORT}
         volumes:
             # En lecture seule, en complément de la configuration de l'image
-            - ./phpmyadmin/config.inc.php:/etc/phpmyadmin/config.user.inc.php:ro
+            - ./phpmyadmin/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php:ro
         depends_on:
             data_mysql_${INSTANCE_NAME}:
                 condition: service_healthy
