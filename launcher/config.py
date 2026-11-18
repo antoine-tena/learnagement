@@ -26,17 +26,17 @@ CONTAINER_APP_DIRS: dict[str, str | None] = {
     "frontend": "frontend",
 }
 # Le fragment compose de chaque conteneur : le `compose.yaml` d'une application, dans son
-# dossier, ou celui d'un service de la base et de l'exploitation, dans `docker/compose/`
+# dossier, ou celui d'un service de la base et de l'exploitation, dans `deploy/compose/`
 COMPOSE_FRAGMENTS = {
-    "data_mysql": "docker/compose/data_mysql.yml",
-    "data_mysql_backup": "docker/compose/data_mysql_backup.yml",
-    "etl": "docker/compose/etl.yml",
-    "phpmyadmin": "docker/compose/phpmyadmin.yml",
+    "data_mysql": "deploy/compose/data_mysql.yml",
+    "data_mysql_backup": "deploy/compose/data_mysql_backup.yml",
+    "etl": "deploy/compose/etl.yml",
+    "phpmyadmin": "deploy/compose/phpmyadmin.yml",
     "backend": "app/api/compose.yaml",
     "web": "app/web/compose.yaml",
     "dashboards": "app/dashboards/compose.yaml",
     "frontend": "frontend/compose.yaml",
 }
 # compose lit aussi son .env, pour les variables qu'il interpole
-COMPOSE_DIR = "docker"
+COMPOSE_DIR = "deploy"
 envs = {"dev", "prod"}

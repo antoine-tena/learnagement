@@ -11,7 +11,7 @@ from launcher.config import GREEN, NC
 
 logger = logging.getLogger(__name__)
 
-DOCKER_DIR = Path("docker")
+DOCKER_DIR = Path("deploy")
 COMPOSE_FILE = DOCKER_DIR / "compose.yaml"
 
 

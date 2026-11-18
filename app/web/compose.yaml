@@ -1,3 +1,4 @@
+    # Fragment assemblé par le lanceur dans deploy/compose.yaml : les chemins partent de deploy/.
     front_php_${INSTANCE_NAME}:
         container_name: learnagement_php_${INSTANCE_NAME}
         build:

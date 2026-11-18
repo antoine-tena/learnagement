@@ -9,8 +9,8 @@
 **/data
 **/backup
 # sauf le script de sauvegarde, qui ne contient aucune donnée
-!docker/backup/
-!docker/backup/backup.sh
+!deploy/backup/
+!deploy/backup/backup.sh
 database/docker-entrypoint-initdb.d
 
 __pycache__
@@ -18,7 +18,7 @@ __pycache__
 *#
 
 # private files that contain password, NEVER PUT IN ON GIT (must be replaced by .env)
-docker/compose.yaml
+deploy/compose.yaml
 certs/
 *.pem
 *.key

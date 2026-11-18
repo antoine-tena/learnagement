@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 FRAGMENTS_DIR = DOCKER_DIR / "compose"
 # Les variables remplacées dans le fichier ; les autres (mots de passe) sont lues par compose
-# dans docker/.env au lancement, pour ne pas les écrire en clair.
+# dans deploy/.env au lancement, pour ne pas les écrire en clair.
 COMPOSE_VARIABLES = (
     "INSTANCE_PROTOCOL",
     "INSTANCE_NAME",
