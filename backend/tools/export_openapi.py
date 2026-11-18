@@ -13,6 +13,8 @@ import logging
 import sys
 from pathlib import Path
 
+import structlog
+
 import tests.conftest  # noqa: F401  (pose les variables factices avant l'import de l'app)
 
 EXIT_DRIFT = 1
@@ -20,7 +22,10 @@ EXIT_DRIFT = 1
 
 def render_schema() -> str:
     """Le schéma OpenAPI de l'application, en JSON stable (clés triées, fin de ligne)."""
-    logging.disable(logging.INFO)  # les routes générées se journalisent à l'import
+    import core.logging  # noqa: F401  (configure structlog avant de le restreindre)
+
+    # les routes générées se journalisent à l'import
+    structlog.configure(wrapper_class=structlog.make_filtering_bound_logger(logging.WARNING))
     from app import app
 
     return json.dumps(app.openapi(), indent=2, sort_keys=True, ensure_ascii=False) + "\n"
@@ -41,10 +46,10 @@ def main(argv: list[str]) -> int:
         return 0
     is_current = arguments.output.exists() and arguments.output.read_text("utf-8") == schema
     if not is_current:
-        print(
+        sys.stderr.write(
             f"{arguments.output} ne correspond plus au code : "
-            "uv run python -m tools.export_openapi --output ../openapi.json",
-            file=sys.stderr,
+            "uv run python -m tools.export_openapi --output ../openapi.json"
+            "\n"
         )
         return EXIT_DRIFT
     return 0

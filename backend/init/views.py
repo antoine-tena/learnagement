@@ -1,11 +1,9 @@
 """Construction des vues ExplicitSecondaryKs_* et point d'entrée init()."""
 
-import traceback
 from typing import Any
 
 import mysql.connector
-
-from core.config import TermColors
+import structlog
 
 from .introspection import (
     DATABASE,
@@ -19,6 +17,8 @@ from .introspection import (
     request,
 )
 from .queries import requests
+
+logger = structlog.get_logger(__name__)
 
 
 def __build_secondary_key_request(conn: Connection, table: str) -> dict[str, Any]:
@@ -82,20 +82,13 @@ def init() -> None:
         database=DATABASE,
     )
 
-    print("##############################################################", flush=True)
     tables = request(requests["check"]["table_without_secondary_K"])
     for table in tables:
-        print(TermColors.WARNING + "Warning: " + table + " has no secondary key!" + TermColors.ENDC)
+        logger.warning("init.table_without_secondary_key", table=table)
 
     tables = request(requests["check"]["primaryK_namming_error"])
     for table in tables:
-        print(
-            TermColors.WARNING
-            + "Warning: "
-            + table
-            + " has wrong primary key naming!"
-            + TermColors.ENDC
-        )
+        logger.warning("init.primary_key_misnamed", table=table)
 
     linked_tables = request(requests["struct"]["linked_table"])
     leaf_tables = request(requests["struct"]["leaf_table"])
@@ -107,15 +100,10 @@ def init() -> None:
         try:
             cursor.execute(query)
             cursor.fetchall()
-        except mysql.connector.Error as err:
-            print(f"Impossible d'exécuter la requête \n {query}:\n {err}")
-            print(traceback.format_exc())
+        except mysql.connector.Error:
+            logger.exception("init.secondary_key_view_failed", table=table)
         finally:
             cursor.close()
 
     conn.close()
-    print(
-        TermColors.OKGREEN
-        + "Init BD Framework requirement done (Check previous Warning)!"
-        + TermColors.ENDC
-    )
+    logger.info("init.done")

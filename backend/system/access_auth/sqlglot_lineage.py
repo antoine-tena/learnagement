@@ -2,6 +2,9 @@
 
 import sqlglot
 import sqlglot.expressions as exp
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 def is_direct_wrapper(node: exp.Expression) -> bool:
@@ -145,8 +148,8 @@ def build_lineage_tree(config: dict) -> dict:
 
             try:
                 accesses = extract_accesses(sql)
-            except Exception as e:
-                print(f"⚠️  [{file_name}.{func_name}] : {e}")
+            except Exception:
+                logger.exception("access_auth.lineage_failed", file=file_name, function=func_name)
                 accesses = []
 
             # Regroupement par table
