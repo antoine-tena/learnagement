@@ -5,7 +5,6 @@ import Link from "next/link";
 import bcrypt from 'bcryptjs';
 
 import AlertBox from "../indicators/alertBox";
-import Loader from "@/app/indicators/loading";
 
 export default function ActivateAccount() {
     /* Page permettant d'activer son compte */
@@ -13,30 +12,25 @@ export default function ActivateAccount() {
     const [pwd, setPwd] = useState('')
     const [hash, setHash] = useState('')
     const [resCopy, setResCopy] = useState(false)
-    const [isVisible, setIsVisible] = useState(false)
     const [wantCopy, setWantCopy] = useState(false) // Permet de savoir si le bouton est cliqué
 
     useEffect(() => { /* Gère l'affichage du message 'copié' */
-
-        setIsVisible(true)
+        if (!wantCopy) return;
         const timer = setTimeout(() => {
-            setIsVisible(false); // Masquer le composant après 2 secondes
-            setWantCopy(false); // Remet à false comme ça l'utilisateur reclique sur le bouton le msg se raffiche
+            setWantCopy(false); // Masque le message après 2 secondes ; un nouveau clic le réaffiche
         }, 2000);
 
         // Nettoyer le timer lorsqu'on quitte le composant pour éviter les fuites de mémoire
         return () => clearTimeout(timer);
-
-
     }, [wantCopy]);
 
-    async function hashPassword(event:any) {
+    async function hashPassword(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
-        let form = event.currentTarget
+        const form = event.currentTarget
 
         try {
             setHash(await bcrypt.hash(pwd, 10))
-        } catch (err) {
+        } catch {
             setHash("Erreur hashage")
         }
         form.reset()
@@ -48,7 +42,7 @@ export default function ActivateAccount() {
             try{
                 await navigator.clipboard.writeText(hash)
                 setResCopy(true)
-            }catch(err){
+            }catch{
                 setResCopy(false)
             }
         }
@@ -57,8 +51,8 @@ export default function ActivateAccount() {
 
     return (
         <main className={"h-screen flex flex-col items-center justify-center"}>
-            {(resCopy && isVisible && wantCopy) && <AlertBox text="Copié !" color={"bg-usmb-green"}/>}
-            {(!resCopy && isVisible && wantCopy) && <AlertBox text="Erreur !" color={"bg-usmb-red"}/>}
+            {(resCopy && wantCopy) && <AlertBox text="Copié !" color={"bg-usmb-green"}/>}
+            {(!resCopy && wantCopy) && <AlertBox text="Erreur !" color={"bg-usmb-red"}/>}
             {(hash == "Erreur hashage") &&  <AlertBox text="Erreur de hashage !" color={"bg-usmb-red"}/>}
 
             <div className={"flex flex-col items-center justify-around gap-4 p-4 shadow-lg"}>

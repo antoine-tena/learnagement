@@ -20,7 +20,7 @@ import Link from "next/link";
 /**
  * Composant principal de l'application
  * Affiche la page d'accueil avec la barre de recherche et la liste des filières
- * 
+ *
  * @returns {JSX.Element} Composant React
  */
 export default function Home() {
@@ -30,8 +30,6 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setIsLoading(true);
-  
     axios.get('/api/proxy/filieres', {withCredentials: true})
       .then((response) => {
         setFilieres(response.data);
@@ -42,7 +40,7 @@ export default function Home() {
         setIsLoading(false);
       });
   }, []);
-  
+
 
   const filteredFilieres = filieres.filter((filiere) =>
     filiere.nom_filiere.toLowerCase().includes(searchTerm.toLowerCase())
@@ -76,4 +74,3 @@ export default function Home() {
     </main>
   );
 }
-

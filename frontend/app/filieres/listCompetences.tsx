@@ -10,19 +10,21 @@ import React, {useEffect, useState} from "react";
 /**
  * Composant de la liste des compétences
  * Affiche la liste des compétences d'une filière
- * 
+ *
  * @param {infosCompetence[]} infosCompetences - Tableau des informations des compétences
  * @param {Function} setIdCompetenceClicked - Fonction pour mettre à jour la compétence sélectionnée
  * @returns {JSX.Element} Composant React
  */
-export default function ListCompetences({infosCompetences, setIdCompetenceClicked}:{infosCompetences: infosCompetence[], setIdCompetenceClicked:any}){
-    const [competenceClicked, setCompetenceCLicked] = useState(-1)
+export default function ListCompetences({infosCompetences, setIdCompetenceClicked}:{infosCompetences: infosCompetence[], setIdCompetenceClicked: (id_competence: number) => void}){
+    // La compétence cliquée ne vaut que pour la liste où elle l'a été ; sinon, la première
+    const [clicked, setClicked] = useState<{competences: infosCompetence[], id_competence: number} | null>(null)
+    const competenceClicked = clicked?.competences === infosCompetences
+        ? clicked.id_competence
+        : (infosCompetences[0]?.id_competence ?? -1)
 
     useEffect(() => {
         if (infosCompetences.length > 0){
-            let default_competence = infosCompetences[0].id_competence
-            setCompetenceCLicked(default_competence)
-            setIdCompetenceClicked(default_competence)
+            setIdCompetenceClicked(infosCompetences[0].id_competence)
         }
     }, [infosCompetences]);
 
@@ -41,7 +43,7 @@ export default function ListCompetences({infosCompetences, setIdCompetenceClicke
 
                              onClick={() => {
                                  setIdCompetenceClicked(competence.id_competence)
-                                 setCompetenceCLicked(competence.id_competence)
+                                 setClicked({competences: infosCompetences, id_competence: competence.id_competence})
                              }}
                         >
                             <p className={"font-semibold text-base/5"}>{competence.libelle_competence}</p>
@@ -49,7 +51,7 @@ export default function ListCompetences({infosCompetences, setIdCompetenceClicke
                     ))}
                 </div>
                 :
-                <p>Pas d'informations sur les compétences pour cette filière</p>}
+                <p>Pas d’informations sur les compétences pour cette filière</p>}
             <div className={"w-full flex justify-center mt-8"}>
                 <p className={"w-4/5 border-t border-gray-300"}></p>
             </div>
