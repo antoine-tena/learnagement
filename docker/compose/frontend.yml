@@ -1,6 +1,8 @@
     front_nextjs_${INSTANCE_NAME}:
         container_name: learnagement_nextjs_${INSTANCE_NAME}
-        build: ./frontend
+        build:
+            context: ./frontend
+            dockerfile: Containerfile
         restart: always
         networks:
               - learnagement_front_${INSTANCE_NAME}
