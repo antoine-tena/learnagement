@@ -99,6 +99,10 @@ Actuellement 4 instances en parallèle sont possibles.
 
 ## Changements d'interface
 
+- **2026-11-18** : phpMyAdmin ne démarre plus en production (`start --env prod`) : la base contient
+  des données personnelles et son port était joignable depuis tout le VPN. Il reste en dev. Pour
+  consulter la base de prod : `docker exec -it learnagement_data_mysql_<instance> mysql …` sur le
+  serveur, ou une sauvegarde (`backupdb`).
 - **2026-11-17** : `POST /modules/create` est retiré au profit de `POST /modules`. L'ancienne route
   écrivait dans des colonnes absentes de `MAQUETTE_module` (`nom_module`, `hProj`, `hPerso`) et
   échouait toujours. La nouvelle prend `code_module`, `nom`, `hCM`, `hTD`, `hTP`, `hProj`,
