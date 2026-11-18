@@ -15,7 +15,7 @@ Les PDF vont dans `data/raw_pdfs/<formation>/` (ignoré par git) ; `ASSISTANT_DA
 `data/` ailleurs.
 
 ```bash
-cd assistant
+cd app/assistant
 uv sync
 uv run learnagement-assistant-chunks   # PDF → data/processed/*.json
 uv run learnagement-assistant-index    # morceaux → data/indexes/faiss_index.bin

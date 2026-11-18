@@ -38,7 +38,7 @@ Les règles de code sont dans la [charte](.claude/rules/ion-repo/charter.md) et 
 |---|---|
 | `app/api/` | ruff, couches (import-linter), `openapi.json` réécrit d'après le code, charte |
 | `launcher/`, `app/importers/`, `app/dashboards/` | ruff (lint et mise en forme), charte |
-| `frontend/` | ESLint, charte |
+| `lab/javascript/nextjs/` | ESLint, charte |
 | `app/web/` (PHP) | PHP-CS-Fixer, PHPStan, couches (deptrac), pas de SQL dans une page, charte |
 | `app/web/` (JavaScript) | ESLint, Prettier, charte |
 | tout le repo | gros fichiers, conflits, clés privées, secrets |

@@ -33,7 +33,7 @@ webApp/
 ### Structure des Dossiers
 
 ```
-frontend/
+lab/javascript/nextjs/
 ├── app/               # Pages et composants Next.js
 ├── lib/               # Bibliothèques utilitaires
 ├── public/            # Assets statiques (icones, logos etc...)

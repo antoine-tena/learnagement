@@ -1,4 +1,4 @@
-// ESLint sur le JavaScript de web/ : pnpm --dir web lint
+// ESLint sur le JavaScript de app/web/ : pnpm --dir app/web lint
 import js from '@eslint/js';
 import globals from 'globals';
 

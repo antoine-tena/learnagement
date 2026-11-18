@@ -70,9 +70,9 @@ openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 3
 ```
 
 ```bash
-# Renommer pour correspondre à ton SSL_DIR
-mv cert.pem  certs/cert.pem
-mv key.pem   certs/key.pem
+# Renommer pour correspondre à SSL_EXTERNAL_DIR
+mv cert.pem  deploy/certs/external/cert.pem
+mv key.pem   deploy/certs/external/key.pem
 ```
 Les problèmes classiques du certificat auto-signé :
 - le  navigateur ne fait pas confiance à une autorité inconnue ;
@@ -101,9 +101,9 @@ mkcert localhost 127.0.0.1 monapp.local
 ```
 
 ```bash
-# Renommer pour correspondre à ton SSL_DIR
-mv localhost+2.pem     certs/cert.pem
-mv localhost+2-key.pem certs/key.pem
+# Renommer pour correspondre à SSL_EXTERNAL_DIR
+mv localhost+2.pem     deploy/certs/external/cert.pem
+mv localhost+2-key.pem deploy/certs/external/key.pem
 ```
 
 ✅ Plus d'avertissement dans le navigateur, valable pour toute la machine.

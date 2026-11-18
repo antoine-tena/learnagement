@@ -6,7 +6,7 @@ vendor/
 node_modules/
 
 # Dette : fichiers pas encore au format. Pour en rendre un : retirer sa ligne, puis
-# pnpm --dir web exec prettier --write <fichier>, dans un commit à part.
+# pnpm --dir app/web exec prettier --write <fichier>, dans un commit à part.
 scripts/dependance_module/filters.js
 scripts/dependance_module/gantt.js
 scripts/dependance_module/modal.js
