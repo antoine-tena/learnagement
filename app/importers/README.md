@@ -4,7 +4,7 @@ Récupère des données depuis l'intranet de Polytech et les services de l'USMB,
 compte de la personne qui lance la commande.
 
 ```bash
-cd scraping
+cd app/importers
 uv sync
 uv run learnagement-scraping --help
 uv run learnagement-scraping disciplines
@@ -35,7 +35,7 @@ pour que leurs auteurs puissent continuer à les faire évoluer. On les lance de
 leurs sorties (emplois du temps, maquettes, cache) y restent, ignorées par git :
 
 ```bash
-cd scraping/scripts
+cd app/importers/scripts
 uv run python scrape_maquette.py -o idu_maquette.json   # catalogue des formations USMB -> JSON
 uv run python ical2json.py fetch <URL ADE ou fichier.ics> --filiere IDU   # -> snapshots/IDU/
 ```

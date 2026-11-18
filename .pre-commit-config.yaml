@@ -59,19 +59,19 @@ repos:
         types: [python]
         files: ^(launcher/|Learnagement\.py$|bootstrap\.py$)
 
-      - id: ruff-check-scraping
-        name: ruff check (scraping)
-        entry: bash -c 'cd scraping && uv run ruff check --fix --force-exclude "${@#scraping/}"' --
+      - id: ruff-check-importers
+        name: ruff check (app/importers)
+        entry: bash -c 'cd app/importers && uv run ruff check --fix --force-exclude "${@#app/importers/}"' --
         language: system
         types: [python]
-        files: ^scraping/
+        files: ^app/importers/
 
-      - id: ruff-format-scraping
-        name: ruff format (scraping)
-        entry: bash -c 'cd scraping && uv run ruff format --force-exclude "${@#scraping/}"' --
+      - id: ruff-format-importers
+        name: ruff format (app/importers)
+        entry: bash -c 'cd app/importers && uv run ruff format --force-exclude "${@#app/importers/}"' --
         language: system
         types: [python]
-        files: ^scraping/
+        files: ^app/importers/
 
       - id: ruff-check-assistant
         name: ruff check (assistant)

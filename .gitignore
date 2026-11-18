@@ -53,11 +53,11 @@ Thumbs.db
 .next/
 
 # scraping exports: personal data
-scraping/out/
+app/importers/out/
 *.tsbuildinfo
 
 # Sorties des scripts de scraping : emplois du temps (noms d'enseignants), maquettes, cache HTML
-scraping/scripts/snapshots/
-scraping/scripts/.cache_formations/
-scraping/scripts/**/*.json
-scraping/scripts/**/*.png
+app/importers/scripts/snapshots/
+app/importers/scripts/.cache_formations/
+app/importers/scripts/**/*.json
+app/importers/scripts/**/*.png
