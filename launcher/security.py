@@ -80,7 +80,7 @@ def generate_self_signed_cert(
     print(f"Clé privée générée : {key_path}")
 
 
-def generate_internal_cert(output_dir: str = "./certs/internal") -> None:
+def generate_internal_cert(output_dir: str = "./deploy/certs/internal") -> None:
     """Certificat interne pour la communication PHP <-> Backend Python (réseau Docker)."""
     instance_name = os.environ["INSTANCE_NAME"]
     generate_self_signed_cert(
@@ -99,7 +99,7 @@ def generate_internal_cert(output_dir: str = "./certs/internal") -> None:
 def generate_external_cert(
     domain: str,
     public_ip: str | None = None,
-    output_dir: str = "./certs/external",
+    output_dir: str = "./deploy/certs/external",
 ) -> None:
     """
     Certificat externe pour l'accès web (fronts). À terme, à remplacer
