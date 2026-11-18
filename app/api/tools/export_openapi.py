@@ -1,7 +1,7 @@
 """Exporte le schéma OpenAPI de l'API dans un fichier versionné, ou vérifie qu'il est à jour.
 
-    uv run python -m tools.export_openapi --output ../openapi.json           # l'écrire
-    uv run python -m tools.export_openapi --output ../openapi.json --check   # le vérifier (CI)
+    uv run python -m tools.export_openapi --output ../../openapi.json           # l'écrire
+    uv run python -m tools.export_openapi --output ../../openapi.json --check   # le vérifier (CI)
 
 Le schéma se calcule sans base ni service : les variables factices des tests suffisent à
 importer l'application.
@@ -48,7 +48,7 @@ def main(argv: list[str]) -> int:
     if not is_current:
         sys.stderr.write(
             f"{arguments.output} ne correspond plus au code : "
-            "uv run python -m tools.export_openapi --output ../openapi.json"
+            "uv run python -m tools.export_openapi --output ../../openapi.json"
             "\n"
         )
         return EXIT_DRIFT

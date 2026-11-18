@@ -13,7 +13,7 @@
             - INSTANCE_NAME=${INSTANCE_NAME}
             - ENV=${ENV}
         volumes:
-            - ../backend/:/app/
+            - ../app/api/:/app/
             - ../${SSL_INTERNAL_DIR}:${DOCKER_SSL_INTERNAL_DIR}:ro
         depends_on:
             data_mysql_${INSTANCE_NAME}:

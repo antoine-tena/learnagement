@@ -20,7 +20,7 @@ from .user_loader import (
     load_enseignant_responsibilities,
 )
 
-dotenv.load_dotenv("../.env")
+dotenv.load_dotenv("../../.env")
 
 
 def main() -> bool:

@@ -20,7 +20,7 @@ CONTAINER_APP_DIRS: dict[str, str | None] = {
     "data_mysql_backup": None,
     "etl": None,
     "phpmyadmin": None,
-    "backend": "backend",
+    "backend": "app/api",
     "web": "web",
     "dashboards": "dashboards",
     "frontend": "frontend",
