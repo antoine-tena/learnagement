@@ -1,7 +1,7 @@
     # ETL Mage AI, premier essai : dans aucun environnement tant qu'il n'est pas configuré.
     etl_${INSTANCE_NAME}:
         container_name: learnagement_etl_${INSTANCE_NAME}
-        image: mageai/mageai:latest
+        image: mageai/mageai:latest@sha256:440970d14b6e1c66e879650c35564cf5125cbbed56032c0fb8337808fdf012fe
         restart: always
         networks:
             - learnagement_back_${INSTANCE_NAME}

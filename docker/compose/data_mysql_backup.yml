@@ -2,7 +2,7 @@
     # dernière sauvegarde a raté ou a plus de BACKUP_MAX_AGE_HOURS heures.
     data_mysql_backup_${INSTANCE_NAME}:
         container_name: learnagement_data_mysql_backup_${INSTANCE_NAME}
-        image: mysql:8.4
+        image: mysql:8.4@sha256:a81d043930e51745522bd5c430961cf8286f0a23f0a9a2a6e0108f7ea71b0902
         restart: unless-stopped
         init: true
         networks:

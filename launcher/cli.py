@@ -59,9 +59,10 @@ async def _setup_administrator() -> None:
     await compose.wait_for_all_ready()
     web_url = f"{os.environ['INSTANCE_PROTOCOL']}://{os.environ['INSTANCE_URL']}"
     logger.info("%sWeb Apps runs on: %s:%s%s", GREEN, web_url, os.environ["FRONT_PHP_PORT"], NC)
-    logger.info(
-        "%sPHPMyAdmin runs on: http://127.0.0.1:%s%s", GREEN, os.environ["PHPMYADMIN_PORT"], NC
-    )
+    if "phpmyadmin" in CONTAINERS[os.environ["ENV"]]:
+        logger.info(
+            "%sPHPMyAdmin runs on: http://127.0.0.1:%s%s", GREEN, os.environ["PHPMYADMIN_PORT"], NC
+        )
     logger.info("%sAdmin is deactivated by default%s", GREEN, NC)
 
 
@@ -106,7 +107,7 @@ def generate_env(env: str) -> None:
 
 
 @cli.command(help="Start the application")
-@click.option("--docker_option", default=None, help="See docker compose options")
+@click.option("--docker_option", default=None, help="See podman compose options")
 @click.option("--restart", is_flag=True, help="Restart the application")
 @click.option("--rebuild", is_flag=True, help="Rebuild Docker images")
 @click.option("--test", is_flag=True, help="Test options without starting the application")

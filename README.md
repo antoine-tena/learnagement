@@ -9,7 +9,7 @@ L'App Web s'organise autour de différents objectifs enrichis par les axes de d�
 
 ## Prérequis
 OS X, Unix or Windows,
-Docker desktop,
+[Podman](https://podman.io/docs/installation) et podman-compose (ou Docker),
 Python 3.12 ou plus,
 [uv](https://docs.astral.sh/uv/getting-started/installation/).
 
@@ -32,7 +32,7 @@ règles de `charter.toml` vérifiées sur les fichiers commités. Le PHP de `web
 
 ### Dev Mode (a la mano)
 
-L'app se lance avec docker (pensez à lancer docker-desktop) ; `uv run` prépare l'environnement :
+L'app se lance avec podman (`podman machine start` sous macOS et Windows) ; `uv run` prépare l'environnement :
 ```bash
 uv run python Learnagement.py start
 ```
@@ -42,14 +42,19 @@ To configure your instance, edit specific ".env_XXX.env" files and restarts the 
 uv run python Learnagement.py start --env XXX
 ```
 
-Au lancement, le lanceur écrit `docker/docker-compose.yml` à partir des fragments de
+Au lancement, le lanceur écrit `docker/compose.yaml` à partir des fragments de
 `docker/compose/` (un par conteneur, Next seulement en dev), attend que chaque conteneur réponde à
-sa sonde `/health`, puis arrête l'instance quand `docker compose up` se termine. Sans terminal
+sa sonde `/health`, puis arrête l'instance quand `podman compose up` se termine. Sans terminal
 interactif, il refuse de demander les mots de passe.
 
 **Changement d'interface (novembre 2026)** : le conteneur MySQL s'appelle désormais
 `learnagement_data_mysql_<instance>`. Une instance existante corrige `MYSQL_SERVER` dans son `.env`
-(ou régénère son environnement), et son `docker/docker-compose.yml` est réécrit à chaque lancement.
+(ou régénère son environnement), et son `docker/compose.yaml` est réécrit à chaque lancement.
+
+**Changement d'interface (novembre 2026)** : le lanceur appelle `podman` et `podman compose` par
+défaut, et la compose écrite s'appelle `docker/compose.yaml` (avant : `docker-compose.yml`).
+Pour garder docker, mettre `DOCKER_COMMAND=docker` et `DOCKER_COMPOSE_COMMAND="docker compose"`
+dans le `.env` de l'instance. Les images se construisent depuis les `Containerfile` de `docker/`.
 
 For any help
 ```bash
@@ -99,6 +104,10 @@ Actuellement 4 instances en parallèle sont possibles.
 
 ## Changements d'interface
 
+- **2026-11-18** : phpMyAdmin ne démarre plus en production (`start --env prod`) : la base contient
+  des données personnelles et son port était joignable depuis tout le VPN. Il reste en dev. Pour
+  consulter la base de prod : `docker exec -it learnagement_data_mysql_<instance> mysql …` sur le
+  serveur, ou une sauvegarde (`backupdb`).
 - **2026-11-17** : `POST /modules/create` est retiré au profit de `POST /modules`. L'ancienne route
   écrivait dans des colonnes absentes de `MAQUETTE_module` (`nom_module`, `hProj`, `hPerso`) et
   échouait toujours. La nouvelle prend `code_module`, `nom`, `hCM`, `hTD`, `hTP`, `hProj`,

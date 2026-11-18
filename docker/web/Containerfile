@@ -4,7 +4,7 @@ RUN apt-get update && apt-get upgrade -y
 RUN apt-get install sudo unzip wget -y
 RUN docker-php-ext-install mysqli && docker-php-ext-enable mysqli
 
-COPY --from=composer/composer:latest-bin /composer /usr/bin/composer
+COPY --from=composer/composer:2-bin@sha256:269d47ef954e254227bccb35e3e40f642756abee44dded405e1fbb6f5e52af0c /composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
