@@ -109,7 +109,7 @@ def render_page(url, pathname, token):
         jwt_token, user_id, main_role, status = check_auth_token(
             url
         )  # if token is none, check_auth_token will get it
-        page_content = render_page_content(url, pathname, jwt_token)
+        page_content = render_page_content(url, pathname, jwt_token, main_role)
         return page_content, jwt_token, user_id, main_role, status
     except Exception as e:
         logging.exception(e)
@@ -168,35 +168,42 @@ def check_auth_token(url):
         raise Exception("Unknown user class")
 
 
-def render_page_content(url, pathname, token):
+def render_page_content(url, pathname, token, role):
+    """La page de l'URL, si elle est au menu du rôle de l'utilisateur ; sinon 403 ou 404.
+
+    L'URL ne suffit pas : un étudiant qui tape `/administratif/…` n'en voit pas la page.
+    """
     logging.info("render_page_content")
 
-    parts = pathname.strip("/").split(
-        "/"
-    )  # ['enseignant', 'app2'] ou ['etudiant','app7'] ou ['enseignant'] etc.
-    if len(parts) == 1:
-        # page section landing
+    parts = pathname.strip("/").split("/")  # ['enseignant', 'app2'] ou ['enseignant']
+    section, key = parts[0], parts[1] if len(parts) > 1 else None
+    if section not in menu_items or (key is not None and key not in apps):
+        return error_page("404: Not found", f"La page {pathname} n'existe pas.")
+    if section != role or (key is not None and key not in role_page_keys(role)):
+        return error_page("403: Forbidden", "Cette page n'est pas ouverte à votre profil.")
+    if key is None:
         return html.Div(
             [
-                html.H2(f"Section: {parts[0].capitalize()}"),
+                html.H2(f"Section: {section.capitalize()}"),
                 html.P("Sélectionnez une rubrique dans la barre latérale."),
             ],
             className="p-3",
         )
-    section, key = parts[0], parts[1]
-    if section in menu_items and key in apps:
-        layout, register_cb = apps[key]
-        if register_cb and key not in registered_callbacks:
-            register_cb(app)
-            registered_callbacks.add(key)
+    layout, register_cb = apps[key]
+    if register_cb and key not in registered_callbacks:
+        register_cb(app)
+        registered_callbacks.add(key)
+    return layout() if callable(layout) else layout
 
-        return layout() if callable(layout) else layout
+
+def role_page_keys(role: str) -> set[str]:
+    """Les pages au menu d'un rôle, les seules qu'il peut ouvrir."""
+    return {key for _label, key in menu_items.get(role, [])}
+
+
+def error_page(title: str, message: str) -> html.Div:
     return html.Div(
-        [
-            html.H1("404: Not found", className="text-danger"),
-            html.Hr(),
-            html.P(f"La page {pathname} n'existe pas."),
-        ],
+        [html.H1(title, className="text-danger"), html.Hr(), html.P(message)],
         className="p-3 bg-light rounded-3",
     )
 
