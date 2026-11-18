@@ -1,6 +1,7 @@
 # Done
 
 The closed tickets of Learnagement, most recent first, one line each:
+- **2026-11-18** · learnagement#T-24 · Le rôle étudiant dans la base — plus rien à faire : `etudiant` est le rôle principal, déduit de la table de la personne (`backend/api/dependencies/user_loader.py`) comme `enseignant` et `administratif` ; `LNM_role` ne garde que les responsabilités en plus (chore/t24-role-etudiant-base) · opened 2026-10-30
 - **2026-11-18** · learnagement#T-23 · Commande du lanceur pour extraire la structure de la base — `python Learnagement.py structuredb [--output]` : structure sans données (commentaires des tables, vues, routines, triggers), dans `db/backup/structure.sql` par défaut, annoncée au README ; jamais lancée sur une vraie base (feat/t23-commande-lanceur-structure-base) · opened 2026-10-30
 `- **2026-11-17** · learnagement#T-53 · Finish the ion-repo update to v0.4.15 — `ion repo install --machine` lancé, identifiants des tickets écrits en `learnagement#T-NN` (chore/ticket-ids) · opened 2026-11-17
 - **2026-11-17** · learnagement#T-31 · Des noms parlants pour les tableaux de bord — pages rangées dans `dashboards/pages/` sans préfixe `appNN_` (paquets découpés compris), clés d'URL inchangées ; `archive/` supprimé, gardé dans l'historique git ; tableaux de bord jamais ouverts dans un navigateur (refactor/tree-cleanup-v2) · opened 2026-10-30
