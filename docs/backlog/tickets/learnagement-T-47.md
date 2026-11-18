@@ -1,7 +1,7 @@
 # learnagement#T-47 · Phase B : la nouvelle arborescence
 - **Type**: improvement
 - **Priority**: 🟠 important
-- **Status**: todo
+- **Status**: in progress — branch feat/t47-phase-nouvelle-arborescence, since 2026-11-18
 - **Opened**: 2026-11-17
 - **Effort**: M · **Owner**: — · **Due**: —
 - **Origin**: architecture cible (`docs/architecture.md`)
