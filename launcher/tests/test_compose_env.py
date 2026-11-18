@@ -65,3 +65,8 @@ def test_production_is_backed_up_with_a_health_check() -> None:
     backup = services["data_mysql_backup_test"]
     assert backup["healthcheck"]["test"][-1] == "health"
     assert "${MYSQL_USER_PASSWORD}" in str(backup["environment"])
+
+
+def test_production_has_no_phpmyadmin() -> None:
+    """La base de prod contient des données personnelles : pas d'interface d'administration."""
+    assert "phpmyadmin" not in CONTAINERS["prod"]

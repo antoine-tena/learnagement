@@ -12,7 +12,7 @@ NC = "\033[0m"  # No color
 # Dans aucune liste pour l'instant : `etl` (Mage AI), premier essai.
 CONTAINERS = {
     "dev": ["data_mysql", "phpmyadmin", "backend", "web", "dashboards", "frontend"],
-    "prod": ["data_mysql", "data_mysql_backup", "phpmyadmin", "backend", "web", "dashboards"],
+    "prod": ["data_mysql", "data_mysql_backup", "backend", "web", "dashboards"],
 }
 # Le dossier où chaque conteneur lit son .env (None : il n'en lit pas)
 CONTAINER_APP_DIRS: dict[str, str | None] = {
