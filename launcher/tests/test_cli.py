@@ -109,11 +109,13 @@ def test_structure_keeps_views_routines_and_triggers_without_data(
     monkeypatch.setenv("MYSQL_SERVER", "learnagement_data_mysql_test")
     monkeypatch.setenv("MYSQL_USER_LOGIN", "user")
     monkeypatch.setenv("MYSQL_USER_PASSWORD", "not-a-real-password")
+    monkeypatch.setenv("MYSQL_ROOT_PASSWORD", "not-a-real-root-password")
     monkeypatch.setenv("MYSQL_DB", "learnagement")
     commands: list[list[str]] = []
 
     def fake_run(command: list[str], **kwargs: Any) -> None:
         commands.append(command)
+        assert kwargs["env"]["MYSQL_PWD"] == "not-a-real-root-password"
         kwargs["stdout"].write(b"CREATE TABLE t (c INT COMMENT 'sens');")
 
     monkeypatch.setattr(subprocess, "run", fake_run)
@@ -121,6 +123,7 @@ def test_structure_keeps_views_routines_and_triggers_without_data(
     db.extract_structure(target)
 
     (command,) = commands
+    assert command[command.index("-u") + 1] == "root"
     assert "--no-data" in command
     assert "--routines" in command
     assert "--ignore-views" not in command
