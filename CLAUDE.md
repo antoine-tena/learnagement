@@ -41,8 +41,6 @@ supprime un dossier, un domaine ou un point d'entrée.
   `certs/` (ignoré : les certificats de `python -m launcher.security`) ; le lanceur y écrit
   `deploy/compose.yaml` (ignoré).
 - `archive/` : le code mort gardé pour mémoire (vide pour l'instant).
-- `scripts/ci/` : la liste des règles revues à la main, lue par `charter.toml` (chemin imposé
-  par ion-repo).
 - `app/api/` : l'API FastAPI (`app.py`) ; `api/` (routes, `dependencies/`), `auth/` (LNM et
   `authenticate_cas/`), `access_control/` (règles, prédicats, responsabilités), `domains/` (requêtes métier par
   domaine : `lnm_university/`, `maquette_module/`, `lnm_etudiant/`, `lnm_evaluation/`, `lnm_mobility_assignment/`…, en snake_case ; les tables SQL gardent leur casse), `models/`, `db/` (connexion
@@ -74,7 +72,8 @@ supprime un dossier, un domaine ou un point d'entrée.
 - `docs/backlog/` : le travail à faire ; `charter.toml` : les règles vérifiées ;
   `.claude/rules/ion-repo/` : les règles d'ion-repo pour Claude.
 - `.github/` : `workflows/ci.yml` (la CI d'une release), `pr-report.yml` et `pr-comment.yml` (le
-  rapport commenté sur chaque PR), `scripts/` (le calcul de ce rapport).
+  rapport commenté sur chaque PR), `scripts/` (le calcul de ce rapport), `CODEOWNERS`,
+  `unverified-rules.txt` (les règles appliquées en relecture, lu par `charter.toml`).
 
 ## Notes
 

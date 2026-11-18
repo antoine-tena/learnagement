@@ -35,6 +35,7 @@ l'API, les variables d'environnement et les commandes du lanceur sont les mêmes
 | `frontend/` | `lab/javascript/nextjs/` (le front Next.js, absent de la production) |
 | `openapi.json` | `app/api/openapi.json` |
 | `certs/` (ignoré) | `deploy/certs/` |
+| `scripts/ci/unverified-rules.txt` | `.github/unverified-rules.txt` |
 
 Nouveaux dossiers, un README chacun en attendant leur contenu : `lab/` et un dossier par langage
 (learnagement#T-50), `app/portal/` (learnagement#T-41), `archive/`, `database/fake-data/`,
