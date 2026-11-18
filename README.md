@@ -107,6 +107,11 @@ Actuellement 4 instances en parallèle sont possibles.
 - **2026-11-18** : nouvelle commande `python Learnagement.py structuredb [--output FICHIER]` :
   la structure de la base sans ses données (tables avec leurs commentaires, vues, routines,
   triggers), par défaut dans `db/backup/structure.sql`.
+- **2026-11-18** : un compte interne s'active par lien, plus en envoyant un hash à l'admin.
+  `POST /account-activation` (`{"login"}`, administratif seulement) renvoie un jeton à usage
+  unique valable 7 jours ; la personne ouvre `/activateAccount?token=<jeton>` sur le front Next,
+  qui envoie le mot de passe à `POST /account-activation/confirm` (`{"token", "password"}`, 12
+  caractères au moins) : l'API le hache. Migration `V0.4.2__account_activation.sql`.
 - **2026-11-18** : phpMyAdmin ne démarre plus en production (`start --env prod`) : la base contient
   des données personnelles et son port était joignable depuis tout le VPN. Il reste en dev. Pour
   consulter la base de prod : `docker exec -it learnagement_data_mysql_<instance> mysql …` sur le
