@@ -49,7 +49,7 @@ export default function ListCompetences({infosCompetences, setIdCompetenceClicke
                     ))}
                 </div>
                 :
-                <p>Pas d'informations sur les compétences pour cette filière</p>}
+                <p>Pas d’informations sur les compétences pour cette filière</p>}
             <div className={"w-full flex justify-center mt-8"}>
                 <p className={"w-4/5 border-t border-gray-300"}></p>
             </div>
