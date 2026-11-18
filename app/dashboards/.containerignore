@@ -1,0 +1,3 @@
+# Le contexte de construction ne garde que ce que copie le Containerfile : ni .env ni .venv.
+*
+!container/

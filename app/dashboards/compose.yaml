@@ -1,7 +1,7 @@
     front_dashplotly_${INSTANCE_NAME}:
         container_name: learnagement_python_web_server_${INSTANCE_NAME}
         build:
-            context: ./dashboards/
+            context: ../app/dashboards/
             dockerfile: Containerfile
         restart: always
         networks:

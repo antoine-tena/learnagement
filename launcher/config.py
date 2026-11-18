@@ -34,8 +34,8 @@ COMPOSE_FRAGMENTS = {
     "phpmyadmin": "docker/compose/phpmyadmin.yml",
     "backend": "app/api/compose.yaml",
     "web": "app/web/compose.yaml",
-    "dashboards": "docker/compose/dashboards.yml",
-    "frontend": "docker/compose/frontend.yml",
+    "dashboards": "app/dashboards/compose.yaml",
+    "frontend": "frontend/compose.yaml",
 }
 # compose lit aussi son .env, pour les variables qu'il interpole
 COMPOSE_DIR = "docker"

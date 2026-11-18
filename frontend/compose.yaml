@@ -1,7 +1,7 @@
     front_nextjs_${INSTANCE_NAME}:
         container_name: learnagement_nextjs_${INSTANCE_NAME}
         build:
-            context: ./frontend
+            context: ../frontend
             dockerfile: Containerfile
         restart: always
         # Écrit node_modules dans le code monté : voir USERNS_MODE dans launcher/compose.py

@@ -13,7 +13,7 @@ RUN mkdir /app
 WORKDIR /app/
 
 # Copy entrypoint
-COPY entrypoint.sh /entrypoint.sh
+COPY container/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh \
     && sed -i 's/\r$//' /entrypoint.sh
 
