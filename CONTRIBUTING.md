@@ -46,7 +46,9 @@ Les règles de code sont dans la [charte](.claude/rules/ion-repo/charter.md) et 
 Chaque outil part du niveau qui passe aujourd'hui ; la dette restante est écrite dans sa
 configuration (`web/.php-cs-fixer.dist.php`, `web/phpstan-baseline.neon`, `web/.prettierignore`,
 `backend/pyproject.toml`) et ne fait que baisser. Le PHP se vérifie sans PHP installé :
-`web/tools/run.sh` passe alors par podman (`web/tools/run.sh vendor/bin/phpstan analyse`).
+`web/tools/run.sh` passe alors par podman (`web/tools/run.sh vendor/bin/phpstan analyse`). Le
+JavaScript de `web/` a ses tests, lancés par Node sans navigateur ni serveur, l'API simulée :
+`pnpm --dir web test` (`web/tests/`), pas encore en CI.
 
 En CI s'ajoutent les tests et le typage du backend, le contrat de l'API (`openapi.json` et les
 routes cassées par rapport à `main`), le lint, le typage et la compilation du front, et l'audit

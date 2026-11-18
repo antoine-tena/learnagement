@@ -98,6 +98,9 @@ export function flyToUniversity(uid) {
         document.getElementById('wishesPanel').classList.add('hidden');
     } else {
         document.getElementById('semestreSelect').value = 'Tous';
+        // Seule la carte publique a le filtre de filière.
+        const filiereSelect = document.getElementById('filiereSelect');
+        if (filiereSelect) filiereSelect.value = 'Toutes';
         const range = document.getElementById('noteMinRange');
         range.value = 20;
         document.getElementById('noteMinValue').innerText = 20;
