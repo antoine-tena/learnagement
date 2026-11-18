@@ -1,11 +1,11 @@
-"""Les migrations de `db/sql/` : MySQL les joue une fois, par ordre alphabétique des noms."""
+"""Les migrations de `database/migrations/` : MySQL les joue une fois, par ordre alphabétique."""
 
 import re
 from collections import Counter
 from pathlib import Path
 
 MIGRATION_NAME = re.compile(r"^V(\d+)\.(\d+)\.(\d+)__\w+\.sql$")
-SQL_DIR = Path(__file__).resolve().parents[2] / "db" / "sql"
+SQL_DIR = Path(__file__).resolve().parents[2] / "database" / "migrations"
 # Versions partagées avant ce test, déjà jouées sur des bases : leur ordre alphabétique tient.
 SHARED_BEFORE_THE_CHECK = {(0, 2, 0)}
 

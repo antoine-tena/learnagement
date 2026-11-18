@@ -18,9 +18,9 @@ from launcher.fake_data.install import offer_fake_data
 
 logger = logging.getLogger(__name__)
 
-DB_DIR = Path("db")
+DB_DIR = Path("database")
 INIT_DIR = DB_DIR / "docker-entrypoint-initdb.d"
-SQL_DIR = DB_DIR / "sql"
+SQL_DIR = DB_DIR / "migrations"
 DATA_DIR = DB_DIR / "data"
 TRANSIENT_ERRORS = ("doesn't exist", "unknown database", "can't connect", "access denied")
 STRUCTURE_OPTIONS = ("--skip-comments", "--no-tablespaces")
@@ -57,7 +57,7 @@ def prepare_init_files() -> None:
 def prepare_initial_data() -> None:
     """Demande les données initiales au premier lancement, puis les copie pour MySQL."""
     if DATA_DIR.exists():
-        logger.info("%sData already exist in 'db/data'!%s", GREEN, NC)
+        logger.info("%sData already exist in 'database/data'!%s", GREEN, NC)
     else:
         DATA_DIR.mkdir()
         offer_fake_data(DATA_DIR, os.environ["ENV"])

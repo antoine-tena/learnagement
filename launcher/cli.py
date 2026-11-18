@@ -152,14 +152,14 @@ def start(
 
 
 @cli.command(name="backupdb", help="Backup the database (structure, data and triggers)")
-@click.option("--backup_folder", default="db/backup", type=click.Path(path_type=Path))
+@click.option("--backup_folder", default="database/backup", type=click.Path(path_type=Path))
 def backup_db(backup_folder: Path) -> None:
     dotenv.load_dotenv()
     db.backup(backup_folder)
 
 
 @cli.command(name="structuredb", help="Extract the database structure with its comments")
-@click.option("--output", default="db/backup/structure.sql", type=click.Path(path_type=Path))
+@click.option("--output", default="database/backup/structure.sql", type=click.Path(path_type=Path))
 def structure_db(output: Path) -> None:
     dotenv.load_dotenv()
     db.extract_structure(output)
@@ -180,7 +180,10 @@ def import_instance(archive: Path) -> None:
 
 @cli.command(
     name="fake-data",
-    help="Write fictitious data on the public curricula into db/data (read at first start only)",
+    help=(
+        "Write fictitious data on the public curricula into database/data "
+        "(read at first start only)"
+    ),
 )
 @click.option(
     "--size",

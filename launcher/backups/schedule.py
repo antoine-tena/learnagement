@@ -17,7 +17,7 @@ from launcher.config import GREEN, NC, RED, YELLOW
 logger = logging.getLogger(__name__)
 
 PARIS = ZoneInfo("Europe/Paris")
-DEFAULT_BACKUP_DIRECTORY = "db/backup"
+DEFAULT_BACKUP_DIRECTORY = "database/backup"
 DEFAULT_BACKUP_AT = "00:00"
 BACKUP_PREFIXES = ("0_struct_", "5_data_", "99_trigger_")
 SECONDS_PER_DAY = 86400

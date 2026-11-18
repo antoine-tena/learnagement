@@ -16,7 +16,7 @@ CONTAINERS = {
 }
 # Le dossier où chaque conteneur lit son .env (None : il n'en lit pas)
 CONTAINER_APP_DIRS: dict[str, str | None] = {
-    "data_mysql": "db",
+    "data_mysql": "database",
     "data_mysql_backup": None,
     "etl": None,
     "phpmyadmin": None,
