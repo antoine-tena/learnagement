@@ -1,5 +1,4 @@
 import io
-from datetime import datetime
 from typing import Annotated
 
 import openpyxl
@@ -7,6 +6,7 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 
 from api.dependencies import get_current_active_user
+from core.clock import export_filename
 from models.request import SQLRequest
 from models.user import User
 
@@ -94,7 +94,7 @@ def export_admin_wishes(current_user: Annotated[User, Depends(get_current_active
     wb.save(stream)
     stream.seek(0)
 
-    filename = f"Export_Voeux_Mobilite_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.xlsx"
+    filename = export_filename("Voeux_Mobilite")
     headers_dict = {"Content-Disposition": f'attachment; filename="{filename}"'}
     return StreamingResponse(
         stream,
@@ -202,7 +202,7 @@ def export_admin_assignments(
     wb.save(stream)
     stream.seek(0)
 
-    filename = f"Export_Affectations_Mobilite_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.xlsx"
+    filename = export_filename("Affectations_Mobilite")
     headers_dict = {"Content-Disposition": f'attachment; filename="{filename}"'}
     return StreamingResponse(
         stream,
