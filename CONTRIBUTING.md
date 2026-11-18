@@ -36,19 +36,19 @@ Les règles de code sont dans la [charte](.claude/rules/ion-repo/charter.md) et 
 
 | Partie | Vérifié aujourd'hui |
 |---|---|
-| `backend/` | ruff, couches (import-linter), `openapi.json` réécrit d'après le code, charte |
-| `launcher/`, `scraping/`, `dashboards/` | ruff (lint et mise en forme), charte |
+| `app/api/` | ruff, couches (import-linter), `openapi.json` réécrit d'après le code, charte |
+| `launcher/`, `app/importers/`, `app/dashboards/` | ruff (lint et mise en forme), charte |
 | `frontend/` | ESLint, charte |
-| `web/` (PHP) | PHP-CS-Fixer, PHPStan, couches (deptrac), pas de SQL dans une page, charte |
-| `web/` (JavaScript) | ESLint, Prettier, charte |
+| `app/web/` (PHP) | PHP-CS-Fixer, PHPStan, couches (deptrac), pas de SQL dans une page, charte |
+| `app/web/` (JavaScript) | ESLint, Prettier, charte |
 | tout le repo | gros fichiers, conflits, clés privées, secrets |
 
 Chaque outil part du niveau qui passe aujourd'hui ; la dette restante est écrite dans sa
-configuration (`web/.php-cs-fixer.dist.php`, `web/phpstan-baseline.neon`, `web/.prettierignore`,
-`backend/pyproject.toml`) et ne fait que baisser. Le PHP se vérifie sans PHP installé :
-`web/tools/run.sh` passe alors par podman (`web/tools/run.sh vendor/bin/phpstan analyse`). Le
-JavaScript de `web/` a ses tests, lancés par Node sans navigateur ni serveur, l'API simulée :
-`pnpm --dir web test` (`web/tests/`), pas encore en CI.
+configuration (`app/web/.php-cs-fixer.dist.php`, `app/web/phpstan-baseline.neon`, `app/web/.prettierignore`,
+`app/api/pyproject.toml`) et ne fait que baisser. Le PHP se vérifie sans PHP installé :
+`app/web/tools/run.sh` passe alors par podman (`app/web/tools/run.sh vendor/bin/phpstan analyse`). Le
+JavaScript de `app/web/` a ses tests, lancés par Node sans navigateur ni serveur, l'API simulée :
+`pnpm --dir app/web test` (`app/web/tests/`), pas encore en CI.
 
 En CI s'ajoutent les tests et le typage du backend, le contrat de l'API (`openapi.json` et les
 routes cassées par rapport à `main`), le lint, le typage et la compilation du front, et l'audit

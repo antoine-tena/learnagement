@@ -8,7 +8,7 @@
 
 Le backend est déjà presque rangé par domaine : `domains/` a un fichier par domaine, avec ses
 routes et son SQL ; `repositories/` n'a qu'un fichier et `models/` trois petits. Il reste à faire
-de ces fichiers des paquets aux noms de kiln (`backend/app/<domaine>/api.py`, `services.py`,
+de ces fichiers des paquets aux noms de kiln (`app/api/app/<domaine>/api.py`, `services.py`,
 règles [ROUTERS] et [SERVICES]), avec learnagement#T-11, sans changer les routes. Pas d'architecture
 hexagonale : seule la logique complexe, comme l'affectation des mobilités, est isolée pour être
 testée sans base.

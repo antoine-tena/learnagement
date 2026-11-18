@@ -97,7 +97,7 @@ Trait plein : chiffrement en production assuré par le dépôt. Trait pointillé
 | L9 | Navigateur → CAS | Redirection vers le CAS | Idem | ⚠️ dépend de l'URL du CAS. |
 | L10 | Front PHP → CAS (validation du ticket) | `CAS_HOST/serviceValidate` | Idem ou mode mock | ⚠️ HTTPS seulement si `CAS_HOST` commence par `https://`. |
 
-**Chiffrement vers MySQL (L6, L7).** MySQL 8.4 sait chiffrer les connexions avec des certificats auto-générés au démarrage, mais le dépôt n'impose rien : pas de `require_secure_transport`, pas de paramètre SSL dans le moteur SQLAlchemy, et le répertoire de configuration monté (`docker/mysql/conf.d`) n'existe pas dans le dépôt. Le trafic reste à l'intérieur du réseau Docker `back` (privé à l'hôte), ce qui limite l'exposition, mais le chiffrement n'est pas démontrable. L'authentification `mysql_native_password` est activée par la commande de lancement.
+**Chiffrement vers MySQL (L6, L7).** MySQL 8.4 sait chiffrer les connexions avec des certificats auto-générés au démarrage, mais le dépôt n'impose rien : pas de `require_secure_transport`, pas de paramètre SSL dans le moteur SQLAlchemy, et le répertoire de configuration monté (`deploy/mysql/conf.d`) n'existe pas dans le dépôt. Le trafic reste à l'intérieur du réseau Docker `back` (privé à l'hôte), ce qui limite l'exposition, mais le chiffrement n'est pas démontrable. L'authentification `mysql_native_password` est activée par la commande de lancement.
 
 **Mode développement.** Tous les liens internes sont en HTTP clair. Le script d'installation avertit si une instance de la branche principale tourne sans `ENV=prod`. Une instance de développement ne doit jamais contenir de données réelles.
 

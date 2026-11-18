@@ -1,4 +1,4 @@
-"""Le fichier compose.yaml de l'instance, assemblé depuis `docker/compose/`, et son état."""
+"""Le fichier compose.yaml de l'instance, assemblé depuis les fragments, et son état."""
 
 import asyncio
 import json
@@ -7,14 +7,14 @@ import os
 import re
 from pathlib import Path
 
-from launcher.config import GREEN, NC
+from launcher.config import COMPOSE_FRAGMENTS, GREEN, NC
 from launcher.docker import COMPOSE_FILE, DOCKER_DIR, compose_command, docker_command
 
 logger = logging.getLogger(__name__)
 
 FRAGMENTS_DIR = DOCKER_DIR / "compose"
 # Les variables remplacées dans le fichier ; les autres (mots de passe) sont lues par compose
-# dans docker/.env au lancement, pour ne pas les écrire en clair.
+# dans deploy/.env au lancement, pour ne pas les écrire en clair.
 COMPOSE_VARIABLES = (
     "INSTANCE_PROTOCOL",
     "INSTANCE_NAME",
@@ -48,8 +48,12 @@ HEALTH_IN_STATUS = re.compile(r"\((healthy|unhealthy|starting)\)")
 
 def render_compose(containers: list[str], variables: dict[str, str]) -> str:
     """Le contenu de compose.yaml pour ces conteneurs."""
-    names = ["_head", *containers, "_tail"]
-    content = "".join((FRAGMENTS_DIR / f"{name}.yml").read_text(encoding="utf-8") for name in names)
+    fragments = [
+        FRAGMENTS_DIR / "_head.yml",
+        *(Path(COMPOSE_FRAGMENTS[container]) for container in containers),
+        FRAGMENTS_DIR / "_tail.yml",
+    ]
+    content = "".join(fragment.read_text(encoding="utf-8") for fragment in fragments)
     for name in COMPOSE_VARIABLES:
         content = content.replace(f"${{{name}}}", variables[name])
     return content

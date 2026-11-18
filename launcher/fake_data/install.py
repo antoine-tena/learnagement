@@ -1,4 +1,4 @@
-"""Poser le jeu fictif dans `db/data`, et le proposer au premier lancement hors production."""
+"""Poser le jeu fictif dans `database/data`, et le proposer au premier lancement hors production."""
 
 import shutil
 from pathlib import Path
@@ -44,5 +44,5 @@ def offer_fake_data(data_dir: Path, env: str) -> None:
         f"If you want an initial data set, put it into '{data_dir}' folder "
         "with name matches with V[0-9]*.sql."
     )
-    click.echo("Free data samples are available at 'db/freeData' folder.")
+    click.echo("Free data samples are available at 'database/open-data' folder.")
     click.prompt("Then press enter", default="", show_default=False)

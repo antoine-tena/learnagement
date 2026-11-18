@@ -9,16 +9,16 @@
 **/data
 **/backup
 # sauf le script de sauvegarde, qui ne contient aucune donnée
-!docker/backup/
-!docker/backup/backup.sh
-db/docker-entrypoint-initdb.d
+!deploy/backup/
+!deploy/backup/backup.sh
+database/docker-entrypoint-initdb.d
 
 __pycache__
 #*
 *#
 
 # private files that contain password, NEVER PUT IN ON GIT (must be replaced by .env)
-docker/compose.yaml
+deploy/compose.yaml
 certs/
 *.pem
 *.key
@@ -26,7 +26,7 @@ certs/
 
 # don't add js modules on git
 frontend/node_modules/
-web/node_modules/
+app/web/node_modules/
 mobility_map/node_modules/
 
 Doc_Private
@@ -53,11 +53,11 @@ Thumbs.db
 .next/
 
 # scraping exports: personal data
-scraping/out/
+app/importers/out/
 *.tsbuildinfo
 
 # Sorties des scripts de scraping : emplois du temps (noms d'enseignants), maquettes, cache HTML
-scraping/scripts/snapshots/
-scraping/scripts/.cache_formations/
-scraping/scripts/**/*.json
-scraping/scripts/**/*.png
+app/importers/scripts/snapshots/
+app/importers/scripts/.cache_formations/
+app/importers/scripts/**/*.json
+app/importers/scripts/**/*.png

@@ -34,10 +34,10 @@ rules_section() {
 
 tests_section() {
     echo "### Tests"
-    (cd backend && uv run pytest -q --no-header -p no:cacheprovider) >"$LOG_DIR/tests.log" 2>&1
+    (cd app/api && uv run pytest -q --no-header -p no:cacheprovider) >"$LOG_DIR/tests.log" 2>&1
     local status=$?
-    verdict "$status" "Tests du backend : $(tail -n 1 "$LOG_DIR/tests.log")" \
-        "Tests du backend : $(tail -n 1 "$LOG_DIR/tests.log")"
+    verdict "$status" "Tests de l'API : $(tail -n 1 "$LOG_DIR/tests.log")" \
+        "Tests de l'API : $(tail -n 1 "$LOG_DIR/tests.log")"
     [[ "$status" -eq 0 ]] || details "Sortie de pytest" "$LOG_DIR/tests.log"
 }
 
@@ -47,7 +47,7 @@ routes_section() {
         echo "➖ Pas d'openapi.json sur la branche de base : rien à comparer."
         return
     fi
-    (cd backend && uv run python -m tools.export_openapi --output "$LOG_DIR/openapi-head.json") \
+    (cd app/api && uv run python -m tools.export_openapi --output "$LOG_DIR/openapi-head.json") \
         >/dev/null 2>"$LOG_DIR/export.log"
     podman run --rm --quiet -v "$LOG_DIR:/specs:Z" "$OASDIFF_IMAGE" breaking \
         /specs/openapi-base.json /specs/openapi-head.json --fail-on ERR >"$LOG_DIR/routes.log" 2>&1
@@ -60,7 +60,7 @@ routes_section() {
 migrations_section() {
     echo "### Migrations"
     local migrations
-    migrations="$(git diff --name-only --diff-filter=AM "$BASE"...HEAD -- 'db/sql/V*.sql')"
+    migrations="$(git diff --name-only --diff-filter=AM "$BASE"...HEAD -- 'database/migrations/V*.sql')"
     if [[ -z "$migrations" ]]; then
         echo "➖ Aucune migration."
         return

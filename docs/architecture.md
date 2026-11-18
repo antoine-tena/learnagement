@@ -17,7 +17,7 @@ D'où quatre principes :
 - **Deux zones dès la racine** : `app/` tourne en production, `lab/` sert à apprendre. Rien de
   `lab/` n'entre dans une image de production.
 - **Un seul cœur** : l'API est la seule à lire et écrire la base. C'est déjà vrai pour le web et les
-  tableaux de bord (la base n'est que sur le réseau interne, et ni `web/` ni `dashboards/` ne
+  tableaux de bord (la base n'est que sur le réseau interne, et ni `app/web/` ni `app/dashboards/` ne
   contiennent de SQL) ; le scraping écrit encore directement en base.
 - **Les mêmes noms partout** : un domaine est un dossier, qui porte le même nom dans chaque
   application, d'après le [glossaire](glossary.md).
@@ -51,7 +51,10 @@ learnagement/
 └── archive/             le code mort gardé pour mémoire
 ```
 
-| Aujourd'hui | Demain |
+Ces déplacements sont faits (T-47), sauf celui de `frontend/` ; chaque ancien chemin est dans
+[moved.md](moved.md).
+
+| Avant | Après |
 |---|---|
 | `backend/` | `app/api/` |
 | `web/` | `app/web/` |
@@ -100,7 +103,7 @@ app/api/mobility/        app/web/mobility/           app/dashboards/mobility/
   une page et transmet le jeton de l'utilisateur ; le cookie est `__Host-`, `HttpOnly`, `Secure`,
   `SameSite=Lax` ([COOKIES]).
 - Les pages des autres applications s'affichent dans le cadre du web (iframe), au lieu des
-  redirections actuelles vers un autre port (`web/views/dashboard/python.php`).
+  redirections actuelles vers un autre port (`app/web/views/dashboard/python.php`).
 - L'API revérifie les droits à chaque appel : une page, même mal écrite, ne montre jamais plus que
   ce que l'utilisateur a le droit de voir.
 - Plus tard : un jeton limité à ce qu'une page déclare lire, et LTI 1.3 pour ouvrir une page dans
@@ -113,7 +116,7 @@ app/api/mobility/        app/web/mobility/           app/dashboards/mobility/
   incompatible ouvre `/api/v2/` ([FROZEN-CONTRACT]). Schemathesis vérifie que l'API respecte son
   contrat.
 - OpenAPI Generator produit un client typé par langage, généré au lancement, jamais commité.
-- La fabrique de routes (`backend/api/route_factory.py`) reste : une requête SQL décrite devient une
+- La fabrique de routes (`app/api/api/route_factory.py`) reste : une requête SQL décrite devient une
   route, ce qui est accessible aux débutants. Chaque requête déclare son schéma de réponse, pour
   que le contrat soit typé.
 
@@ -191,9 +194,9 @@ python Learnagement.py lab run php/vanilla/projects/mes-absences
 
 | Code | Ce qu'on fait |
 |---|---|
-| `web/views/dashboard/mobility-admin.php` (2 953 lignes, le JS dans la page) | découpé en dossier de page, JS réécrit en modules |
+| `app/web/views/dashboard/mobility-admin.php` (2 953 lignes, le JS dans la page) | découpé en dossier de page, JS réécrit en modules |
 | `mobility-map.php` et `mobility-map_open.php` (31 lignes de différence) | fusionnés en une page paramétrée |
-| `backend/domains/lnm_university.py` (2 155 lignes), `maquette_module.py` (1 249) | découpés en `mobility/` et `curriculum/` ; les routes de plus de 100 lignes réécrites, tests d'abord |
+| `app/api/domains/lnm_university.py` (2 155 lignes), `maquette_module.py` (1 249) | découpés en `mobility/` et `curriculum/` ; les routes de plus de 100 lignes réécrites, tests d'abord |
 | SQL assemblé à la main (9 endroits) | paramètres liés |
 | vieux code commenté, `test.php`, `app11_dag_dependance_new.py` | supprimés, l'historique git les garde |
 | scraping qui écrit en base | passe par des routes d'import de l'API |
@@ -231,5 +234,5 @@ ou non.
 - Où vont les sauvegardes : ce sont des données personnelles.
 - phpMyAdmin : le retirer de la production, ou ne l'ouvrir que par un tunnel SSH (T-45).
 - Postgres avec SQLAlchemy et Alembic, à la place des migrations SQL et des conventions de
-  [db/README.md](db/README.md) (T-39).
+  [database/README](../database/README) (T-39).
 - Les noms de branches : ceux de [git.md](git.md) ou ceux de la règle [BRANCHES] d'ion-repo.

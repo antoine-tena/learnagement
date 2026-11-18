@@ -18,7 +18,7 @@ jobs:
   backend:
     uses: antoine-tena/ion-repo/.github/workflows/python.yml@eb0dc112605e3ccda49cc80374ffd3185a96baf7 # develop
     with:
-      directory: backend
+      directory: app/api
 
   # openapi.json, à la racine, suit le code de l'API (le front ne génère pas encore ses types).
   # Le job breaking compare le schéma à celui de main (la production) : une route retirée ou un
@@ -26,7 +26,8 @@ jobs:
   api-contract:
     uses: antoine-tena/ion-repo/.github/workflows/api-contract.yml@f6340428fb1176f4ec53290ace508da3f7f49e61 # develop
     with:
-      export: uv run python -m tools.export_openapi --check --output ../openapi.json
+      backend: app/api
+      export: uv run python -m tools.export_openapi --check --output ../../openapi.json
       generate: "true"
       breaking-base: main
 
@@ -34,16 +35,16 @@ jobs:
   assistant:
     uses: antoine-tena/ion-repo/.github/workflows/python.yml@eb0dc112605e3ccda49cc80374ffd3185a96baf7 # develop
     with:
-      directory: assistant
+      directory: app/assistant
 
-  # Les tableaux de bord Dash : ruff et mypy au niveau qui passe aujourd'hui (dashboards/
-  # pyproject.toml), puis pytest (dashboards/tests/, sans réseau ni base) ; un job à part
+  # Les tableaux de bord Dash : ruff et mypy au niveau qui passe aujourd'hui (app/dashboards/
+  # pyproject.toml), puis pytest (app/dashboards/tests/, sans réseau ni base) ; un job à part
   # plutôt que python.yml, qui impose mypy strict.
   dashboards:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: dashboards
+        working-directory: app/dashboards
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
@@ -62,23 +63,23 @@ jobs:
         typecheck
         build
 
-  # Le JavaScript de web/ : ESLint et Prettier (dette dans web/.prettierignore).
+  # Le JavaScript de app/web/ : ESLint et Prettier (dette dans app/web/.prettierignore).
   web-js:
     uses: antoine-tena/ion-repo/.github/workflows/pnpm.yml@eb0dc112605e3ccda49cc80374ffd3185a96baf7 # develop
     with:
-      directory: web
+      directory: app/web
       scripts: |
         lint
         format:check
 
-  # Le PHP de web/ : PHP-CS-Fixer et PHPStan au niveau qui passe aujourd'hui (dette dans
-  # web/.php-cs-fixer.dist.php et web/phpstan-baseline.neon).
+  # Le PHP de app/web/ : PHP-CS-Fixer et PHPStan au niveau qui passe aujourd'hui (dette dans
+  # app/web/.php-cs-fixer.dist.php et app/web/phpstan-baseline.neon).
   web-php:
     runs-on: ubuntu-latest
     container: docker.io/library/composer:2
     defaults:
       run:
-        working-directory: web
+        working-directory: app/web
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: composer install --no-interaction --no-progress
@@ -89,12 +90,12 @@ jobs:
       # Une page ne touche jamais la base : pas de fonction SQL native hors de vendor/.
       - run: "! grep -rnE --include='*.php' --exclude-dir=vendor '\\b(mysqli|mysql|pg|sqlite|odbc)_\\w+\\s*\\(' ."
 
-  # Les couches du backend (import-linter, contrats dans backend/pyproject.toml).
+  # Les couches de l'API (import-linter, contrats dans app/api/pyproject.toml).
   backend-layers:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: backend
+        working-directory: app/api
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
@@ -111,5 +112,5 @@ jobs:
   security:
     uses: antoine-tena/ion-repo/.github/workflows/security.yml@eb0dc112605e3ccda49cc80374ffd3185a96baf7 # develop
     with:
-      uv: "backend"
+      uv: "app/api"
       pnpm: "frontend"

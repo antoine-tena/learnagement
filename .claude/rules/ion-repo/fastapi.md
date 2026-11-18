@@ -1,11 +1,11 @@
 ---
 paths:
-  - "backend/**"
+  - "app/api/**"
 ---
 <!-- Written by ion-repo and kept current by `ion repo update`: do not edit, it would be overwritten. -->
 # Backend: FastAPI
 
-`backend/app/`: entry point (`main.py`), settings (`settings.py`), health probes (`health.py`);
+`app/api/app/`: entry point (`main.py`), settings (`settings.py`), health probes (`health.py`);
 one module per domain. Run: `ion repo dev` (or `uv run uvicorn app.main:app --reload`); check:
 `ion repo check`.
 

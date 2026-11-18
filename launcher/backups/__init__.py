@@ -5,7 +5,7 @@ Pas encore branchée au lancement : `launch_backup_system()` est à appeler depu
 Variables d'environnement :
   BACKUP                   active le système (true/1/yes/on). Défaut : false
   BACKUP_AT                "HH:MM", heure de la sauvegarde quotidienne. Défaut : 00:00
-  BACKUP_DIRECTORY         répertoire local. Défaut : db/backup
+  BACKUP_DIRECTORY         répertoire local. Défaut : database/backup
   BACKUP_REMOTE_DIRECTORY  répertoire distant monté le temps de la sauvegarde (prioritaire) :
                            //serveur/partage (cifs), serveur:/chemin (nfs),
                            utilisateur@serveur:chemin (sshfs), \\\\serveur\\partage (Windows)

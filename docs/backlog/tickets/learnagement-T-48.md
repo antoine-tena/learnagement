@@ -14,10 +14,10 @@ comportement, les tests passent avant et après. Regroupe learnagement#T-11, lea
   `tests/`) ; `core/` pour la configuration, la base, l'authentification et les droits
 - [ ] Web : une page par dossier (`view.php`, `actions.php`, `js/`, `style.css`), rangée par domaine
 - [ ] Tableaux de bord : un dossier par domaine, un fichier par rôle, sans préfixe `appNN_`.
-  Restait le 2026-11-18 (repris de learnagement#T-27) : les fichiers de `dashboards/pages/`
+  Restait le 2026-11-18 (repris de learnagement#T-27) : les fichiers de `app/dashboards/pages/`
   ont perdu leur préfixe (learnagement#T-31), mais ils restent à plat ; et les noms dans le
   code le gardent (`app10_administratif_layout`, `app11_new_dag`, `apc20_…` dans
-  `dashboards/apc_dash/`). Les clés d'URL (`app10_administratif`…) sont publiées : elles ne
+  `app/dashboards/apc_dash/`). Les clés d'URL (`app10_administratif`…) sont publiées : elles ne
   changent pas, seul leur nom dans le code change.
 - [ ] Les noms du glossaire appliqués au code, sans toucher aux tables ni aux routes publiées
 - [ ] La fabrique de routes déclare un schéma de réponse par requête

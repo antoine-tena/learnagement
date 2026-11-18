@@ -31,19 +31,19 @@ repos:
 
   - repo: local
     hooks:
-      - id: ruff-check-backend
-        name: ruff check (backend)
-        entry: bash -c 'cd backend && uv run ruff check --fix --force-exclude "${@#backend/}"' --
+      - id: ruff-check-app/api
+        name: ruff check (app/api)
+        entry: bash -c 'cd app/api && uv run ruff check --fix --force-exclude "${@#app/api/}"' --
         language: system
         types: [python]
-        files: ^backend/
+        files: ^app/api/
 
-      - id: ruff-format-backend
-        name: ruff format (backend)
-        entry: bash -c 'cd backend && uv run ruff format --force-exclude "${@#backend/}"' --
+      - id: ruff-format-app/api
+        name: ruff format (app/api)
+        entry: bash -c 'cd app/api && uv run ruff format --force-exclude "${@#app/api/}"' --
         language: system
         types: [python]
-        files: ^backend/
+        files: ^app/api/
 
       - id: ruff-check-launcher
         name: ruff check (launcher)
@@ -59,47 +59,47 @@ repos:
         types: [python]
         files: ^(launcher/|Learnagement\.py$|bootstrap\.py$)
 
-      - id: ruff-check-scraping
-        name: ruff check (scraping)
-        entry: bash -c 'cd scraping && uv run ruff check --fix --force-exclude "${@#scraping/}"' --
+      - id: ruff-check-importers
+        name: ruff check (app/importers)
+        entry: bash -c 'cd app/importers && uv run ruff check --fix --force-exclude "${@#app/importers/}"' --
         language: system
         types: [python]
-        files: ^scraping/
+        files: ^app/importers/
 
-      - id: ruff-format-scraping
-        name: ruff format (scraping)
-        entry: bash -c 'cd scraping && uv run ruff format --force-exclude "${@#scraping/}"' --
+      - id: ruff-format-importers
+        name: ruff format (app/importers)
+        entry: bash -c 'cd app/importers && uv run ruff format --force-exclude "${@#app/importers/}"' --
         language: system
         types: [python]
-        files: ^scraping/
+        files: ^app/importers/
 
       - id: ruff-check-assistant
-        name: ruff check (assistant)
-        entry: bash -c 'cd assistant && uv run ruff check --fix --force-exclude "${@#assistant/}"' --
+        name: ruff check (app/assistant)
+        entry: bash -c 'cd app/assistant && uv run ruff check --fix --force-exclude "${@#app/assistant/}"' --
         language: system
         types: [python]
-        files: ^assistant/
+        files: ^app/assistant/
 
       - id: ruff-format-assistant
-        name: ruff format (assistant)
-        entry: bash -c 'cd assistant && uv run ruff format --force-exclude "${@#assistant/}"' --
+        name: ruff format (app/assistant)
+        entry: bash -c 'cd app/assistant && uv run ruff format --force-exclude "${@#app/assistant/}"' --
         language: system
         types: [python]
-        files: ^assistant/
+        files: ^app/assistant/
 
       - id: ruff-check-dashboards
-        name: ruff check (dashboards)
-        entry: bash -c 'cd dashboards && uv run ruff check --fix --force-exclude "${@#dashboards/}"' --
+        name: ruff check (app/dashboards)
+        entry: bash -c 'cd app/dashboards && uv run ruff check --fix --force-exclude "${@#app/dashboards/}"' --
         language: system
         types: [python]
-        files: ^dashboards/
+        files: ^app/dashboards/
 
       - id: ruff-format-dashboards
-        name: ruff format (dashboards)
-        entry: bash -c 'cd dashboards && uv run ruff format --force-exclude "${@#dashboards/}"' --
+        name: ruff format (app/dashboards)
+        entry: bash -c 'cd app/dashboards && uv run ruff format --force-exclude "${@#app/dashboards/}"' --
         language: system
         types: [python]
-        files: ^dashboards/
+        files: ^app/dashboards/
 
       - id: eslint
         name: eslint (frontend)
@@ -107,71 +107,71 @@ repos:
         language: system
         files: ^frontend/.*\.(vue|ts|tsx|mjs)$
 
-      # web/ : le PHP par web/tools/run.sh (le PHP de la machine, sinon podman), le JavaScript par
-      # pnpm ; les règles et leur dette sont dans les fichiers de configuration de web/.
+      # app/web/ : le PHP par app/web/tools/run.sh (le PHP de la machine, sinon podman), le JavaScript
+      # par pnpm ; les règles et leur dette sont dans les fichiers de configuration de app/web/.
       - id: php-cs-fixer-web
-        name: php-cs-fixer (web)
-        entry: bash -c 'web/tools/run.sh vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --show-progress=none --path-mode=intersection "${@#web/}"' --
+        name: php-cs-fixer (app/web)
+        entry: bash -c 'app/web/tools/run.sh vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --show-progress=none --path-mode=intersection "${@#app/web/}"' --
         language: system
         types: [php]
-        files: ^web/
+        files: ^app/web/
 
       - id: phpstan-web
-        name: phpstan (web)
-        entry: bash -c 'web/tools/run.sh vendor/bin/phpstan analyse --no-progress --memory-limit=1G "${@#web/}"' --
+        name: phpstan (app/web)
+        entry: bash -c 'app/web/tools/run.sh vendor/bin/phpstan analyse --no-progress --memory-limit=1G "${@#app/web/}"' --
         language: system
         types: [php]
-        files: ^web/
-        exclude: ^web/(vendor|tools)/
+        files: ^app/web/
+        exclude: ^app/web/(vendor|tools)/
 
       # Les couches : tout le graphe, relu dès qu'un fichier de la couche change.
       - id: deptrac-web
-        name: deptrac (web)
-        entry: web/tools/run.sh vendor/bin/deptrac analyse --config-file=deptrac.yaml --no-progress
+        name: deptrac (app/web)
+        entry: app/web/tools/run.sh vendor/bin/deptrac analyse --config-file=deptrac.yaml --no-progress
         language: system
         types: [php]
-        files: ^web/
+        files: ^app/web/
         pass_filenames: false
 
       - id: no-sql-web
-        name: pas de SQL dans web/ (l'API seule lit la base)
+        name: pas de SQL dans app/web/ (l'API seule lit la base)
         entry: '\b(mysqli|mysql|pg|sqlite|odbc)_\w+\s*\('
         language: pygrep
         types: [php]
-        files: ^web/
-        exclude: ^web/vendor/
+        files: ^app/web/
+        exclude: ^app/web/vendor/
 
-      - id: lint-imports-backend
-        name: import-linter (backend)
-        entry: bash -c 'cd backend && uv run lint-imports --no-cache' --
+      - id: lint-imports-api
+        name: import-linter (app/api)
+        entry: bash -c 'cd app/api && uv run lint-imports --no-cache' --
         language: system
         types: [python]
-        files: ^backend/
+        files: ^app/api/
         pass_filenames: false
 
       # openapi.json réécrit d'après le code : un changement de route s'y voit dans la PR.
-      - id: openapi-backend
-        name: openapi.json (backend)
-        entry: bash -c 'cd backend && uv run python -m tools.export_openapi --output ../openapi.json >/dev/null' --
+      - id: openapi-api
+        name: openapi.json (app/api)
+        entry: bash -c 'cd app/api && uv run python -m tools.export_openapi --output ../../openapi.json >/dev/null' --
         language: system
         types: [python]
-        files: ^backend/
-        exclude: ^backend/tests/
+        files: ^app/api/
+        exclude: ^app/api/tests/
         pass_filenames: false
 
       - id: eslint-web
-        name: eslint (web)
-        entry: bash -c 'cd web && { [ -d node_modules ] || pnpm install --frozen-lockfile --silent; } && pnpm exec eslint --fix "${@#web/}"' --
+        name: eslint (app/web)
+        entry: bash -c 'cd app/web && { [ -d node_modules ] || pnpm install --frozen-lockfile --silent; } && pnpm exec eslint --fix "${@#app/web/}"' --
         language: system
         types: [javascript]
-        files: ^web/
+        files: ^app/web/
 
       - id: prettier-web
-        name: prettier (web)
-        entry: bash -c 'cd web && { [ -d node_modules ] || pnpm install --frozen-lockfile --silent; } && pnpm exec prettier --write --ignore-unknown "${@#web/}"' --
+        name: prettier (app/web)
+        entry: bash -c 'cd app/web && { [ -d node_modules ] || pnpm install --frozen-lockfile --silent; } && pnpm exec prettier --write --ignore-unknown "${@#app/web/}"' --
         language: system
         types: [javascript]
-        files: ^web/
+        files: ^app/web/
 
       - id: charter
         name: charter (charter.toml, committed files)

@@ -1,9 +1,9 @@
 """Génération, chargement et propagation des fichiers .env.
 
-`.env` est l'environnement de l'instance. Il est produit à partir de `config/env.skeleton`,
+`.env` est l'environnement de l'instance. Il est produit à partir de `deploy/env.skeleton`,
 des réponses de l'utilisateur (`.env.default`) et des autres parts `.env.<part>` (`.env.git` :
 le commit), puis des valeurs de l'environnement choisi (`.env_<env>.env`, copié de
-`config/env.<env>`). Une part ne redéfinit jamais une clé d'une autre.
+`deploy/env.<env>`). Une part ne redéfinit jamais une clé d'une autre.
 """
 
 import logging
@@ -74,7 +74,7 @@ def load_env_parts(directory: Path = Path(".")) -> EnvVars:
 
 def generate_base_env() -> EnvVars:
     """Demande le nom et les mots de passe de l'instance, et génère ses secrets."""
-    env_vars = load_env_file("config/env.skeleton")
+    env_vars = load_env_file("deploy/env.skeleton")
 
     instance_name = ask("Give the intance name (lowercase): ").lower()
     env_vars["INSTANCE_NAME"] = instance_name
@@ -103,7 +103,7 @@ def generate_base_env() -> EnvVars:
 def _copy_env_templates() -> None:
     for name in ("dev", "prod"):
         if not env_file_of(name).exists():
-            shutil.copy(f"config/env.{name}", env_file_of(name))
+            shutil.copy(f"deploy/env.{name}", env_file_of(name))
 
 
 def _env_dirs() -> list[Path]:

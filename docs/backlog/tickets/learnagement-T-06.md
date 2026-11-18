@@ -11,7 +11,7 @@
 `podman compose`, `USER` non root, images de base par digest, `HEALTHCHECK` par service,
 Node 18 (fin de vie) → Node LTS.
 
-- [x] `Containerfile` par conteneur, `docker/compose.yaml` écrit par le lanceur
+- [x] `Containerfile` par conteneur, `deploy/compose.yaml` écrit par le lanceur
 - [x] Lanceur sur `podman` et `podman compose` par défaut (docker reste possible par le `.env`)
 - [x] `USER` non root : backend, dashboards, frontend
 - [ ] `USER` non root pour `web` : Apache écoute sur 80 et 443 ; des ports hauts (8080, 8443)

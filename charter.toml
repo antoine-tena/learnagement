@@ -10,15 +10,15 @@ unverified_rules = "scripts/ci/unverified-rules.txt"
 
 [bans.logging]
 id = "LOGGING"
-files = ["backend/*.py", "backend/**/*.py"]
+files = ["app/api/*.py", "app/api/**/*.py"]
 
 [bans.constant-time]
 id = "CONSTANT-TIME"
-files = ["backend/*.py", "backend/**/*.py"]
+files = ["app/api/*.py", "app/api/**/*.py"]
 
 [bans.personal-data]
 id = "PERSONAL-DATA"
-files = ["backend/*.py", "backend/**/*.py"]
+files = ["app/api/*.py", "app/api/**/*.py"]
 
 [bans.forbidden-tools]
 id = "UV-PODMAN"
@@ -39,14 +39,14 @@ budget = 0
 [ratchets.long-routes]
 id = "VIEW-15"
 decorator = '\s*@\w*(app|router)\.(get|post|put|patch|delete)'
-files = ["backend/**/*.py"]
+files = ["app/api/**/*.py"]
 budget = 2
 
 # A real clock in a test: it passes today and breaks at midnight or on a Sunday.
 [ratchets.clock-in-tests]
 rule = "occurrences"
 id = "CLOCK"
-files = ["backend/tests/*.py", "backend/tests/**/*.py"]
+files = ["app/api/tests/*.py", "app/api/tests/**/*.py"]
 pattern = "datetime.now("
 budget = 0
 
@@ -59,7 +59,7 @@ suffixes = [".ts", ".tsx", ".mjs"]
 test_suffixes = [".test.ts", ".test.tsx", ".spec.ts", ".spec.tsx"]
 floor = 0
 
-# [FILE-SIZE] pour le PHP et le JavaScript de web/, que le cliquet du dessus ne compte pas :
+# [FILE-SIZE] pour le PHP et le JavaScript de app/web/, que le cliquet du dessus ne compte pas :
 # la dette d'aujourd'hui est le plafond, baissé à mesure que les phases découpent les fichiers.
 [ratchets.file-size-web]
 rule = "file-size"

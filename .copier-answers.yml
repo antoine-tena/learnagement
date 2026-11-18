@@ -2,6 +2,7 @@
 _commit: v0.4.15-90-gbd841b9
 _src_path: https://github.com/antoine-tena/ion-repo.git
 backend: fastapi
+backend_dir: app/api
 ci_runner: github
 compact_window: 400000
 created: '2026-10-30'

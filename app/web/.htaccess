@@ -1,0 +1,7 @@
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]
+# Outillage de développement : jamais servi.
+RedirectMatch 404 ^/(vendor|node_modules|tools|container)/
+RedirectMatch 404 ^/(composer\.(json|lock)|package\.json|pnpm-lock\.yaml|eslint\.config\.js|phpstan(-baseline)?\.neon(\.dist)?|\.php-cs-fixer\.dist\.php|\.prettier(rc\.json|ignore)|Containerfile|compose\.yaml|\.containerignore)$

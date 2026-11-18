@@ -1,4 +1,4 @@
-"""Le jeu fictif posé dans `db/data` : par la commande, ou proposé au premier lancement."""
+"""Le jeu fictif posé dans `database/data` : par la commande, ou proposé au premier lancement."""
 
 from pathlib import Path
 

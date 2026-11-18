@@ -1,6 +1,6 @@
 ---
 paths:
-  - "backend/**"
+  - "app/api/**"
   - "frontend/**"
 ---
 <!-- Written by ion-repo and kept current by `ion repo update`: do not edit, it would be overwritten. -->

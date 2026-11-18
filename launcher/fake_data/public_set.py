@@ -1,4 +1,4 @@
-"""Ce que le jeu fictif reprend du jeu public `db/freeData/Polytech_Annecy_Chambery/`.
+"""Ce que le jeu fictif reprend du jeu public `database/open-data/Polytech_Annecy_Chambery/`.
 
 Les promos, rôles et universités partenaires y sont désignés par leur nom, jamais par leur
 numéro : le jeu fictif reste juste si le jeu public est renuméroté.
@@ -10,7 +10,7 @@ from pathlib import Path
 
 from launcher.fake_data.sql import Raw
 
-PUBLIC_SET_DIR = Path("db/freeData/Polytech_Annecy_Chambery")
+PUBLIC_SET_DIR = Path("database/open-data/Polytech_Annecy_Chambery")
 PUBLIC_PARTNER_UNIVERSITIES = 91
 COHORT_GROUP_TYPE = 1
 LECTURE_SESSION_TYPE = 1

@@ -4,7 +4,7 @@
 Outil d'intégration des données de l'enseignement : le pont entre étudiants, enseignants et administratifs de l'USMB.
 
 Size **Medium**: production app, real users, several contributors (`ion repo set size=…`).
-Backend FastAPI in `backend/`, frontend Next.js 16 + React 19 in `frontend/`.
+Backend FastAPI in `app/api/`, frontend Next.js 16 + React 19 in `frontend/`.
 
 ## Commands
 - `ion repo dev`: dev servers in background, nothing asked; never `--foreground` from Claude (API http://localhost:8000/api/, docs `/api/docs`; front http://localhost:3000). Then `ion repo dev logs [service]|status|stop`. Worker or background task: `name: command` line in its folder's `Procfile.dev`.

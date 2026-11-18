@@ -6,14 +6,14 @@
 - **Effort**: M · **Owner**: @antoine-tena · **Due**: —
 - **Origin**: revue de l'architecture ; priorité relevée le 2026-11-17 (serveur déjà surchargé)
 
-`dashboards/apc_dash/polytech_rag/` embarque `sentence-transformers` et `faiss-cpu` dans l'image
+`app/dashboards/apc_dash/polytech_rag/` embarque `sentence-transformers` et `faiss-cpu` dans l'image
 de tous les tableaux de bord. Le sortir dans son propre conteneur, appelé par `apc20_chatbot`, en
 respectant [AI-FEATURES].
 
 La recherche vectorielle n'était importée par aucune page : l'assistant du tableau de bord
 (`FileService`) lit les PDF avec PyMuPDF seul, et `apc20_chatbot` (Groq) ne l'appelle pas.
 
-- [x] Sortir le pipeline vectoriel dans son composant `assistant/` (`learnagement_assistant`,
+- [x] Sortir le pipeline vectoriel dans son composant `app/assistant/` (`learnagement_assistant`,
   torch en version CPU), avec ses tests et son job de CI
 - [x] Retirer `faiss-cpu` et `sentence-transformers` (donc torch et CUDA) de l'image Dash
 - [ ] Construire l'index sur les vrais PDF des formations (absents du repo, à demander)
