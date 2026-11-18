@@ -15,6 +15,8 @@ logging.basicConfig(
 
 # Cookie posé par le front PHP sur le même hôte : le jeton ne passe pas par l'URL
 TOKEN_COOKIE = "lnm_token"
+# L'algorithme avec lequel l'API signe ses jetons
+JWT_ALGORITHM = "HS256"
 
 
 def token_from_cookie() -> str | None:
@@ -60,18 +62,20 @@ def decode_token(token, leeway=30):
     if not token:
         return False
     secret_key = os.getenv("JWT_SIGNING_KEY")
+    if not secret_key:
+        # Sans la clé de l'API, aucune signature n'est vérifiable : tout jeton est refusé.
+        logging.error("Token refusé : JWT_SIGNING_KEY absente de l'environnement")
+        raise jwt.InvalidTokenError("JWT_SIGNING_KEY absente")
     try:
-        decode_options = {"verify_signature": bool(secret_key), "verify_exp": True}
+        payload = jwt.decode(
+            token,
+            key=secret_key,
+            algorithms=[JWT_ALGORITHM],
+            options={"verify_signature": True, "verify_exp": True},
+            leeway=timedelta(seconds=leeway),
+        )
 
-        decode_kwargs = {"options": decode_options, "leeway": timedelta(seconds=leeway)}
-
-        if secret_key:
-            decode_kwargs["key"] = secret_key
-            decode_kwargs["algorithms"] = ["HS256"]
-
-        payload = jwt.decode(token, **decode_kwargs)
-
-        logging.info(payload.__repr__())
+        logging.info("Token valide pour user_id=%s", payload.get("id"))
         return payload
 
     except jwt.ExpiredSignatureError as e:
