@@ -94,16 +94,17 @@ python Learnagement.py fake-data --size medium --seed 2026
 ```
 Il est écrit dans `db/data/`, que MySQL ne lit qu'à sa première initialisation.
 
-Comptes de test du jeu fictif, tous avec le mot de passe `learnagement-fictif` :
+Comptes de test du jeu fictif, tous avec le mot de passe `learnagement-fictif` ; le login est
+le mail, comme pour tout compte interne :
 
 | Identifiant | Profil | Rôle |
 |---|---|---|
-| `etudiant.demo` | étudiant | IDU 4e année |
-| `enseignant.demo` | enseignant | sans rôle |
-| `entreprises.demo` | enseignant | Relation entreprises |
-| `etudes.demo` | administratif | Responsable études |
-| `international.demo` | administratif | Relations internationales |
-| `scolarite.demo` | administratif | Responsable de la scolarité |
+| `etudiant.demo@example.org` | étudiant | IDU 4e année |
+| `enseignant.demo@example.org` | enseignant | sans rôle |
+| `entreprises.demo@example.org` | enseignant | Relation entreprises |
+| `etudes.demo@example.org` | administratif | Responsable études |
+| `international.demo@example.org` | administratif | Relations internationales |
+| `scolarite.demo@example.org` | administratif | Responsable de la scolarité |
 
 Si vous avez chargé le jeu de données libres "small", vous trouverez via PhPMyAdmin un ensemble d'utilisateurs de test dont :
 - un enseignant : AMELIE.CODRON@truc.com / toto

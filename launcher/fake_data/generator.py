@@ -42,7 +42,9 @@ TEACHER_COUNT = {FakeDataSize.SMALL: 15, FakeDataSize.MEDIUM: 40, FakeDataSize.L
 
 def account_person(account: TestAccount, person_id: int, password_hash: str) -> Person:
     """La personne derrière un compte de test."""
-    return Person(person_id, account.first_name, TEST_LAST_NAME, account.login, password_hash)
+    return Person(
+        person_id, account.first_name, TEST_LAST_NAME, account.mail_local_part, password_hash
+    )
 
 
 def people_sql(students: list[Student], teachers: list[Person], staff: list[Person]) -> str:
@@ -104,7 +106,7 @@ def build_people(
         for index, account in enumerate(TEACHER_ACCOUNTS, start=1)
     ]
     teachers = test_teachers + [
-        Person(p.id + len(test_teachers), p.first_name, p.last_name, p.login)
+        Person(p.id + len(test_teachers), p.first_name, p.last_name, p.mail_local_part)
         for p in make_teachers(pool, TEACHER_COUNT[size])
     ]
     staff = [
@@ -113,7 +115,7 @@ def build_people(
     ]
     test_student = account_person(STUDENT_ACCOUNT, 1, password_hash)
     students = [Student(**vars(test_student), cohort=TEST_STUDENT_COHORT)] + [
-        Student(s.id + 1, s.first_name, s.last_name, s.login, cohort=s.cohort)
+        Student(s.id + 1, s.first_name, s.last_name, s.mail_local_part, cohort=s.cohort)
         for s in make_students(pool, STUDENTS_PER_COHORT[size])
     ]
     return students, teachers, staff
