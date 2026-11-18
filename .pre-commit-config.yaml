@@ -88,18 +88,18 @@ repos:
         files: ^assistant/
 
       - id: ruff-check-dashboards
-        name: ruff check (dashboards)
-        entry: bash -c 'cd dashboards && uv run ruff check --fix --force-exclude "${@#dashboards/}"' --
+        name: ruff check (app/dashboards)
+        entry: bash -c 'cd app/dashboards && uv run ruff check --fix --force-exclude "${@#app/dashboards/}"' --
         language: system
         types: [python]
-        files: ^dashboards/
+        files: ^app/dashboards/
 
       - id: ruff-format-dashboards
-        name: ruff format (dashboards)
-        entry: bash -c 'cd dashboards && uv run ruff format --force-exclude "${@#dashboards/}"' --
+        name: ruff format (app/dashboards)
+        entry: bash -c 'cd app/dashboards && uv run ruff format --force-exclude "${@#app/dashboards/}"' --
         language: system
         types: [python]
-        files: ^dashboards/
+        files: ^app/dashboards/
 
       - id: eslint
         name: eslint (frontend)

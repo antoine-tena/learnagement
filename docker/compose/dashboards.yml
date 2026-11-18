@@ -12,8 +12,8 @@
             - INSTANCE_NAME=${INSTANCE_NAME}
             - ENV=${ENV}
         volumes:
-            - ../dashboards/:/app/
-            - ../dashboards/data/:/data/
+            - ../app/dashboards/:/app/
+            - ../app/dashboards/data/:/data/
             - ../${SSL_INTERNAL_DIR}:${DOCKER_SSL_INTERNAL_DIR}:ro
             - ../${SSL_EXTERNAL_DIR}:${DOCKER_SSL_EXTERNAL_DIR}:ro
         depends_on:

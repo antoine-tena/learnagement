@@ -22,7 +22,7 @@ CONTAINER_APP_DIRS: dict[str, str | None] = {
     "phpmyadmin": None,
     "backend": "app/api",
     "web": "app/web",
-    "dashboards": "dashboards",
+    "dashboards": "app/dashboards",
     "frontend": "frontend",
 }
 # compose lit aussi son .env, pour les variables qu'il interpole

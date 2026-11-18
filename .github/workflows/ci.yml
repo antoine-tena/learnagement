@@ -37,14 +37,14 @@ jobs:
     with:
       directory: assistant
 
-  # Les tableaux de bord Dash : ruff et mypy au niveau qui passe aujourd'hui (dashboards/
-  # pyproject.toml), puis pytest (dashboards/tests/, sans réseau ni base) ; un job à part
+  # Les tableaux de bord Dash : ruff et mypy au niveau qui passe aujourd'hui (app/dashboards/
+  # pyproject.toml), puis pytest (app/dashboards/tests/, sans réseau ni base) ; un job à part
   # plutôt que python.yml, qui impose mypy strict.
   dashboards:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: dashboards
+        working-directory: app/dashboards
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
