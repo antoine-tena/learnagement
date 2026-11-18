@@ -3,11 +3,12 @@ from collections.abc import Callable
 from typing import Annotated
 
 import dotenv
-from fastapi import APIRouter, Depends, Header
+from fastapi import APIRouter, Depends, Header, Request
 from fastapi.security import OAuth2PasswordRequestForm
 
 import auth.authenticate_cas as authenticate_cas
 import auth.authenticate_lnm as authenticate_lnm
+from core.rate_limit import LOGIN_RATE_LIMIT, limiter
 from models.token import Token
 
 dotenv.load_dotenv(".env")
@@ -22,7 +23,9 @@ router = APIRouter()
 @router.post(
     "/token", tags=["Auth"], summary="Token", description="Authenticate user and return JWT token"
 )
+@limiter.limit(LOGIN_RATE_LIMIT)
 async def login_for_access_token(
+    request: Request,
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> Token:
     return await authenticate_lnm.login_for_access_token(form_data)
