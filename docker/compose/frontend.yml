@@ -4,6 +4,8 @@
             context: ./frontend
             dockerfile: Containerfile
         restart: always
+        # Écrit node_modules dans le code monté : voir USERNS_MODE dans launcher/compose.py
+        userns_mode: ${USERNS_MODE}
         networks:
               - learnagement_front_${INSTANCE_NAME}
         ports:
