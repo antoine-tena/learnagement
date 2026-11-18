@@ -12,20 +12,20 @@ from launcher.fake_data.sql import Raw
 
 PUBLIC_SET_DIR = Path("db/freeData/Polytech_Annecy_Chambery")
 PUBLIC_PARTNER_UNIVERSITIES = 91
-PROMO_GROUP_TYPE = 1
+COHORT_GROUP_TYPE = 1
 LECTURE_SESSION_TYPE = 1
 
 
 @dataclass(frozen=True)
-class PublicPromo:
+class PublicCohort:
     """Une promo du jeu public : sa filière et son année d'études."""
 
     program: str
     year: int
 
 
-PUBLIC_PROMOS = tuple(
-    PublicPromo(program, year)
+PUBLIC_COHORTS = tuple(
+    PublicCohort(program, year)
     for program in ("IDU", "MM", "SEA", "BAT", "EIT")
     for year in (3, 4, 5)
 )
@@ -40,11 +40,11 @@ class PublicRole(StrEnum):
     REGISTRAR = "Responsable de la scolarité"
 
 
-def promo_id(promo: PublicPromo) -> Raw:
+def cohort_id(cohort: PublicCohort) -> Raw:
     """La sous-requête qui retrouve le numéro d'une promo du jeu public."""
     return Raw(
         "(SELECT `id_promo` FROM `LNM_promo` JOIN `LNM_filiere` USING (`id_filiere`) "
-        f"WHERE `nom_filiere` = '{promo.program}' AND `annee` = {promo.year})"
+        f"WHERE `nom_filiere` = '{cohort.program}' AND `annee` = {cohort.year})"
     )
 
 

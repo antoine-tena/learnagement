@@ -14,10 +14,10 @@ from launcher.fake_data.accounts import (
 )
 from launcher.fake_data.people import NamePool, Person, Student, make_students, make_teachers
 from launcher.fake_data.public_set import (
-    PROMO_GROUP_TYPE,
-    PUBLIC_PROMOS,
-    PublicPromo,
-    promo_id,
+    COHORT_GROUP_TYPE,
+    PUBLIC_COHORTS,
+    PublicCohort,
+    cohort_id,
     role_id,
 )
 from launcher.fake_data.sql import Raw, SqlValue, insert
@@ -25,7 +25,7 @@ from launcher.fake_data.vocabulary import COMPONENT
 
 DEFAULT_SEED = 2026
 FAKE_DATA_FILE_NAME = "V0.99.9__fake_data.sql"
-TEST_STUDENT_PROMO = PublicPromo("IDU", 4)
+TEST_STUDENT_COHORT = PublicCohort("IDU", 4)
 
 
 class FakeDataSize(StrEnum):
@@ -36,7 +36,7 @@ class FakeDataSize(StrEnum):
     LARGE = "large"
 
 
-STUDENTS_PER_PROMO = {FakeDataSize.SMALL: 8, FakeDataSize.MEDIUM: 25, FakeDataSize.LARGE: 80}
+STUDENTS_PER_COHORT = {FakeDataSize.SMALL: 8, FakeDataSize.MEDIUM: 25, FakeDataSize.LARGE: 80}
 TEACHER_COUNT = {FakeDataSize.SMALL: 15, FakeDataSize.MEDIUM: 40, FakeDataSize.LARGE: 120}
 
 
@@ -48,13 +48,13 @@ def account_person(account: TestAccount, person_id: int, password_hash: str) -> 
 def people_sql(students: list[Student], teachers: list[Person], staff: list[Person]) -> str:
     """Les étudiants, leur groupe promo, les enseignants et les administratifs."""
     student_rows: list[list[SqlValue]] = [
-        [s.id, s.last_name, s.first_name, s.mail, s.login, s.password, promo_id(s.promo)]
+        [s.id, s.last_name, s.first_name, s.mail, s.login, s.password, cohort_id(s.cohort)]
         for s in students
     ]
     group_rows: list[list[SqlValue]] = [
         [s.id, Raw(
-            f"(SELECT `id_groupe` FROM `LNM_groupe` WHERE `id_promo` = {promo_id(s.promo)} "
-            f"AND `id_groupe_type` = {PROMO_GROUP_TYPE})"
+            f"(SELECT `id_groupe` FROM `LNM_groupe` WHERE `id_promo` = {cohort_id(s.cohort)} "
+            f"AND `id_groupe_type` = {COHORT_GROUP_TYPE})"
         )]
         for s in students
     ]  # fmt: skip
@@ -112,9 +112,9 @@ def build_people(
         for index, account in enumerate(STAFF_ACCOUNTS, start=1)
     ]
     test_student = account_person(STUDENT_ACCOUNT, 1, password_hash)
-    students = [Student(**vars(test_student), promo=TEST_STUDENT_PROMO)] + [
-        Student(s.id + 1, s.first_name, s.last_name, s.login, promo=s.promo)
-        for s in make_students(pool, STUDENTS_PER_PROMO[size])
+    students = [Student(**vars(test_student), cohort=TEST_STUDENT_COHORT)] + [
+        Student(s.id + 1, s.first_name, s.last_name, s.login, cohort=s.cohort)
+        for s in make_students(pool, STUDENTS_PER_COHORT[size])
     ]
     return students, teachers, staff
 
@@ -125,7 +125,7 @@ def generate(size: FakeDataSize, seed: int = DEFAULT_SEED) -> str:
     students, teachers, staff = build_people(rng, size)
     header = (
         f"-- Données fictives Learnagement : taille {size.value}, graine {seed}.\n"
-        f"-- {len(PUBLIC_PROMOS)} promos du jeu public, aucune personne réelle.\n"
+        f"-- {len(PUBLIC_COHORTS)} promos du jeu public, aucune personne réelle.\n"
         "-- Produit par `python Learnagement.py fake-data` : ne pas éditer à la main.\n"
         "SET NAMES utf8mb4;\n\n"
     )

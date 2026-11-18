@@ -5,8 +5,8 @@ from datetime import date, datetime, time, timedelta
 
 from launcher.fake_data.people import Person, Student
 from launcher.fake_data.public_set import (
+    COHORT_GROUP_TYPE,
     LECTURE_SESSION_TYPE,
-    PROMO_GROUP_TYPE,
     PUBLIC_PARTNER_UNIVERSITIES,
     partner_university_id,
 )
@@ -37,15 +37,15 @@ def internships(rng: random.Random, students: list[Student], teachers: list[Pers
         (company, city) for company in COMPANIES for city in CITIES
     ]  # (entreprise, ville) : l'entreprise et l'intitulé forment une clé unique
     rows: list[list[SqlValue]] = []
-    for index, student in enumerate(s for s in students if s.promo.year in INTERNSHIP_YEARS):
+    for index, student in enumerate(s for s in students if s.cohort.year in INTERNSHIP_YEARS):
         company, (city, postcode) = placements[index % len(placements)]
         title = rng.choice(INTERNSHIP_TITLES)
         start = date(2027, 4, 5) + timedelta(weeks=rng.randrange(4))
-        weeks = INTERNSHIP_WEEKS[student.promo.year]
+        weeks = INTERNSHIP_WEEKS[student.cohort.year]
         rows.append([
             f"{company} — {city}", f"{title} {index + 1}", f"Stage fictif : {title.lower()}.",
             None, city, postcode, COUNTRY, start, start + timedelta(weeks=weeks),
-            INTERNSHIP_YEARS[student.promo.year].value, student.id, rng.choice(teachers).id,
+            INTERNSHIP_YEARS[student.cohort.year].value, student.id, rng.choice(teachers).id,
         ])  # fmt: skip
     columns = (
         "entreprise", "intitulé", "description", "adresse", "ville", "code_postal", "pays",
@@ -57,7 +57,7 @@ def internships(rng: random.Random, students: list[Student], teachers: list[Pers
 def mobility_wishes(rng: random.Random, students: list[Student]) -> str:
     """Trois vœux d'universités partenaires distinctes par étudiant de 4e année."""
     rows: list[list[SqlValue]] = []
-    for student in (s for s in students if s.promo.year == MOBILITY_YEAR):
+    for student in (s for s in students if s.cohort.year == MOBILITY_YEAR):
         ranks = rng.sample(range(PUBLIC_PARTNER_UNIVERSITIES), WISHES_PER_STUDENT)
         submitted = datetime.combine(SCHOOL_YEAR_START + timedelta(days=rng.randrange(60)), time(9))
         for priority, rank in enumerate(ranks, start=1):
@@ -80,7 +80,7 @@ def lectures(teacher_count: int) -> str:
         "INSERT INTO `MAQUETTE_module_sequencage` (`id_module`, `nombre`, `id_seance_type`, "
         "`id_groupe_type`, `duree_h`, `id_intervenant_principal`)\n"
         f"SELECT DISTINCT m.`id_module`, {LECTURES_PER_MODULE}, {LECTURE_SESSION_TYPE}, "
-        f"{PROMO_GROUP_TYPE}, {LECTURE_HOURS}, {teacher}\n"
+        f"{COHORT_GROUP_TYPE}, {LECTURE_HOURS}, {teacher}\n"
         "FROM `MAQUETTE_module` m\n"
         "JOIN `MAQUETTE_module_as_learning_unit` USING (`id_module`);\n"
     )

@@ -5,7 +5,7 @@ import random
 import unicodedata
 from dataclasses import dataclass
 
-from launcher.fake_data.public_set import PUBLIC_PROMOS, PublicPromo
+from launcher.fake_data.public_set import PUBLIC_COHORTS, PublicCohort
 from launcher.fake_data.vocabulary import FAKE_MAIL_DOMAIN, FIRST_NAMES, LAST_NAMES
 
 
@@ -28,7 +28,7 @@ class Person:
 class Student(Person):
     """Un étudiant fictif, inscrit dans une promo du jeu public."""
 
-    promo: PublicPromo = PUBLIC_PROMOS[0]
+    cohort: PublicCohort = PUBLIC_COHORTS[0]
 
 
 def slug(word: str) -> str:
@@ -55,13 +55,13 @@ def make_teachers(pool: NamePool, count: int) -> list[Person]:
     return [pool.person(teacher_id) for teacher_id in range(1, count + 1)]
 
 
-def make_students(pool: NamePool, per_promo: int) -> list[Student]:
-    """Les étudiants fictifs, `per_promo` dans chaque promo du jeu public."""
+def make_students(pool: NamePool, per_cohort: int) -> list[Student]:
+    """Les étudiants fictifs, `per_cohort` dans chaque promo du jeu public."""
     students: list[Student] = []
-    for promo in PUBLIC_PROMOS:
-        for _ in range(per_promo):
+    for cohort in PUBLIC_COHORTS:
+        for _ in range(per_cohort):
             base = pool.person(len(students) + 1)
             students.append(
-                Student(base.id, base.first_name, base.last_name, base.login, promo=promo)
+                Student(base.id, base.first_name, base.last_name, base.login, cohort=cohort)
             )
     return students
