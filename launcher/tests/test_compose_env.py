@@ -6,7 +6,7 @@ import pytest
 import yaml
 
 from launcher import compose, env
-from launcher.config import CONTAINER_APP_DIRS, CONTAINERS
+from launcher.config import COMPOSE_FRAGMENTS, CONTAINER_APP_DIRS, CONTAINERS
 
 VARIABLES = {name: "x" for name in compose.COMPOSE_VARIABLES} | {"INSTANCE_NAME": "test"}
 
@@ -22,6 +22,11 @@ def test_every_fragment_is_valid_and_known() -> None:
     every_container = sorted(CONTAINER_APP_DIRS)
     rendered = compose.render_compose(every_container, VARIABLES)
     assert len(yaml.safe_load(rendered)["services"]) == len(every_container)
+
+
+def test_every_container_has_a_fragment() -> None:
+    assert sorted(COMPOSE_FRAGMENTS) == sorted(CONTAINER_APP_DIRS)
+    assert all(Path(fragment).is_file() for fragment in COMPOSE_FRAGMENTS.values())
 
 
 def test_passwords_stay_out_of_the_compose_file() -> None:

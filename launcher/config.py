@@ -8,7 +8,7 @@ GREEN = "\033[0;32m"
 YELLOW = "\033[0;33m"
 NC = "\033[0m"  # No color
 
-# Les conteneurs de chaque environnement, un fragment `docker/compose/<conteneur>.yml` chacun.
+# Les conteneurs de chaque environnement, un fragment compose chacun (COMPOSE_FRAGMENTS).
 # Dans aucune liste pour l'instant : `etl` (Mage AI), premier essai.
 CONTAINERS = {
     "dev": ["data_mysql", "phpmyadmin", "backend", "web", "dashboards", "frontend"],
@@ -24,6 +24,18 @@ CONTAINER_APP_DIRS: dict[str, str | None] = {
     "web": "app/web",
     "dashboards": "app/dashboards",
     "frontend": "frontend",
+}
+# Le fragment compose de chaque conteneur : le `compose.yaml` d'une application, dans son
+# dossier, ou celui d'un service de la base et de l'exploitation, dans `docker/compose/`
+COMPOSE_FRAGMENTS = {
+    "data_mysql": "docker/compose/data_mysql.yml",
+    "data_mysql_backup": "docker/compose/data_mysql_backup.yml",
+    "etl": "docker/compose/etl.yml",
+    "phpmyadmin": "docker/compose/phpmyadmin.yml",
+    "backend": "docker/compose/backend.yml",
+    "web": "docker/compose/web.yml",
+    "dashboards": "docker/compose/dashboards.yml",
+    "frontend": "docker/compose/frontend.yml",
 }
 # compose lit aussi son .env, pour les variables qu'il interpole
 COMPOSE_DIR = "docker"
