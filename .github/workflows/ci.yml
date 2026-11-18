@@ -37,7 +37,8 @@ jobs:
       directory: assistant
 
   # Les tableaux de bord Dash : ruff et mypy au niveau qui passe aujourd'hui (dashboards/
-  # pyproject.toml) ; pas encore de tests, d'où un job à part plutôt que python.yml.
+  # pyproject.toml), puis pytest (dashboards/tests/, sans réseau ni base) ; un job à part
+  # plutôt que python.yml, qui impose mypy strict.
   dashboards:
     runs-on: ubuntu-latest
     defaults:
@@ -51,6 +52,7 @@ jobs:
       - run: uv run --no-sync ruff format --check .
       - run: uv sync --locked
       - run: uv run --no-sync mypy .
+      - run: uv run --no-sync pytest
 
   frontend:
     uses: antoine-tena/ion-repo/.github/workflows/pnpm.yml@eb0dc112605e3ccda49cc80374ffd3185a96baf7 # develop
