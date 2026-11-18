@@ -10,10 +10,10 @@ Avant de déplacer quoi que ce soit, la machine vérifie les règles dans tous l
 les phases suivantes se relisent vite. Rien n'est déplacé ici.
 
 - [x] La charte compte aussi le `.php` et le `.js` ([FILE-SIZE]), budget au niveau actuel (6)
-- [x] ruff (lint et mise en forme) et mypy sur `dashboards/`, dans le pre-commit et la CI ; la
-  dette, règle par règle et module par module, dans `dashboards/pyproject.toml`
-- [x] PHP-CS-Fixer et PHPStan sur `web/`, au niveau qui passe aujourd'hui, relevé ensuite
-- [x] Prettier et ESLint sur le JS de `web/`
+- [x] ruff (lint et mise en forme) et mypy sur `app/dashboards/`, dans le pre-commit et la CI ; la
+  dette, règle par règle et module par module, dans `app/dashboards/pyproject.toml`
+- [x] PHP-CS-Fixer et PHPStan sur `app/web/`, au niveau qui passe aujourd'hui, relevé ensuite
+- [x] Prettier et ESLint sur le JS de `app/web/`
 - [x] Les couches vérifiées : import-linter en Python, deptrac en PHP
 - [x] `openapi.json` exporté et versionné, vérifié en CI (le workflow `api-contract.yml`
   d'ion-repo, avec une commande d'export FastAPI) ; les routes cassées détectées (oasdiff), à

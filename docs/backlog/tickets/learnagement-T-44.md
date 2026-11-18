@@ -7,7 +7,7 @@
 - **Origin**: lecture du code, 2026-11-17
 
 La base de production, qui porte les stages et bientôt la mobilité d'environ 400 étudiants, est
-sauvegardée chaque jour par le conteneur `data_mysql_backup` (`docker/backup/backup.sh`), et sa
+sauvegardée chaque jour par le conteneur `data_mysql_backup` (`deploy/backup/backup.sh`), et sa
 restauration est essayée (`docs/prod.md`). Les copies restent sur le même serveur que la base,
 et un échec ne prévient encore personne hors du serveur : deux décisions de Flavien
 (`urgent.md`).

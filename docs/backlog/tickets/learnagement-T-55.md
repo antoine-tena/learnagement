@@ -4,11 +4,11 @@
 - **Status**: todo
 - **Opened**: 2026-11-18
 - **Effort**: S · **Owner**: — · **Due**: —
-- **Origin**: learnagement#T-54, vu par le test de la carte (`web/tests/mobility-map.test.mjs`)
+- **Origin**: learnagement#T-54, vu par le test de la carte (`app/web/tests/mobility-map.test.mjs`)
 
-`fetchStudentQuota` (`web/scripts/mobility-map/api.js`) appelle
+`fetchStudentQuota` (`app/web/scripts/mobility-map/api.js`) appelle
 `/api.php?path=/university/etudiant/<id>/quota?annee_scolaire=2025-2026` : le `?` et le `=`
-sortent du motif de chemin de `web/api.php`, qui répond 400. Le bloc du quota de la filière ne
+sortent du motif de chemin de `app/web/api.php`, qui répond 400. Le bloc du quota de la filière ne
 s'affiche donc jamais, campagne ouverte ou non ; l'année y est aussi écrite en dur.
 
 - [ ] Faire passer les paramètres de requête par `api.php` jusqu'au backend (ou l'année dans le

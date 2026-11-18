@@ -1,7 +1,7 @@
 # learnagement#T-40 · Le conteneur Next redémarre
 - **Type**: bug
 - **Priority**: 🟡 normal
-- **Status**: to verify — `frontend/`, `docker/frontend/`
+- **Status**: to verify — `frontend/`, `frontend/`
 - **Opened**: 2026-11-17
 - **Effort**: S · **Owner**: — · **Due**: —
 - **Origin**: réunion avec Flavien Vernier, 2026-11-17

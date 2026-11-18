@@ -8,7 +8,7 @@
 
 Idée de Flavien : un seul front, où chacun contribue dans son langage. La cible la réalise en deux
 parties : la porte d'entrée, ici, et le lab (learnagement#T-50). Aujourd'hui, le PHP redirige vers Dash et Next
-sur un autre port en posant un cookie (`web/views/dashboard/python.php`).
+sur un autre port en posant un cookie (`app/web/views/dashboard/python.php`).
 
 - [ ] Un proxy (Caddy) : un seul domaine, des chemins au lieu de ports (`/`, `/api/`,
   `/dashboards/`, `/assistant/`)

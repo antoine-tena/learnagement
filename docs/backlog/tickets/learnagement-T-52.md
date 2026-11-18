@@ -8,7 +8,7 @@
 
 Le serveur sature déjà, selon Flavien. Le code montre des suspects : Dash lancé avec 2 processus
 qui chargent chacun PyTorch par le RAG (learnagement#T-38), l'API qui relance sa suite de tests et `uv sync` à
-chaque démarrage, production comprise (`docker/backend/entrypoint.sh`), le code monté en volume
+chaque démarrage, production comprise (`app/api/container/entrypoint.sh`), le code monté en volume
 dans les conteneurs.
 
 - [ ] Mesurer la mémoire et le processeur de chaque conteneur
