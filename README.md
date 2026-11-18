@@ -84,7 +84,27 @@ Note, containers will rebuild.
 
 ## Utilisation
 
-Lors du 1e lancement il vous sera demandé si vous souhaitez charger des données.
+Lors du 1e lancement il vous sera demandé si vous souhaitez charger des données. Hors production,
+le lanceur propose un jeu fictif (`small`, `medium` ou `large`) : des promos, étudiants,
+enseignants, stages, vœux de mobilité, séances et absences inventés, posés sur les maquettes
+publiques de Polytech Annecy-Chambéry. Aucune personne réelle, tous les mails en `@example.org`.
+Le même jeu se régénère à tout moment, identique pour une même graine :
+```bash
+python Learnagement.py fake-data --size medium --seed 2026
+```
+Il est écrit dans `db/data/`, que MySQL ne lit qu'à sa première initialisation.
+
+Comptes de test du jeu fictif, tous avec le mot de passe `learnagement-fictif` :
+
+| Identifiant | Profil | Rôle |
+|---|---|---|
+| `etudiant.demo` | étudiant | IDU 4e année |
+| `enseignant.demo` | enseignant | sans rôle |
+| `entreprises.demo` | enseignant | Relation entreprises |
+| `etudes.demo` | administratif | Responsable études |
+| `international.demo` | administratif | Relations internationales |
+| `scolarite.demo` | administratif | Responsable de la scolarité |
+
 Si vous avez chargé le jeu de données libres "small", vous trouverez via PhPMyAdmin un ensemble d'utilisateurs de test dont :
 - un enseignant : AMELIE.CODRON@truc.com / toto
 - un étudiant : LAURENT.BONNIFAIT@machin.com / toto
@@ -104,6 +124,9 @@ Actuellement 4 instances en parallèle sont possibles.
 
 ## Changements d'interface
 
+- **2026-11-18** : nouvelle commande du lanceur, `fake-data`, et nouvelle question au premier
+  lancement hors production : un jeu fictif (`small` par défaut) ou vos propres fichiers
+  (`none`, l'ancien comportement). La production ne change pas.
 - **2026-11-18** : phpMyAdmin ne démarre plus en production (`start --env prod`) : la base contient
   des données personnelles et son port était joignable depuis tout le VPN. Il reste en dev. Pour
   consulter la base de prod : `docker exec -it learnagement_data_mysql_<instance> mysql …` sur le
