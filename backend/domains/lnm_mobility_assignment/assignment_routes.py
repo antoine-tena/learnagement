@@ -1,9 +1,9 @@
 """Routes d'exécution et de suivi de l'algorithme d'affectation mobilité."""
 
-import logging
 import time
 from typing import Annotated
 
+import structlog
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 
 from api.dependencies import get_current_active_user
@@ -24,7 +24,7 @@ from .schemas import AssignmentRunPayload
 # backend
 assignment_progress = {"is_running": False, "progress": 0, "step": "", "error": None}
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 router = APIRouter()
 
 
@@ -83,7 +83,7 @@ def execute_assignment_task(payload: AssignmentRunPayload, current_user: User) -
         assignment_progress["step"] = "Terminé !"
         assignment_progress["is_running"] = False
     except Exception as e:
-        logger.error(f"Erreur algorithme affectation: {e}")
+        logger.exception("mobility.assignment_failed")
         assignment_progress["error"] = str(e)
         assignment_progress["is_running"] = False
 
