@@ -26,7 +26,10 @@ WISHES_PER_STUDENT = 3
 LECTURES_PER_MODULE = 4
 LECTURE_HOURS = 2
 ABSENCE_ONE_IN = 15
-SCHOOL_YEAR_START = date(2026, 9, 7)
+SCHOOL_YEAR_START = date(2026, 9, 7)  # un lundi
+SCHOOL_DAYS = 150
+DAYS_PER_SCHOOL_WEEK = 5
+WEEKEND_DAYS = 2
 SESSION_HOUR = time(8)
 COUNTRY = "France"
 
@@ -86,12 +89,24 @@ def lectures(teacher_count: int) -> str:
     )
 
 
+def session_day_offset(session_id: int) -> int:
+    """Les jours entre la rentrée (un lundi) et la séance : un jour ouvré, week-end sauté."""
+    school_day = session_id % SCHOOL_DAYS
+    return school_day + WEEKEND_DAYS * (school_day // DAYS_PER_SCHOOL_WEEK)
+
+
+def session_day_offset_sql(column: str) -> str:
+    """Le même calcul que `session_day_offset`, écrit en SQL MySQL sur `column`."""
+    school_day = f"MOD({column}, {SCHOOL_DAYS})"
+    return f"({school_day} + {WEEKEND_DAYS} * ({school_day} DIV {DAYS_PER_SCHOOL_WEEK}))"
+
+
 def session_schedule_and_absences(seed: int) -> str:
     """Une date pour chaque séance, puis quelques absences, tirées de la graine en SQL."""
     return (
         "UPDATE `CLASS_session` SET `schedule` = "
         f"TIMESTAMP('{SCHOOL_YEAR_START.isoformat()}', '{SESSION_HOUR.isoformat()}') "
-        "+ INTERVAL MOD(`id_session`, 150) DAY;\n"
+        f"+ INTERVAL {session_day_offset_sql('`id_session`')} DAY;\n"
         "INSERT INTO `CLASS_absence` (`id_session`, `id_etudiant`)\n"
         "SELECT s.`id_session`, g.`id_etudiant`\n"
         "FROM `CLASS_session` s\n"
