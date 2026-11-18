@@ -25,7 +25,7 @@ certs/
 
 
 # don't add js modules on git
-frontend/node_modules/
+lab/javascript/nextjs/node_modules/
 app/web/node_modules/
 mobility_map/node_modules/
 
