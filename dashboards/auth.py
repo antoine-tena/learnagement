@@ -37,7 +37,7 @@ def is_token_valid(token, leeway=30):
     try:
         decode_token(token, leeway)
         return True
-    except:
+    except jwt.InvalidTokenError:
         return False
 
 

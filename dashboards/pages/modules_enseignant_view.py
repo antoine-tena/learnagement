@@ -129,7 +129,7 @@ def register_callbacks_view(app):
                     .to_frame()
                     .reset_index(level=[0, 1])
                 )
-            except:
+            except TypeError:
                 df = pd.DataFrame(columns=["code_module", "nom_module", "nom"])
 
         table_intervenants = dbc.Table.from_dataframe(
