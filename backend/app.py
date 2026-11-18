@@ -3,10 +3,13 @@ import os
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 
 import init
 from auth import authenticate
 from core.logging import logger, uvicorn_log_config
+from core.rate_limit import limiter
 from domains import (
     account_activation,
     apc_competence,
@@ -28,6 +31,8 @@ from system import access_auth, check
 # app = FastAPI(dependencies=[Depends(get_query_token)])
 origins = ["*"]
 app = FastAPI()
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # Ajouter le middleware à l'application
 app.add_middleware(

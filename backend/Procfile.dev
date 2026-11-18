@@ -1,0 +1,1 @@
+fastapi: uv run uvicorn app:app --reload --port ${FASTAPI_PORT:-8000}

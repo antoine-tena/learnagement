@@ -1,9 +1,10 @@
 from datetime import UTC, datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 
 from api.dependencies import get_current_active_user
+from core.rate_limit import ACTIVATION_RATE_LIMIT, limiter
 from db.connection import get_connection
 from models.user import User
 
@@ -32,9 +33,10 @@ def create_activation_link(
 
 
 # Route publique : la personne n'a pas encore de mot de passe. Le jeton (256 bits, usage unique,
-# 7 jours) est le seul secret ; la réponse ne dit jamais si un compte existe.
+# 7 jours) est le seul secret, le débit est limité ; la réponse ne dit jamais si un compte existe.
 @router.post("/account-activation/confirm", tags=["auth"], response_model=ActivationDone)
-def confirm_activation(payload: ActivationConfirm) -> ActivationDone:
+@limiter.limit(ACTIVATION_RATE_LIMIT)
+def confirm_activation(request: Request, payload: ActivationConfirm) -> ActivationDone:
     """Pose le mot de passe choisi, haché par l'API."""
     with get_connection() as conn:
         is_activated = service.activate(conn, payload.token, payload.password, datetime.now(UTC))
