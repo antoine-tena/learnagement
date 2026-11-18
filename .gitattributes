@@ -8,7 +8,7 @@
 *.npz binary
 
 # Generated files, exempt from [FILE-SIZE].
-backend/uv.lock linguist-generated=true
+app/api/uv.lock linguist-generated=true
 frontend/pnpm-lock.yaml linguist-generated=true
 web/composer.lock linguist-generated=true
 web/pnpm-lock.yaml linguist-generated=true
