@@ -190,7 +190,7 @@ def render_page_content(url, pathname, token):
             register_cb(app)
             registered_callbacks.add(key)
 
-        return layout
+        return layout() if callable(layout) else layout
     return html.Div(
         [
             html.H1("404: Not found", className="text-danger"),
