@@ -25,33 +25,40 @@ supprime un dossier, un domaine ou un point d'entrée.
   `bootstrap.py`), `security.py` (certificats :
   `python -m launcher.security`), `tools.py`, `tests/`.
   `bootstrap.py` lance `Learnagement.py` avec `uv run`. Chaque composant Python (la racine pour
-  le lanceur, `backend/`, `dashboards/`, `scraping/`, `assistant/`) a son `pyproject.toml` et son `uv.lock`.
-- `docker/` : un dossier par conteneur (`backend/`, `web/`, `frontend/`, `dashboards/`,
-  `phpmyadmin/` : Containerfile, entrypoint), `backup/` (`backup.sh`, la sauvegarde quotidienne
-  de la prod) et `compose/` (un fragment par conteneur), d'où le
-  lanceur produit `docker/compose.yaml` (ignoré).
-- `backend/` : l'API FastAPI (`app.py`) ; `api/` (routes, `dependencies/`), `auth/` (LNM et
+  le lanceur, `app/api/`, `app/dashboards/`, `app/importers/`, `app/assistant/`) a son `pyproject.toml` et son `uv.lock`.
+- `app/` : ce qui tourne en production, une application par dossier (`docs/architecture.md`) ;
+  chacune porte son `Containerfile`, son `container/` (entrypoint, configuration copiée dans
+  l'image), son `.containerignore` et son `compose.yaml`, un fragment que le lanceur assemble
+  (chemins relatifs à `deploy/`). Les anciens chemins : `docs/moved.md`.
+- `deploy/` : `env.skeleton`, `env.dev`, `env.prod` (les modèles des `.env`), `compose/` (les
+  fragments des services sans application : MySQL, sa sauvegarde, phpMyAdmin, ETL, `_head`,
+  `_tail`), `backup/` (`backup.sh`, la sauvegarde quotidienne de la prod), `phpmyadmin/` ; le
+  lanceur y écrit `deploy/compose.yaml` (ignoré).
+- `app/api/` : l'API FastAPI (`app.py`) ; `api/` (routes, `dependencies/`), `auth/` (LNM et
   `authenticate_cas/`), `access_control/` (règles, prédicats, responsabilités), `domains/` (requêtes métier par
   domaine : `lnm_university/`, `maquette_module/`, `lnm_etudiant/`, `lnm_evaluation/`, `lnm_mobility_assignment/`…, en snake_case ; les tables SQL gardent leur casse), `models/`, `db/` (connexion
   SQLAlchemy), `tools/` (`export_openapi.py` : le schéma `openapi.json` de la racine), `tests/`
   (pytest) ; les couches import-linter sont dans `pyproject.toml`.
-- `web/` : le front principal, en PHP (Apache) ; `index.php` + `utils/router.php`, `views/`
+- `app/web/` : le front principal, en PHP (Apache) ; `index.php` + `utils/router.php`, `views/`
   (pages, dont `views/dashboard/mobility-admin/`, `views/dashboard/stage/`), `components/`, `scripts/` (`dependance_module/`, `mobility-admin/`, `mobility-map/` : les deux cartes de mobilité), `utils/apiProxy.php` (appels à l'API), `theme/` (dont `theme/theme/`, `theme/mobility-map-streetview/`), `assets/` ; `tests/` (tests Node du JavaScript,
-  `pnpm --dir web test`) ; `tools/run.sh` (PHP, ou podman sans PHP) et la
+  `pnpm --dir app/web test`) ; `tools/run.sh` (PHP, ou podman sans PHP) et la
   configuration de PHP-CS-Fixer, PHPStan, deptrac, ESLint, Prettier (`package.json`).
-- `dashboards/` : les tableaux de bord Dash (`main.py`, `clock.py` (date du jour à Paris), `main_app/`, `pages/` : une page par vue (dont les paquets
+- `app/dashboards/` : les tableaux de bord Dash (`main.py`, `clock.py` (date du jour à Paris), `main_app/`, `pages/` : une page par vue (dont les paquets
   `modules_enseignant_edit/`, `stages_administratif/`, `checks_administratif/`) et son `_tools.py`), `apc_dash/` (approche par compétences, dont
   `apc20_chatbot_tools/`, `apc20_competence_ac/`, `apc20_heatmap_apc/`, `apc20_ens_contribution/`, `apc20_ens_fiche_module/`, `apc20_ens_reseau_gaps/`, `apc20_metier_orientation/`, `app_reseaupolytech_etudiant/`, `polytech_rag/` : l'assistant qui lit les PDF, sans index).
-- `assistant/` : le paquet `learnagement_assistant`, la recherche vectorielle de l'assistant APC
+- `app/assistant/` : le paquet `learnagement_assistant`, la recherche vectorielle de l'assistant APC
   (RAG : PDF → morceaux → vecteurs → index FAISS ; commandes `learnagement-assistant-chunks` et
   `-index`), hors de l'image Dash ; pas encore en production.
-- `frontend/` : le front Next.js en cours de refonte (`app/`, proxy vers l'API).
-- `scraping/` : le paquet `learnagement_scraping` (commande `learnagement-scraping`) : `parsers.py`
+- `frontend/` : le front Next.js en cours de refonte (`app/`, proxy vers l'API), hors de `app/`
+  tant que learnagement#T-12 n'a pas décidé de son sort ; son conteneur est rangé comme ceux de
+  `app/`.
+- `app/importers/` : le paquet `learnagement_scraping` (commande `learnagement-scraping`) : `parsers.py`
   (HTML vers données), `browser.py` (Selenium), `db.py` (écritures), `cli.py` ; `out/` est ignoré.
-  `scraping/scripts/` : les scripts autonomes de l'équipe (`ical2json.py` + `ical2json_lib/`
+  `app/importers/scripts/` : les scripts autonomes de l'équipe (`ical2json.py` + `ical2json_lib/`
   emplois du temps ADE, `scrape_maquette.py` + `scrape_maquette_lib/` catalogue des formations, `matching_26_27/`).
-- `db/` : `sql/` (schéma, migrations versionnées `VX.Y.Z__*.sql`), `freeData/` (jeux de données
-  libres), `tools/` ; `db/data/` et `db/backup/` sont privés et ignorés.
+- `database/` : `migrations/` (schéma, migrations versionnées `VX.Y.Z__*.sql`), `open-data/`
+  (jeux de données libres), `tools/` ; `database/data/` et `database/backup/` sont privés et
+  ignorés.
 - `docs/` : la documentation (`README.md` en est l'index) ; `architecture.md` (la cible : `app/`
   pour la production, `lab/` pour apprendre, et ses étapes), `glossary.md` (le nom de chaque mot
   du métier dans le code), `docs/mobility/` pour le module de mobilité. `CONTRIBUTING.md`, à la
@@ -66,8 +73,8 @@ supprime un dossier, un domaine ou un point d'entrée.
 - Les branches de Flavien : `main` (production), `prerelease`, `dev` (intégration), puis
   `feature/`, `bugfix/`, `refactor/`… (`docs/git.md`). Le fork `antoine-tena/learnagement` intègre
   sur `antoine-tena`, puis propose ses changements à `dev` en pull request.
-- Les `.env` sont générés par le lanceur à partir de `config/env.skeleton` et
-  `config/env.<env>`, puis recopiés dans chaque conteneur : on ne les édite jamais à la
+- Les `.env` sont générés par le lanceur à partir de `deploy/env.skeleton` et
+  `deploy/env.<env>`, puis recopiés dans chaque conteneur : on ne les édite jamais à la
   main dans les sous-dossiers.
 - Des étudiants travaillent sur le repo par promotion : on ne casse pas une interface (route de
   l'API, variable d'environnement, commande du lanceur) sans le signaler dans le README.

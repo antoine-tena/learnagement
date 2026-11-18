@@ -1,2 +1,9 @@
 # Every pull request asks the team for a review.
 * @FlavienVernier @antoine-tena
+
+# Zones de production : Flavien approuve (docs/architecture.md, « Les relectures »). Les
+# relecteurs de docs/ et de lab/ attendent la délégation décidée avec lui.
+/app/ @FlavienVernier
+/database/ @FlavienVernier
+/deploy/ @FlavienVernier
+/launcher/ @FlavienVernier

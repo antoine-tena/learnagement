@@ -25,8 +25,8 @@ L'environnement sera créé dans /.venv. Le bootstrap installe aussi des hooks g
 post-merge, post-rewrite) qui écrivent le commit courant dans `.env.git` (`GIT_COMMIT`).
 Hors production, il installe aussi le hook de pré-commit (avec `uv tool install` : `pre-commit`
 et `ion-repo`, qui fournit `charter`) : avant chaque commit, la mise en forme est corrigée et les
-règles de `charter.toml` vérifiées sur les fichiers commités. Le PHP de `web/` se vérifie par
-`web/tools/run.sh` (le PHP de la machine, sinon podman), son JavaScript par pnpm ;
+règles de `charter.toml` vérifiées sur les fichiers commités. Le PHP de `app/web/` se vérifie par
+`app/web/tools/run.sh` (le PHP de la machine, sinon podman), son JavaScript par pnpm ;
 `openapi.json`, à la racine, est le schéma de l'API, réécrit par
 `cd backend && uv run python -m tools.export_openapi --output ../openapi.json`.
 
@@ -42,19 +42,27 @@ To configure your instance, edit specific ".env_XXX.env" files and restarts the 
 uv run python Learnagement.py start --env XXX
 ```
 
-Au lancement, le lanceur écrit `docker/compose.yaml` à partir des fragments de
-`docker/compose/` (un par conteneur, Next seulement en dev), attend que chaque conteneur réponde à
+Au lancement, le lanceur écrit `deploy/compose.yaml` à partir des fragments : le `compose.yaml`
+de chaque application (`app/api/`, `app/web/`, `app/dashboards/`, `frontend/`, Next seulement en
+dev) et ceux de `deploy/compose/` (MySQL, sa sauvegarde, phpMyAdmin), attend que chaque conteneur réponde à
 sa sonde `/health`, puis arrête l'instance quand `podman compose up` se termine. Sans terminal
 interactif, il refuse de demander les mots de passe.
 
+**Changement d'interface (novembre 2026)** : les dossiers ont pris leur place cible
+(`docs/architecture.md`) : `backend/` est devenu `app/api/`, `web/` `app/web/`, `dashboards/`
+`app/dashboards/`, `scraping/` `app/importers/`, `assistant/` `app/assistant/`, `db/` `database/`,
+`docker/` et `config/` `deploy/`. Les routes, les variables d'environnement et les commandes du
+lanceur ne changent pas. Chaque ancien chemin, et ce qu'une instance ou une branche en cours doit
+faire : [docs/moved.md](docs/moved.md).
+
 **Changement d'interface (novembre 2026)** : le conteneur MySQL s'appelle désormais
 `learnagement_data_mysql_<instance>`. Une instance existante corrige `MYSQL_SERVER` dans son `.env`
-(ou régénère son environnement), et son `docker/compose.yaml` est réécrit à chaque lancement.
+(ou régénère son environnement), et son `deploy/compose.yaml` est réécrit à chaque lancement.
 
 **Changement d'interface (novembre 2026)** : le lanceur appelle `podman` et `podman compose` par
-défaut, et la compose écrite s'appelle `docker/compose.yaml` (avant : `docker-compose.yml`).
+défaut, et la compose écrite s'appelle `deploy/compose.yaml` (avant : `docker-compose.yml`).
 Pour garder docker, mettre `DOCKER_COMMAND=docker` et `DOCKER_COMPOSE_COMMAND="docker compose"`
-dans le `.env` de l'instance. Les images se construisent depuis les `Containerfile` de `docker/`.
+dans le `.env` de l'instance. Les images se construisent depuis le `Containerfile` de chaque application.
 
 For any help
 ```bash
@@ -92,7 +100,7 @@ Le même jeu se régénère à tout moment, identique pour une même graine :
 ```bash
 python Learnagement.py fake-data --size medium --seed 2026
 ```
-Il est écrit dans `db/data/`, que MySQL ne lit qu'à sa première initialisation.
+Il est écrit dans `database/data/`, que MySQL ne lit qu'à sa première initialisation.
 
 Comptes de test du jeu fictif, tous avec le mot de passe `learnagement-fictif` ; le login est
 le mail, comme pour tout compte interne :
@@ -125,7 +133,7 @@ Actuellement 4 instances en parallèle sont possibles.
 
 ## Changements d'interface
 
-- **2026-11-18** : nouvelle variable `TRUSTED_PROXIES` (`config/env.skeleton`) : les proxys dont
+- **2026-11-18** : nouvelle variable `TRUSTED_PROXIES` (`deploy/env.skeleton`) : les proxys dont
   l'API croit l'en-tête `X-Forwarded-For`, par défaut les réseaux des conteneurs. La limite de
   débit de `/token` et de l'activation compte ainsi par client réel derrière le front PHP ; le
   front PHP transmet l'adresse du client. Le front Next ne la transmet pas encore.
@@ -134,11 +142,11 @@ Actuellement 4 instances en parallèle sont possibles.
   (`none`, l'ancien comportement). La production ne change pas.
 - **2026-11-18** : la base refuse (erreur SQL 45000) une personne dont le login ou le mail existe
   déjà dans une autre des tables `LNM_administratif`, `LNM_enseignant`, `LNM_etudiant`
-  (migration `V0.4.3`). Avant de l'appliquer, `db/tools/people_in_several_tables.sql` liste les
+  (migration `V0.4.3`). Avant de l'appliquer, `database/tools/people_in_several_tables.sql` liste les
   doublons déjà présents, à régler à la main.
 - **2026-11-18** : nouvelle commande `python Learnagement.py structuredb [--output FICHIER]` :
   la structure de la base sans ses données (tables avec leurs commentaires, vues, routines,
-  triggers), par défaut dans `db/backup/structure.sql`.
+  triggers), par défaut dans `database/backup/structure.sql`.
 - **2026-11-18** : un compte interne s'active par lien, plus en envoyant un hash à l'admin.
   `POST /account-activation` (`{"login"}`, administratif seulement) renvoie un jeton à usage
   unique valable 7 jours ; la personne ouvre `/activateAccount?token=<jeton>` sur le front Next,
@@ -173,7 +181,7 @@ python Learnagement.py start --from_scratch
 
 ## Sauvegardes
 
-En production, la base est sauvegardée chaque jour dans `db/backup/` par le conteneur
+En production, la base est sauvegardée chaque jour dans `database/backup/` par le conteneur
 `data_mysql_backup` ; la vérification et la restauration sont décrites dans
 [docs/prod.md](docs/prod.md#sauvegardes).
 

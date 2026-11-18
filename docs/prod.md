@@ -3,14 +3,14 @@
 ## Sauvegardes
 
 En production, le conteneur `learnagement_data_mysql_backup_<instance>` sauvegarde la base
-chaque jour à `BACKUP_AT` (02:00 par défaut, heure de Paris), avec `docker/backup/backup.sh` :
+chaque jour à `BACKUP_AT` (02:00 par défaut, heure de Paris), avec `deploy/backup/backup.sh` :
 
-- un fichier par jour, `db/backup/learnagement_<AAAAMMJJ-HHMMSS>.sql.gz` : structure, données et
+- un fichier par jour, `database/backup/learnagement_<AAAAMMJJ-HHMMSS>.sql.gz` : structure, données et
   triggers, cohérents (`--single-transaction`), lisible par son seul propriétaire ;
 - les fichiers de plus de `BACKUP_RETENTION_DAYS` jours (30) sont supprimés ;
 - une première sauvegarde est faite dès le premier démarrage du conteneur.
 
-Les variables sont dans `config/env.skeleton` (`BACKUP`, `BACKUP_AT`, `BACKUP_DIRECTORY`,
+Les variables sont dans `deploy/env.skeleton` (`BACKUP`, `BACKUP_AT`, `BACKUP_DIRECTORY`,
 `BACKUP_RETENTION_DAYS`, `BACKUP_MAX_AGE_HOURS`, `BACKUP_ALERT_URL`).
 
 **Savoir si elles marchent.** Le conteneur passe `unhealthy` quand la dernière sauvegarde a
@@ -45,7 +45,7 @@ n'est pas tapé.
 MYSQL=learnagement_data_mysql_<instance>
 docker exec -i $MYSQL sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot -e \
   "DROP DATABASE $MYSQL_DATABASE; CREATE DATABASE $MYSQL_DATABASE;"'
-gunzip -c db/backup/learnagement_<AAAAMMJJ-HHMMSS>.sql.gz \
+gunzip -c database/backup/learnagement_<AAAAMMJJ-HHMMSS>.sql.gz \
   | docker exec -i $MYSQL sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot "$MYSQL_DATABASE"'
 ```
 
