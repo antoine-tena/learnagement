@@ -1,7 +1,7 @@
     backend_python_${INSTANCE_NAME}:
         container_name: learnagement_backend_python_${INSTANCE_NAME}
         build:
-            context: ./backend/
+            context: ../app/api/
             dockerfile: Containerfile
         restart: "no"
         networks:

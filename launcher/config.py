@@ -32,7 +32,7 @@ COMPOSE_FRAGMENTS = {
     "data_mysql_backup": "docker/compose/data_mysql_backup.yml",
     "etl": "docker/compose/etl.yml",
     "phpmyadmin": "docker/compose/phpmyadmin.yml",
-    "backend": "docker/compose/backend.yml",
+    "backend": "app/api/compose.yaml",
     "web": "docker/compose/web.yml",
     "dashboards": "docker/compose/dashboards.yml",
     "frontend": "docker/compose/frontend.yml",
