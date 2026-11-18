@@ -1,6 +1,7 @@
 # Done
 
 The closed tickets of Learnagement, most recent first, one line each:
+- **2026-11-18** · learnagement#T-23 · Commande du lanceur pour extraire la structure de la base — `python Learnagement.py structuredb [--output]` : structure sans données (commentaires des tables, vues, routines, triggers), dans `db/backup/structure.sql` par défaut, annoncée au README ; jamais lancée sur une vraie base (feat/t23-commande-lanceur-structure-base) · opened 2026-10-30
 `- **2026-11-17** · learnagement#T-53 · Finish the ion-repo update to v0.4.15 — `ion repo install --machine` lancé, identifiants des tickets écrits en `learnagement#T-NN` (chore/ticket-ids) · opened 2026-11-17
 - **2026-11-17** · learnagement#T-31 · Des noms parlants pour les tableaux de bord — pages rangées dans `dashboards/pages/` sans préfixe `appNN_` (paquets découpés compris), clés d'URL inchangées ; `archive/` supprimé, gardé dans l'historique git ; tableaux de bord jamais ouverts dans un navigateur (refactor/tree-cleanup-v2) · opened 2026-10-30
 - **2026-11-18** · learnagement#T-08 · Python : plus d'`except:` nu ni de date sans fuseau — `dashboards/` : 2 `except:` nus réduits à l'erreur visée (`jwt.InvalidTokenError`, `TypeError`), 13 dates du jour passées par `dashboards/clock.py` (heure de Paris) ; `scraping/` : rien trouvé ; pages jamais ouvertes dans un navigateur (fix/t08-dashboards-except-time-zone) · opened 2026-10-30
