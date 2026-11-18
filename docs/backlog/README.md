@@ -7,7 +7,7 @@ n'est ouvert.**
 
 North star: **Learnagement in service**.
 
-**Next free: learnagement#T-56.**
+**Next free: learnagement#T-57.**
 
 Open tickets, one line each: `ion repo backlog`.
 
