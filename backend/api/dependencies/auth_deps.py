@@ -34,15 +34,15 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> Use
         payload = decode_access_token(token)
         user_login = payload.get("login")
         if user_login is None:
-            logger.error(f"Login error with payload: {payload}")
+            logger.error("auth.token_without_login")
             raise credentials_exception
         token_data = TokenData(login=user_login)
     except InvalidTokenError as e:
-        logger.error(f"Invalid token : {e}")
+        logger.error("auth.invalid_token", error=str(e))
         raise credentials_exception from e
     user = get_user(token_data.login)
     if user is None:
-        logger.error(f"Login error with payload: {payload}")
+        logger.error("auth.token_unknown_user")
         raise credentials_exception
     return user
 
