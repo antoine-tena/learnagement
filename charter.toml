@@ -6,7 +6,7 @@
 
 size = "medium"
 exclude = ["/migrations/", "/notebooks/"]
-unverified_rules = "scripts/ci/unverified-rules.txt"
+unverified_rules = ".github/unverified-rules.txt"
 
 [bans.logging]
 id = "LOGGING"
