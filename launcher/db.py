@@ -37,7 +37,7 @@ def mysql_container() -> str:
 
 
 def _client_env() -> dict[str, str]:
-    """L'environnement du client : `docker exec -e MYSQL_PWD` y lit le mot de passe."""
+    """L'environnement du client : `podman exec -e MYSQL_PWD` y lit le mot de passe."""
     return {**os.environ, "MYSQL_PWD": os.environ["MYSQL_USER_PASSWORD"]}
 
 

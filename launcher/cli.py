@@ -107,7 +107,7 @@ def generate_env(env: str) -> None:
 
 
 @cli.command(help="Start the application")
-@click.option("--docker_option", default=None, help="See docker compose options")
+@click.option("--docker_option", default=None, help="See podman compose options")
 @click.option("--restart", is_flag=True, help="Restart the application")
 @click.option("--rebuild", is_flag=True, help="Rebuild Docker images")
 @click.option("--test", is_flag=True, help="Test options without starting the application")

@@ -25,6 +25,6 @@ CONTAINER_APP_DIRS: dict[str, str | None] = {
     "dashboards": "dashboards",
     "frontend": "frontend",
 }
-# docker compose lit aussi son .env, pour les variables qu'il interpole
+# compose lit aussi son .env, pour les variables qu'il interpole
 COMPOSE_DIR = "docker"
 envs = {"dev", "prod"}

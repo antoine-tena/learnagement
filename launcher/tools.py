@@ -9,7 +9,7 @@ from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 
 
 def protect_tty() -> None:
-    """Rend au terminal ses réglages à la sortie, même si docker compose les a changés."""
+    """Rend au terminal ses réglages à la sortie, même si compose les a changés."""
     if os.name == "nt" or not sys.stdin.isatty():
         return
     import termios
