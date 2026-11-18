@@ -22,12 +22,8 @@ INIT_DIR = DB_DIR / "docker-entrypoint-initdb.d"
 SQL_DIR = DB_DIR / "sql"
 DATA_DIR = DB_DIR / "data"
 TRANSIENT_ERRORS = ("doesn't exist", "unknown database", "can't connect", "access denied")
-DUMP_OPTIONS = (
-    "--ignore-views",
-    "--skip-comments",
-    "--skip-extended-insert",
-    "--no-tablespaces",
-)
+STRUCTURE_OPTIONS = ("--skip-comments", "--no-tablespaces")
+DUMP_OPTIONS = (*STRUCTURE_OPTIONS, "--ignore-views", "--skip-extended-insert")
 
 password_hash = PasswordHash((BcryptHasher(),))
 
@@ -147,7 +143,7 @@ async def create_administrator_with_retry(max_retries: int = 10, retry_delay: in
     )
 
 
-def _dump(target: Path, *options: str) -> None:
+def _dump(target: Path, *options: str, base: tuple[str, ...] = DUMP_OPTIONS) -> None:
     """mysqldump dans `target`, écrit d'un coup : jamais de sauvegarde à moitié écrite."""
     part = target.with_name(target.name + ".part")
     try:
@@ -158,7 +154,7 @@ def _dump(target: Path, *options: str) -> None:
                     "mysqldump",
                     "-u",
                     os.environ["MYSQL_USER_LOGIN"],
-                    *DUMP_OPTIONS,
+                    *base,
                     *options,
                     os.environ["MYSQL_DB"],
                 ],
@@ -183,3 +179,10 @@ def backup(folder: Path) -> None:
     _dump(folder / f"0_struct_{stamp}.sql", "--no-data", "--skip-triggers")
     _dump(folder / f"5_data_{stamp}.sql", "--no-create-info", "--skip-triggers")
     _dump(folder / f"99_trigger_{stamp}.sql", "--no-create-info", "--no-data")
+
+
+def extract_structure(target: Path) -> None:
+    """La structure seule (tables et leurs commentaires, vues, routines, triggers), sans données."""
+    logger.info("%sStructure DB%s -> %s", GREEN, NC, target)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    _dump(target, "--no-data", "--routines", base=STRUCTURE_OPTIONS)

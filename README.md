@@ -104,6 +104,9 @@ Actuellement 4 instances en parallèle sont possibles.
 
 ## Changements d'interface
 
+- **2026-11-18** : nouvelle commande `python Learnagement.py structuredb [--output FICHIER]` :
+  la structure de la base sans ses données (tables avec leurs commentaires, vues, routines,
+  triggers), par défaut dans `db/backup/structure.sql`.
 - **2026-11-18** : phpMyAdmin ne démarre plus en production (`start --env prod`) : la base contient
   des données personnelles et son port était joignable depuis tout le VPN. Il reste en dev. Pour
   consulter la base de prod : `docker exec -it learnagement_data_mysql_<instance> mysql …` sur le
