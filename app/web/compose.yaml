@@ -1,7 +1,7 @@
     front_php_${INSTANCE_NAME}:
         container_name: learnagement_php_${INSTANCE_NAME}
         build:
-            context: ./web/
+            context: ../app/web/
             dockerfile: Containerfile
         restart: always
         networks:
@@ -14,7 +14,7 @@
         volumes:
             - ../app/web:/var/www/html
             - ./log/php:/var/log/apache2
-            - ./web/lnm-php.ini:/usr/local/etc/php/conf.d/lnm-php.ini
+            - ../app/web/container/lnm-php.ini:/usr/local/etc/php/conf.d/lnm-php.ini
             - ../${SSL_INTERNAL_DIR}:${DOCKER_SSL_INTERNAL_DIR}:ro
             - ../${SSL_EXTERNAL_DIR}:${DOCKER_SSL_EXTERNAL_DIR}:ro
         depends_on:

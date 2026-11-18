@@ -33,7 +33,7 @@ COMPOSE_FRAGMENTS = {
     "etl": "docker/compose/etl.yml",
     "phpmyadmin": "docker/compose/phpmyadmin.yml",
     "backend": "app/api/compose.yaml",
-    "web": "docker/compose/web.yml",
+    "web": "app/web/compose.yaml",
     "dashboards": "docker/compose/dashboards.yml",
     "frontend": "docker/compose/frontend.yml",
 }
