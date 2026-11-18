@@ -234,5 +234,5 @@ ou non.
 - Où vont les sauvegardes : ce sont des données personnelles.
 - phpMyAdmin : le retirer de la production, ou ne l'ouvrir que par un tunnel SSH (T-45).
 - Postgres avec SQLAlchemy et Alembic, à la place des migrations SQL et des conventions de
-  [database/README](../database/README) (T-39).
+  [database/README.md](../database/README.md) (T-39).
 - Les noms de branches : ceux de [git.md](git.md) ou ceux de la règle [BRANCHES] d'ion-repo.
