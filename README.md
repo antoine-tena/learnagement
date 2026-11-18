@@ -106,7 +106,7 @@ Actuellement 4 instances en parallèle sont possibles.
 
 - **2026-11-18** : la base refuse (erreur SQL 45000) une personne dont le login ou le mail existe
   déjà dans une autre des tables `LNM_administratif`, `LNM_enseignant`, `LNM_etudiant`
-  (migration `V0.4.2`). Avant de l'appliquer, `db/tools/people_in_several_tables.sql` liste les
+  (migration `V0.4.3`). Avant de l'appliquer, `db/tools/people_in_several_tables.sql` liste les
   doublons déjà présents, à régler à la main.
 - **2026-11-18** : nouvelle commande `python Learnagement.py structuredb [--output FICHIER]` :
   la structure de la base sans ses données (tables avec leurs commentaires, vues, routines,
