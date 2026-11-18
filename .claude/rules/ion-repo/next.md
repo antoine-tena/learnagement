@@ -1,12 +1,12 @@
 ---
 paths:
-  - "frontend/**"
+  - "lab/javascript/nextjs/**"
 ---
 <!-- Written by ion-repo and kept current by `ion repo update`: do not edit, it would be overwritten. -->
 # Frontend: Next.js 16 and React 19
 
-`frontend/app/`: routes (App Router); `frontend/components/`: components; `frontend/lib/`: API
-client and constants (`constants.ts`). Read `frontend/AGENTS.md` before using a Next.js API.
+`lab/javascript/nextjs/app/`: routes (App Router); `lab/javascript/nextjs/components/`: components; `lab/javascript/nextjs/lib/`: API
+client and constants (`constants.ts`). Read `lab/javascript/nextjs/AGENTS.md` before using a Next.js API.
 Run: `ion repo dev`; check: `ion repo check` (ESLint, `tsc`).
 
 ## Code

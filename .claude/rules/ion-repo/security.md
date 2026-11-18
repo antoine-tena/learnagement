@@ -1,7 +1,7 @@
 ---
 paths:
   - "app/api/**"
-  - "frontend/**"
+  - "lab/javascript/nextjs/**"
 ---
 <!-- Written by ion-repo and kept current by `ion repo update`: do not edit, it would be overwritten. -->
 # Browser security

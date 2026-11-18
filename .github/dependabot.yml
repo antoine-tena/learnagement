@@ -9,7 +9,7 @@ updates:
       default-days: 7
   - package-ecosystem: npm
     directories:
-      - "/frontend"
+      - "/lab/javascript/nextjs"
     schedule:
       interval: weekly
     cooldown:

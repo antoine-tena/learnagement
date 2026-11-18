@@ -58,6 +58,7 @@ jobs:
   frontend:
     uses: antoine-tena/ion-repo/.github/workflows/pnpm.yml@eb0dc112605e3ccda49cc80374ffd3185a96baf7 # develop
     with:
+      directory: lab/javascript/nextjs
       scripts: |
         lint
         typecheck
@@ -113,4 +114,4 @@ jobs:
     uses: antoine-tena/ion-repo/.github/workflows/security.yml@eb0dc112605e3ccda49cc80374ffd3185a96baf7 # develop
     with:
       uv: "app/api"
-      pnpm: "frontend"
+      pnpm: "lab/javascript/nextjs"
