@@ -2,17 +2,16 @@
 
 import datetime
 from typing import Annotated
-from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends
 
 from api.dependencies import Rows, db_request, get_current_active_user
+from core.clock import campus_now
 from models.request import SQLRequest
 from models.user import User
 
 router = APIRouter()
 
-CAMPUS_TIME_ZONE = ZoneInfo("Europe/Paris")
 
 # Un rendu par promotion concernée, du plus proche au plus lointain.
 UPCOMING_RENDUS = """
@@ -50,4 +49,4 @@ def get_enseignant_rendus(
 
 
 def _today() -> datetime.date:
-    return datetime.datetime.now(CAMPUS_TIME_ZONE).date()
+    return campus_now().date()
