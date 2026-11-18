@@ -8,7 +8,7 @@ cd /var/www/html
 
 # Les dépendances aux versions de composer.lock, jamais mises à jour au démarrage. En production,
 # sans les outils de vérification (require-dev) ; ailleurs, vendor/ est partagé avec la machine
-# du développeur, qui s'en sert pour vérifier le PHP (web/tools/run.sh).
+# du développeur, qui s'en sert pour vérifier le PHP (app/web/tools/run.sh).
 if [ -f composer.json ] ; then
     echo "Installing Composer dependencies..."
     if [ "$ENV" = "prod" ]; then

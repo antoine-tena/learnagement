@@ -63,23 +63,23 @@ jobs:
         typecheck
         build
 
-  # Le JavaScript de web/ : ESLint et Prettier (dette dans web/.prettierignore).
+  # Le JavaScript de app/web/ : ESLint et Prettier (dette dans app/web/.prettierignore).
   web-js:
     uses: antoine-tena/ion-repo/.github/workflows/pnpm.yml@eb0dc112605e3ccda49cc80374ffd3185a96baf7 # develop
     with:
-      directory: web
+      directory: app/web
       scripts: |
         lint
         format:check
 
-  # Le PHP de web/ : PHP-CS-Fixer et PHPStan au niveau qui passe aujourd'hui (dette dans
-  # web/.php-cs-fixer.dist.php et web/phpstan-baseline.neon).
+  # Le PHP de app/web/ : PHP-CS-Fixer et PHPStan au niveau qui passe aujourd'hui (dette dans
+  # app/web/.php-cs-fixer.dist.php et app/web/phpstan-baseline.neon).
   web-php:
     runs-on: ubuntu-latest
     container: docker.io/library/composer:2
     defaults:
       run:
-        working-directory: web
+        working-directory: app/web
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: composer install --no-interaction --no-progress

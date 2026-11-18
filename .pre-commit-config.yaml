@@ -107,39 +107,39 @@ repos:
         language: system
         files: ^frontend/.*\.(vue|ts|tsx|mjs)$
 
-      # web/ : le PHP par web/tools/run.sh (le PHP de la machine, sinon podman), le JavaScript par
-      # pnpm ; les règles et leur dette sont dans les fichiers de configuration de web/.
+      # app/web/ : le PHP par app/web/tools/run.sh (le PHP de la machine, sinon podman), le JavaScript
+      # par pnpm ; les règles et leur dette sont dans les fichiers de configuration de app/web/.
       - id: php-cs-fixer-web
         name: php-cs-fixer (web)
-        entry: bash -c 'web/tools/run.sh vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --show-progress=none --path-mode=intersection "${@#web/}"' --
+        entry: bash -c 'app/web/tools/run.sh vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --show-progress=none --path-mode=intersection "${@#app/web/}"' --
         language: system
         types: [php]
-        files: ^web/
+        files: ^app/web/
 
       - id: phpstan-web
         name: phpstan (web)
-        entry: bash -c 'web/tools/run.sh vendor/bin/phpstan analyse --no-progress --memory-limit=1G "${@#web/}"' --
+        entry: bash -c 'app/web/tools/run.sh vendor/bin/phpstan analyse --no-progress --memory-limit=1G "${@#app/web/}"' --
         language: system
         types: [php]
-        files: ^web/
-        exclude: ^web/(vendor|tools)/
+        files: ^app/web/
+        exclude: ^app/web/(vendor|tools)/
 
       # Les couches : tout le graphe, relu dès qu'un fichier de la couche change.
       - id: deptrac-web
         name: deptrac (web)
-        entry: web/tools/run.sh vendor/bin/deptrac analyse --config-file=deptrac.yaml --no-progress
+        entry: app/web/tools/run.sh vendor/bin/deptrac analyse --config-file=deptrac.yaml --no-progress
         language: system
         types: [php]
-        files: ^web/
+        files: ^app/web/
         pass_filenames: false
 
       - id: no-sql-web
-        name: pas de SQL dans web/ (l'API seule lit la base)
+        name: pas de SQL dans app/web/ (l'API seule lit la base)
         entry: '\b(mysqli|mysql|pg|sqlite|odbc)_\w+\s*\('
         language: pygrep
         types: [php]
-        files: ^web/
-        exclude: ^web/vendor/
+        files: ^app/web/
+        exclude: ^app/web/vendor/
 
       - id: lint-imports-api
         name: import-linter (app/api)
@@ -161,17 +161,17 @@ repos:
 
       - id: eslint-web
         name: eslint (web)
-        entry: bash -c 'cd web && { [ -d node_modules ] || pnpm install --frozen-lockfile --silent; } && pnpm exec eslint --fix "${@#web/}"' --
+        entry: bash -c 'cd app/web && { [ -d node_modules ] || pnpm install --frozen-lockfile --silent; } && pnpm exec eslint --fix "${@#app/web/}"' --
         language: system
         types: [javascript]
-        files: ^web/
+        files: ^app/web/
 
       - id: prettier-web
         name: prettier (web)
-        entry: bash -c 'cd web && { [ -d node_modules ] || pnpm install --frozen-lockfile --silent; } && pnpm exec prettier --write --ignore-unknown "${@#web/}"' --
+        entry: bash -c 'cd app/web && { [ -d node_modules ] || pnpm install --frozen-lockfile --silent; } && pnpm exec prettier --write --ignore-unknown "${@#app/web/}"' --
         language: system
         types: [javascript]
-        files: ^web/
+        files: ^app/web/
 
       - id: charter
         name: charter (charter.toml, committed files)

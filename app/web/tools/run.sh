@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Lance une commande PHP (composer, vendor/bin/…) dans web/ : avec le PHP de la machine s'il est
+# Lance une commande PHP (composer, vendor/bin/…) dans app/web/ : avec le PHP de la machine s'il est
 # là, sinon dans l'image composer officielle, par podman (ou docker). Installe vendor/ au besoin.
-#   web/tools/run.sh composer install
-#   web/tools/run.sh vendor/bin/phpstan analyse
+#   app/web/tools/run.sh composer install
+#   app/web/tools/run.sh vendor/bin/phpstan analyse
 set -euo pipefail
 
 readonly COMPOSER_IMAGE="docker.io/library/composer:2"
@@ -17,7 +17,7 @@ run() {
     local engine
     engine="$(command -v podman || command -v docker || true)"
     if [[ -z "$engine" ]]; then
-        echo "Ni PHP ni podman : installez l'un des deux pour vérifier le PHP de web/." >&2
+        echo "Ni PHP ni podman : installez l'un des deux pour vérifier le PHP de app/web/." >&2
         return 1
     fi
     local user_options=(--user "$(id -u):$(id -g)")
