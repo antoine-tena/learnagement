@@ -59,7 +59,7 @@ suffixes = [".ts", ".tsx", ".mjs"]
 test_suffixes = [".test.ts", ".test.tsx", ".spec.ts", ".spec.tsx"]
 floor = 0
 
-# [FILE-SIZE] pour le PHP et le JavaScript de web/, que le cliquet du dessus ne compte pas :
+# [FILE-SIZE] pour le PHP et le JavaScript de app/web/, que le cliquet du dessus ne compte pas :
 # la dette d'aujourd'hui est le plafond, baissé à mesure que les phases découpent les fichiers.
 [ratchets.file-size-web]
 rule = "file-size"
