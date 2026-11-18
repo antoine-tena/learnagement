@@ -1,5 +1,6 @@
 import logging
 import os
+from http import HTTPStatus
 import jwt
 from datetime import datetime, timezone, timedelta
 
@@ -60,7 +61,7 @@ def decode_token(token, leeway=30):
     """
 
     if not token:
-        return False
+        raise jwt.InvalidTokenError("aucun jeton")
     secret_key = os.getenv("JWT_SIGNING_KEY")
     if not secret_key:
         # Sans la clé de l'API, aucune signature n'est vérifiable : tout jeton est refusé.
@@ -109,6 +110,7 @@ class FlaskAuth(Dash):
 
                 if not is_token_valid(token):
                     session.pop("token", None)
-                    # print("Redirection-", flush=True)
-                    logging.info(f"destroy token")
-                    return
+                    # 204 : Dash n'actualise rien, sans erreur affichée. Au premier chargement,
+                    # la barre latérale part avant le callback qui pose le jeton, puis repart.
+                    logging.info("Callback refusé : jeton de session absent ou invalide")
+                    return "", HTTPStatus.NO_CONTENT
