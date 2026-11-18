@@ -222,7 +222,10 @@ Le reste est déplacé tel quel, puis découpé et renommé sans changer ce qu'i
 
 ## À décider avec Flavien
 
-- L'arborescence `app/` et `lab/`, et le sort de Next (T-12).
+L'arborescence `app/` et `lab/` se fait sur le fork, puis se montre à Flavien, qui la reprend
+ou non.
+
+- Le sort de Next (T-12).
 - Le glossaire, et ses points à confirmer.
 - La délégation des relectures par zone.
 - Où vont les sauvegardes : ce sont des données personnelles.

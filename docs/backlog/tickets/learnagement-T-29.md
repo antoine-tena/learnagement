@@ -1,7 +1,7 @@
 # learnagement#T-29 · Le backend découpé par domaine
 - **Type**: improvement
 - **Priority**: ⚪ background
-- **Status**: blocked — waiting for learnagement#T-33
+- **Status**: todo
 - **Opened**: 2026-10-30
 - **Effort**: M · **Owner**: — · **Due**: —
 - **Origin**: revue de l'arborescence, revue de l'architecture
