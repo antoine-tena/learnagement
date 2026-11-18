@@ -1,9 +1,9 @@
 # learnagement#T-08 · Python : plus d'`except:` nu ni de date sans fuseau
 - **Type**: improvement
 - **Priority**: 🟡 normal
-- **Status**: todo
+- **Status**: in progress — branch fix/t08-dashboards-except-time-zone, since 2026-11-18
 - **Opened**: 2026-10-30
-- **Effort**: XS · **Owner**: — · **Due**: —
+- **Effort**: XS · **Owner**: @antoine-tena · **Due**: —
 - **Origin**: `kiln score`, règles BARE-EXCEPT et NAIVE-DATETIMES
 
 Recompté le 2026-11-18 : 2 `except:` nus et 13 dates sans fuseau, tous dans `dashboards/`.
