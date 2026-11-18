@@ -24,7 +24,7 @@ supprime un dossier, un domaine ou un point d'entrée.
   `bootstrap.py`), `security.py` (certificats :
   `python -m launcher.security`), `tools.py`, `tests/`.
   `bootstrap.py` lance `Learnagement.py` avec `uv run`. Chaque composant Python (la racine pour
-  le lanceur, `backend/`, `dashboards/`, `scraping/`) a son `pyproject.toml` et son `uv.lock`.
+  le lanceur, `backend/`, `dashboards/`, `scraping/`, `assistant/`) a son `pyproject.toml` et son `uv.lock`.
 - `docker/` : un dossier par conteneur (`backend/`, `web/`, `frontend/`, `dashboards/`,
   `phpmyadmin/` : Dockerfile, entrypoint), `backup/` (`backup.sh`, la sauvegarde quotidienne
   de la prod) et `compose/` (un fragment par conteneur), d'où le
@@ -39,7 +39,10 @@ supprime un dossier, un domaine ou un point d'entrée.
   configuration de PHP-CS-Fixer, PHPStan, deptrac, ESLint, Prettier (`package.json`).
 - `dashboards/` : les tableaux de bord Dash (`main.py`, `main_app/`, `pages/` : une page par vue (dont les paquets
   `modules_enseignant_edit/`, `stages_administratif/`, `checks_administratif/`) et son `_tools.py`), `apc_dash/` (approche par compétences, dont
-  `apc20_chatbot_tools/`, `apc20_competence_ac/`, `apc20_heatmap_apc/`, `apc20_ens_contribution/`, `apc20_ens_fiche_module/`, `apc20_ens_reseau_gaps/`, `apc20_metier_orientation/`, `app_reseaupolytech_etudiant/`).
+  `apc20_chatbot_tools/`, `apc20_competence_ac/`, `apc20_heatmap_apc/`, `apc20_ens_contribution/`, `apc20_ens_fiche_module/`, `apc20_ens_reseau_gaps/`, `apc20_metier_orientation/`, `app_reseaupolytech_etudiant/`, `polytech_rag/` : l'assistant qui lit les PDF, sans index).
+- `assistant/` : le paquet `learnagement_assistant`, la recherche vectorielle de l'assistant APC
+  (RAG : PDF → morceaux → vecteurs → index FAISS ; commandes `learnagement-assistant-chunks` et
+  `-index`), hors de l'image Dash ; pas encore en production.
 - `frontend/` : le front Next.js en cours de refonte (`app/`, proxy vers l'API).
 - `scraping/` : le paquet `learnagement_scraping` (commande `learnagement-scraping`) : `parsers.py`
   (HTML vers données), `browser.py` (Selenium), `db.py` (écritures), `cli.py` ; `out/` est ignoré.
