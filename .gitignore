@@ -11,7 +11,7 @@
 # sauf le script de sauvegarde, qui ne contient aucune donnée
 !docker/backup/
 !docker/backup/backup.sh
-db/docker-entrypoint-initdb.d
+database/docker-entrypoint-initdb.d
 
 __pycache__
 #*

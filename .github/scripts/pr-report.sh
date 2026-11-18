@@ -60,7 +60,7 @@ routes_section() {
 migrations_section() {
     echo "### Migrations"
     local migrations
-    migrations="$(git diff --name-only --diff-filter=AM "$BASE"...HEAD -- 'db/sql/V*.sql')"
+    migrations="$(git diff --name-only --diff-filter=AM "$BASE"...HEAD -- 'database/migrations/V*.sql')"
     if [[ -z "$migrations" ]]; then
         echo "➖ Aucune migration."
         return

@@ -24,7 +24,7 @@
             MYSQL_USER_PASSWORD: ${MYSQL_USER_PASSWORD}
         volumes:
             - ./backup/backup.sh:/opt/backup.sh:ro
-            - ${BACKUP_DIRECTORY:-../db/backup}:/backup
+            - ${BACKUP_DIRECTORY:-../database/backup}:/backup
             - learnagement_persistent_backup_state_${INSTANCE_NAME}:/state
         healthcheck:
             test: ["CMD", "/bin/bash", "/opt/backup.sh", "health"]

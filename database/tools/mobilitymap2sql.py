@@ -2,7 +2,7 @@ import csv
 from pathlib import Path
 
 CSV = Path("mobility_map/public/mobility.csv")  # fichier CSV attendu avec les en-têtes fournis
-OUT = Path("db/freeData/5_mob_partner_universities.sql")
+OUT = Path("database/open-data/5_mob_partner_universities.sql")
 
 def sql_val(v):
     if v is None or v == "":

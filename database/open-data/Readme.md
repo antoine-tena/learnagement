@@ -7,7 +7,7 @@ V{Version number}\__{Data set name}\__{comment}
 
 To use it, from learnagement directory:
 ```
-cp db/freeData/*data_small* db/data/
+cp database/open-data/*data_small* database/data/
 ```
 ## test set
 

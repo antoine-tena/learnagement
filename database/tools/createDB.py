@@ -17,10 +17,10 @@ def executeScriptsFromFile(cursor, filename):
             print("Command skipped: ", e)
 
 # SQL file to create the tables
-sqlTableSkeleton = "db/sql/table_skeleton.sql"
+sqlTableSkeleton = "database/migrations/table_skeleton.sql"
 
 # SQL file to create the views
-sqlViewSkeleton = "db/sql/table_skeleton.sql"
+sqlViewSkeleton = "database/migrations/table_skeleton.sql"
 
 # SQL free data file
 # Be careful the order is important due to foreign keys
