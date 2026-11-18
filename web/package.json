@@ -4,6 +4,7 @@
   "description": "Outils de vérification du JavaScript de web/ (rien n'est empaqueté : Apache sert les fichiers tels quels).",
   "type": "module",
   "scripts": {
+    "test": "node --test tests/*.test.mjs",
     "lint": "eslint .",
     "format:check": "prettier --check ."
   },

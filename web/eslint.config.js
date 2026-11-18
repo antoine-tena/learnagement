@@ -56,7 +56,7 @@ export default [
         rules: { 'no-redeclare': ['error', { builtinGlobals: false }] },
     },
     {
-        files: ['eslint.config.js'],
+        files: ['eslint.config.js', 'tests/**/*.mjs'],
         languageOptions: { globals: globals.node },
     },
 ];
