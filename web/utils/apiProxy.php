@@ -11,7 +11,12 @@ function forwardToBackend(
         . ':' . getenv('BACKEND_PYTHON_DOCKER_PORT') . '/' . ltrim(rtrim($path,'/'), '/');
     getLogger()->info("Forwarding to backend url: " . $backendUrl);
 
-    $headers = array_merge(["Content-Type: " . $contentType], $extraHeaders);
+    // L'adresse du client, posée ici et jamais reprise de sa requête : l'API compte sa limite de
+    // débit par client réel.
+    $headers = array_merge(
+        ["Content-Type: " . $contentType, "X-Forwarded-For: " . ($_SERVER['REMOTE_ADDR'] ?? '')],
+        $extraHeaders
+    );
 
     $ch = curl_init($backendUrl);
     curl_setopt_array($ch, [
