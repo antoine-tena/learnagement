@@ -29,15 +29,24 @@ supprime un dossier, un domaine ou un point d'entrée.
 - `app/` : ce qui tourne en production, une application par dossier (`docs/architecture.md`) ;
   chacune porte son `Containerfile`, son `container/` (entrypoint, configuration copiée dans
   l'image), son `.containerignore` et son `compose.yaml`, un fragment que le lanceur assemble
-  (chemins relatifs à `deploy/`). Les anciens chemins : `docs/moved.md`.
+  (chemins relatifs à `deploy/`). Les anciens chemins : `docs/moved.md`. `app/portal/` : la
+  porte d'entrée, à construire (learnagement#T-41), un README seulement.
+- `lab/` : pour apprendre, rien n'y part en production ; `README.md` (le tableau pour choisir),
+  un dossier par langage (`php/`, `python/`, `javascript/`, `java/`, `csharp/`, `go/`, `rust/`,
+  leur kit à venir avec learnagement#T-50) ; `lab/javascript/nextjs/` : le front Next.js
+  (`app/`, proxy vers l'API), lancé en dev seulement, son conteneur rangé comme ceux de `app/`.
 - `deploy/` : `env.skeleton`, `env.dev`, `env.prod` (les modèles des `.env`), `compose/` (les
   fragments des services sans application : MySQL, sa sauvegarde, phpMyAdmin, ETL, `_head`,
-  `_tail`), `backup/` (`backup.sh`, la sauvegarde quotidienne de la prod), `phpmyadmin/` ; le
-  lanceur y écrit `deploy/compose.yaml` (ignoré).
+  `_tail`), `backup/` (`backup.sh`, la sauvegarde quotidienne de la prod), `phpmyadmin/`,
+  `certs/` (ignoré : les certificats de `python -m launcher.security`) ; le lanceur y écrit
+  `deploy/compose.yaml` (ignoré).
+- `archive/` : le code mort gardé pour mémoire (vide pour l'instant).
+- `scripts/ci/` : la liste des règles revues à la main, lue par `charter.toml` (chemin imposé
+  par ion-repo).
 - `app/api/` : l'API FastAPI (`app.py`) ; `api/` (routes, `dependencies/`), `auth/` (LNM et
   `authenticate_cas/`), `access_control/` (règles, prédicats, responsabilités), `domains/` (requêtes métier par
   domaine : `lnm_university/`, `maquette_module/`, `lnm_etudiant/`, `lnm_evaluation/`, `lnm_mobility_assignment/`…, en snake_case ; les tables SQL gardent leur casse), `models/`, `db/` (connexion
-  SQLAlchemy), `tools/` (`export_openapi.py` : le schéma `openapi.json` de la racine), `tests/`
+  SQLAlchemy), `tools/` (`export_openapi.py` : le schéma `app/api/openapi.json`), `tests/`
   (pytest) ; les couches import-linter sont dans `pyproject.toml`.
 - `app/web/` : le front principal, en PHP (Apache) ; `index.php` + `utils/router.php`, `views/`
   (pages, dont `views/dashboard/mobility-admin/`, `views/dashboard/stage/`), `components/`, `scripts/` (`dependance_module/`, `mobility-admin/`, `mobility-map/` : les deux cartes de mobilité), `utils/apiProxy.php` (appels à l'API), `theme/` (dont `theme/theme/`, `theme/mobility-map-streetview/`), `assets/` ; `tests/` (tests Node du JavaScript,
@@ -49,19 +58,18 @@ supprime un dossier, un domaine ou un point d'entrée.
 - `app/assistant/` : le paquet `learnagement_assistant`, la recherche vectorielle de l'assistant APC
   (RAG : PDF → morceaux → vecteurs → index FAISS ; commandes `learnagement-assistant-chunks` et
   `-index`), hors de l'image Dash ; pas encore en production.
-- `frontend/` : le front Next.js en cours de refonte (`app/`, proxy vers l'API), hors de `app/`
-  tant que learnagement#T-12 n'a pas décidé de son sort ; son conteneur est rangé comme ceux de
-  `app/`.
 - `app/importers/` : le paquet `learnagement_scraping` (commande `learnagement-scraping`) : `parsers.py`
   (HTML vers données), `browser.py` (Selenium), `db.py` (écritures), `cli.py` ; `out/` est ignoré.
   `app/importers/scripts/` : les scripts autonomes de l'équipe (`ical2json.py` + `ical2json_lib/`
   emplois du temps ADE, `scrape_maquette.py` + `scrape_maquette_lib/` catalogue des formations, `matching_26_27/`).
 - `database/` : `migrations/` (schéma, migrations versionnées `VX.Y.Z__*.sql`), `open-data/`
-  (jeux de données libres), `tools/` ; `database/data/` et `database/backup/` sont privés et
+  (jeux de données libres), `fake-data/` (README du jeu fictif, généré par `launcher/fake_data/`),
+  `tools/` ; `database/data/` et `database/backup/` sont privés et
   ignorés.
 - `docs/` : la documentation (`README.md` en est l'index) ; `architecture.md` (la cible : `app/`
   pour la production, `lab/` pour apprendre, et ses étapes), `glossary.md` (le nom de chaque mot
-  du métier dans le code), `docs/mobility/` pour le module de mobilité. `CONTRIBUTING.md`, à la
+  du métier dans le code), `docs/mobility/` pour le module de mobilité, `adr/` (une décision
+  d'architecture par fichier). `CONTRIBUTING.md`, à la
   racine : comment contribuer aujourd'hui.
 - `docs/backlog/` : le travail à faire ; `charter.toml` : les règles vérifiées ;
   `.claude/rules/ion-repo/` : les règles d'ion-repo pour Claude.

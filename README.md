@@ -27,8 +27,8 @@ Hors production, il installe aussi le hook de pré-commit (avec `uv tool install
 et `ion-repo`, qui fournit `charter`) : avant chaque commit, la mise en forme est corrigée et les
 règles de `charter.toml` vérifiées sur les fichiers commités. Le PHP de `app/web/` se vérifie par
 `app/web/tools/run.sh` (le PHP de la machine, sinon podman), son JavaScript par pnpm ;
-`openapi.json`, à la racine, est le schéma de l'API, réécrit par
-`cd backend && uv run python -m tools.export_openapi --output ../openapi.json`.
+`app/api/openapi.json` est le schéma de l'API, réécrit par
+`cd app/api && uv run python -m tools.export_openapi --output openapi.json`.
 
 ### Dev Mode (a la mano)
 
@@ -43,16 +43,17 @@ uv run python Learnagement.py start --env XXX
 ```
 
 Au lancement, le lanceur écrit `deploy/compose.yaml` à partir des fragments : le `compose.yaml`
-de chaque application (`app/api/`, `app/web/`, `app/dashboards/`, `frontend/`, Next seulement en
-dev) et ceux de `deploy/compose/` (MySQL, sa sauvegarde, phpMyAdmin), attend que chaque conteneur réponde à
+de chaque application (`app/api/`, `app/web/`, `app/dashboards/`, et `lab/javascript/nextjs/`
+seulement en dev) et ceux de `deploy/compose/` (MySQL, sa sauvegarde, phpMyAdmin), attend que chaque conteneur réponde à
 sa sonde `/health`, puis arrête l'instance quand `podman compose up` se termine. Sans terminal
 interactif, il refuse de demander les mots de passe.
 
 **Changement d'interface (novembre 2026)** : les dossiers ont pris leur place cible
 (`docs/architecture.md`) : `backend/` est devenu `app/api/`, `web/` `app/web/`, `dashboards/`
 `app/dashboards/`, `scraping/` `app/importers/`, `assistant/` `app/assistant/`, `db/` `database/`,
-`docker/` et `config/` `deploy/`. Les routes, les variables d'environnement et les commandes du
-lanceur ne changent pas. Chaque ancien chemin, et ce qu'une instance ou une branche en cours doit
+`docker/` et `config/` `deploy/`, `frontend/` `lab/javascript/nextjs/`, `openapi.json`
+`app/api/openapi.json`, `certs/` `deploy/certs/`. Les routes, les noms des variables
+d'environnement et les commandes du lanceur ne changent pas. Chaque ancien chemin, et ce qu'une instance ou une branche en cours doit
 faire : [docs/moved.md](docs/moved.md).
 
 **Changement d'interface (novembre 2026)** : le conteneur MySQL s'appelle désormais
