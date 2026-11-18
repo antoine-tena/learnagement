@@ -11,6 +11,8 @@
 filtre de filière à `Toutes`), `api.js` de quatre URL (slash au début ou à la fin du `path`
 envoyé à `/api.php`).
 
-- [ ] Vérifier, sur les deux pages, laquelle des formes d'URL l'API attend vraiment
-- [ ] Un seul dossier de scripts, les différences passées en paramètre par chaque page
+- [x] Vérifier, sur les deux pages, laquelle des formes d'URL l'API attend vraiment : un `path`
+      qui commence par `/` (motif de `web/api.php`), les `/` du début et de la fin retirés avant le
+      backend ; la carte publique, sans `/` initial, recevait 400 et n'affichait aucune université
+- [x] Un seul dossier de scripts, les différences passées en paramètre par chaque page
       (`mobility-map.php`, `mobility-map_open.php`)

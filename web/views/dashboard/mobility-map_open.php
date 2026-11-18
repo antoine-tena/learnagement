@@ -154,5 +154,5 @@ crossorigin=""/>
 <?php $t->endSlot(); ?>
 
 <?php $t->startSlot('script.bottom'); ?>
-<script type="module" defer src="/scripts/mobility-map-open/main.js"></script>
+<script type="module" defer src="/scripts/mobility-map/main.js"></script>
 <?php $t->endSlot(); ?>

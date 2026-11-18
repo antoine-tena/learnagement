@@ -36,7 +36,7 @@ supprime un dossier, un domaine ou un point d'entrée.
   SQLAlchemy), `tools/` (`export_openapi.py` : le schéma `openapi.json` de la racine), `tests/`
   (pytest) ; les couches import-linter sont dans `pyproject.toml`.
 - `web/` : le front principal, en PHP (Apache) ; `index.php` + `utils/router.php`, `views/`
-  (pages, dont `views/dashboard/mobility-admin/`, `views/dashboard/stage/`), `components/`, `scripts/` (`dependance_module/`, `mobility-admin/`, `mobility-map/`, `mobility-map-open/`), `utils/apiProxy.php` (appels à l'API), `theme/` (dont `theme/theme/`, `theme/mobility-map-streetview/`), `assets/` ; `tests/` (tests Node du JavaScript,
+  (pages, dont `views/dashboard/mobility-admin/`, `views/dashboard/stage/`), `components/`, `scripts/` (`dependance_module/`, `mobility-admin/`, `mobility-map/` : les deux cartes de mobilité), `utils/apiProxy.php` (appels à l'API), `theme/` (dont `theme/theme/`, `theme/mobility-map-streetview/`), `assets/` ; `tests/` (tests Node du JavaScript,
   `pnpm --dir web test`) ; `tools/run.sh` (PHP, ou podman sans PHP) et la
   configuration de PHP-CS-Fixer, PHPStan, deptrac, ESLint, Prettier (`package.json`).
 - `dashboards/` : les tableaux de bord Dash (`main.py`, `clock.py` (date du jour à Paris), `main_app/`, `pages/` : une page par vue (dont les paquets

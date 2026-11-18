@@ -1,4 +1,4 @@
-// La carte de mobilité de l'étudiant connecté, chargée avec une API simulée.
+// Les deux pages de carte de mobilité (connectée, publique) font la même chose avec le même code.
 // pnpm --dir web test
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 
 const HARNESS = join(dirname(fileURLToPath(import.meta.url)), 'mobility-map', 'harness.mjs');
 const STUDENT_PAGE = 'views/dashboard/mobility-map.php';
+const PUBLIC_PAGE = 'views/dashboard/mobility-map_open.php';
 const BOTH_UNIVERSITIES = [[10, 20], [30, 40]];
 
 function runPage(pagePath, scenario) {
@@ -40,4 +41,24 @@ test('la carte connectée, sans session, montre les universités sans voeux', ()
         'campaignOpenBadge', 'filterForm', 'studentQuotaContainer', 'wishesBtn', 'wishesCount',
         'wishesEmpty', 'wishesList', 'wishesPanel', 'wishesSubmittedBadge',
     ]);
+});
+
+test('la carte publique montre les universités, sans voeux ni campagne', () => {
+    const page = runPage(PUBLIC_PAGE, 'anonymous');
+
+    assert.deepEqual(page.apiCalls, [
+        'GET /university/etudiant/0/campaign-status -> 401',
+        'GET /university -> 200',
+        'GET /university/etudiant/0/assignment -> 401',
+        'GET /university/etudiant/0/wishes -> 401',
+    ]);
+    assert.deepEqual(page.markerPositions, BOTH_UNIVERSITIES);
+    assert.deepEqual(page.hiddenElements, [
+        'campaignOpenBadge', 'filterForm', 'studentQuotaContainer', 'wishesCount',
+        'wishesEmpty', 'wishesList', 'wishesPanel', 'wishesSubmittedBadge',
+    ]);
+});
+
+test('les deux pages chargent le même script', () => {
+    assert.equal(runPage(PUBLIC_PAGE, 'anonymous').scriptSrc, runPage(STUDENT_PAGE, 'anonymous').scriptSrc);
 });
