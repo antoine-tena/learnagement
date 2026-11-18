@@ -34,9 +34,9 @@ jobs:
       - name: Outils
         run: |
           uv tool install pre-commit
-          pnpm --dir frontend install --frozen-lockfile
-          pnpm --dir web install --frozen-lockfile
-          (cd web && composer install --no-interaction --no-progress)
+          pnpm --dir lab/javascript/nextjs install --frozen-lockfile
+          pnpm --dir app/web install --frozen-lockfile
+          (cd app/web && composer install --no-interaction --no-progress)
       - name: Rapport
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
