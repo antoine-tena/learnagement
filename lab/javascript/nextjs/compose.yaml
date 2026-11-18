@@ -2,7 +2,7 @@
     front_nextjs_${INSTANCE_NAME}:
         container_name: learnagement_nextjs_${INSTANCE_NAME}
         build:
-            context: ../frontend
+            context: ../lab/javascript/nextjs
             dockerfile: Containerfile
         restart: always
         # Écrit node_modules dans le code monté : voir USERNS_MODE dans launcher/compose.py
@@ -15,8 +15,8 @@
             - INSTANCE_NAME=${INSTANCE_NAME}
             - ENV=${ENV}
         volumes:
-            - ../frontend:/app
-            - ../frontend/node_modules:/app/node_modules
+            - ../lab/javascript/nextjs:/app
+            - ../lab/javascript/nextjs/node_modules:/app/node_modules
             - ../${SSL_INTERNAL_DIR}:${DOCKER_SSL_INTERNAL_DIR}:ro
             - ../${SSL_EXTERNAL_DIR}:${DOCKER_SSL_EXTERNAL_DIR}:ro
         depends_on:

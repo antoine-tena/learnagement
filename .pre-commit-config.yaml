@@ -102,7 +102,7 @@ repos:
         files: ^app/dashboards/
 
       - id: eslint
-        name: eslint (frontend)
+        name: eslint (lab/javascript/nextjs)
         entry: bash -c 'cd lab/javascript/nextjs && pnpm exec eslint --fix "${@#lab/javascript/nextjs/}"' --
         language: system
         files: ^lab/javascript/nextjs/.*\.(vue|ts|tsx|mjs)$

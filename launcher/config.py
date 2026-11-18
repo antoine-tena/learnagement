@@ -23,7 +23,7 @@ CONTAINER_APP_DIRS: dict[str, str | None] = {
     "backend": "app/api",
     "web": "app/web",
     "dashboards": "app/dashboards",
-    "frontend": "frontend",
+    "frontend": "lab/javascript/nextjs",
 }
 # Le fragment compose de chaque conteneur : le `compose.yaml` d'une application, dans son
 # dossier, ou celui d'un service de la base et de l'exploitation, dans `deploy/compose/`
@@ -35,7 +35,7 @@ COMPOSE_FRAGMENTS = {
     "backend": "app/api/compose.yaml",
     "web": "app/web/compose.yaml",
     "dashboards": "app/dashboards/compose.yaml",
-    "frontend": "frontend/compose.yaml",
+    "frontend": "lab/javascript/nextjs/compose.yaml",
 }
 # compose lit aussi son .env, pour les variables qu'il interpole
 COMPOSE_DIR = "deploy"
