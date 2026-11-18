@@ -4,9 +4,10 @@ import asyncio
 import json
 import logging
 import os
+from pathlib import Path
 
 from launcher.config import GREEN, NC
-from launcher.docker import COMPOSE_FILE, DOCKER_DIR, compose_command
+from launcher.docker import COMPOSE_FILE, DOCKER_DIR, compose_command, docker_command
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +33,14 @@ COMPOSE_VARIABLES = (
     "SSL_EXTERNAL_DIR",
     "DOCKER_SSL_INTERNAL_DIR",
     "DOCKER_SSL_EXTERNAL_DIR",
+    "USERNS_MODE",
 )
+# Sous podman sans root, keep-id fait de l'utilisateur de la machine celui du conteneur : un
+# conteneur non root écrit alors dans le code monté (node_modules du front). docker : host.
+USERNS_MODE_PODMAN = "keep-id"
+USERNS_MODE_DOCKER = "host"
+# Le premier démarrage installe les dépendances : les sondes s'accordent environ 5 minutes.
+READY_TIMEOUT_SECONDS = 300
 
 
 def render_compose(containers: list[str], variables: dict[str, str]) -> str:
@@ -44,10 +52,17 @@ def render_compose(containers: list[str], variables: dict[str, str]) -> str:
     return content
 
 
+def userns_mode(docker_executable: str) -> str:
+    """Le mode d'espace de noms des utilisateurs selon l'outil : podman ou docker."""
+    is_podman = Path(docker_executable).name == "podman"
+    return USERNS_MODE_PODMAN if is_podman else USERNS_MODE_DOCKER
+
+
 def write_compose_file(containers: list[str]) -> None:
     """Écrit compose.yaml, à chaque lancement, pour les conteneurs de l'environnement."""
     logger.info("%sDocker configuration%s", GREEN, NC)
-    COMPOSE_FILE.write_text(render_compose(containers, dict(os.environ)), encoding="utf-8")
+    variables = {**os.environ, "USERNS_MODE": userns_mode(docker_command()[0])}
+    COMPOSE_FILE.write_text(render_compose(containers, variables), encoding="utf-8")
 
 
 def _is_ready(container: dict[str, object]) -> bool:
@@ -67,7 +82,7 @@ def parse_compose_ps(output: str) -> list[dict[str, object]]:
     return containers
 
 
-async def wait_for_all_ready(timeout: int = 60, poll_interval: int = 3) -> None:
+async def wait_for_all_ready(timeout: int = READY_TIMEOUT_SECONDS, poll_interval: int = 3) -> None:
     """Attend que tous les conteneurs du projet soient prêts."""
     command = [
         *compose_command(),

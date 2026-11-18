@@ -10,3 +10,6 @@ networks:
     learnagement_back_${INSTANCE_NAME}:
         name: learnagement_back_${INSTANCE_NAME}
         driver: bridge
+# podman-compose : pas de pod, qui refuserait le userns_mode du front ; docker ignore cette clé
+x-podman:
+    in_pod: false

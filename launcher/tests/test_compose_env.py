@@ -29,6 +29,22 @@ def test_passwords_stay_out_of_the_compose_file() -> None:
     assert "${MYSQL_USER_PASSWORD}" in rendered
 
 
+def test_podman_maps_the_user_into_the_frontend() -> None:
+    """Sous podman sans root, `node` est l'utilisateur de la machine : il écrit node_modules."""
+    variables = VARIABLES | {"USERNS_MODE": compose.userns_mode("/usr/bin/podman")}
+    services = yaml.safe_load(compose.render_compose(CONTAINERS["dev"], variables))["services"]
+    assert services["front_nextjs_test"]["userns_mode"] == "keep-id"
+    assert compose.userns_mode("docker") == "host"
+
+
+def test_launcher_waits_as_long_as_the_health_checks() -> None:
+    services = yaml.safe_load(compose.render_compose(CONTAINERS["dev"], VARIABLES))["services"]
+    for service in services.values():
+        check = service.get("healthcheck", {})
+        budget = int(check.get("retries", 0)) * int(str(check.get("interval", "0s")).rstrip("s"))
+        assert budget <= compose.READY_TIMEOUT_SECONDS
+
+
 def test_compose_ps_accepts_a_list_or_one_object_per_line() -> None:
     as_list = '[{"State": "running"}, {"State": "exited", "ExitCode": 0}]'
     per_line = '{"State": "running"}\n{"State": "exited", "ExitCode": 0}\n'
