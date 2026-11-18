@@ -13,4 +13,4 @@ lab/javascript/nextjs/pnpm-lock.yaml linguist-generated=true
 app/web/composer.lock linguist-generated=true
 app/web/pnpm-lock.yaml linguist-generated=true
 app/web/phpstan-baseline.neon linguist-generated=true
-openapi.json linguist-generated=true
+app/api/openapi.json linguist-generated=true

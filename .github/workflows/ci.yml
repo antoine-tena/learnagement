@@ -20,14 +20,15 @@ jobs:
     with:
       directory: app/api
 
-  # openapi.json, à la racine, suit le code de l'API (le front ne génère pas encore ses types).
+  # app/api/openapi.json suit le code de l'API (le front ne génère pas encore ses types).
   # Le job breaking compare le schéma à celui de main (la production) : une route retirée ou un
   # champ devenu obligatoire sans nouvelle version fait échouer ([FROZEN-CONTRACT]).
   api-contract:
     uses: antoine-tena/ion-repo/.github/workflows/api-contract.yml@f6340428fb1176f4ec53290ace508da3f7f49e61 # develop
     with:
       backend: app/api
-      export: uv run python -m tools.export_openapi --check --output ../../openapi.json
+      export: uv run python -m tools.export_openapi --check --output openapi.json
+      schema: app/api/openapi.json
       generate: "true"
       breaking-base: main
 

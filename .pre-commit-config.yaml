@@ -149,10 +149,10 @@ repos:
         files: ^app/api/
         pass_filenames: false
 
-      # openapi.json réécrit d'après le code : un changement de route s'y voit dans la PR.
+      # app/api/openapi.json réécrit d'après le code : un changement de route s'y voit dans la PR.
       - id: openapi-api
-        name: openapi.json (app/api)
-        entry: bash -c 'cd app/api && uv run python -m tools.export_openapi --output ../../openapi.json >/dev/null' --
+        name: app/api/openapi.json
+        entry: bash -c 'cd app/api && uv run python -m tools.export_openapi --output openapi.json >/dev/null' --
         language: system
         types: [python]
         files: ^app/api/
