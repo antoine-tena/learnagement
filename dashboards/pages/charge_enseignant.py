@@ -3,6 +3,7 @@ import plotly.express as px
 from dash import html, dcc, Input, Output, State
 import dash_bootstrap_components as dbc
 from datetime import date, datetime
+from clock import now_in_paris, today_in_paris
 from pages import charge_tools
 
 
@@ -41,7 +42,7 @@ def update_df(df):
 
 
 def get_semester():
-    today = datetime.today().date()  # Date d'aujourd'hui
+    today = today_in_paris()  # Date d'aujourd'hui
     semester = 0  # even semester
     if today > date(today.year, 8, 1) and today < date(today.year + 1, 1, 15):
         semester = 1  # odd semester
@@ -83,8 +84,8 @@ def register_callbacks(app):
     def update_graph(filtre_periode, user_id, token):
         df = charge_tools.get_chargeByEnseignantId(token, user_id)
 
-        today = datetime.today().date()  # Date d'aujourd'hui
-        current_month = datetime.today().strftime("%B")  # Mois courant, par exemple "January"
+        today = today_in_paris()  # Date d'aujourd'hui
+        current_month = now_in_paris().strftime("%B")  # Mois courant, par exemple "January"
 
         # Filtrer les données selon la sélection
         if filtre_periode == "all":
@@ -144,11 +145,11 @@ def register_callbacks(app):
                 .reset_index()
             )
         elif period == "this_month":
-            current_month = datetime.today().strftime("%B")  # Mois courant, par exemple "January"
+            current_month = now_in_paris().strftime("%B")  # Mois courant, par exemple "January"
             df = update_df(df)
             df = df[df["mois"] == current_month]  # Filtre pour le mois en cours
         elif period == "today":
-            today = datetime.today().date()  # Date d'aujourd'hui
+            today = today_in_paris()  # Date d'aujourd'hui
             df = update_df(df)
             df = df[df["jour"] == today]  # Filtre pour le jour d'aujourd'hui
         table_1 = (

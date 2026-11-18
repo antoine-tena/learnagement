@@ -1,5 +1,7 @@
 from datetime import date, datetime
 
+from clock import today_in_paris
+
 import dash_bootstrap_components as dbc
 from dash import dcc, html
 
@@ -105,9 +107,9 @@ app10_administratif_layout = html.Div(
                                 id="dates_input",
                                 min_date_allowed=date(2025, 1, 1),
                                 max_date_allowed=date(2026, 12, 31),
-                                initial_visible_month=datetime.now(),
-                                start_date=datetime.now(),
-                                end_date=datetime.now(),
+                                initial_visible_month=today_in_paris(),
+                                start_date=today_in_paris(),
+                                end_date=today_in_paris(),
                             ),
                             width=8,
                         ),
