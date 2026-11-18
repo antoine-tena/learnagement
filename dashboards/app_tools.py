@@ -8,7 +8,9 @@ import pandas as pd
 import requests
 import io
 import json
+from urllib.parse import urlsplit
 
+import jwt
 from requests import HTTPError, Timeout, RequestException
 
 load_dotenv()
@@ -42,6 +44,20 @@ def delete_endpoint(url, token):
     return python_endpoint("delete", url, None, token)
 
 
+def url_without_query(url: str) -> str:
+    """L'URL sans ses paramètres, seule partie qui peut aller dans les logs."""
+    return urlsplit(url)._replace(query="", fragment="").geturl()
+
+
+def user_id_of(token: str | None) -> object:
+    """L'identifiant de l'utilisateur du jeton, pour les logs ; l'API vérifie le jeton elle-même."""
+    try:
+        claims = jwt.decode(token or "", options={"verify_signature": False})
+    except jwt.InvalidTokenError:
+        return None
+    return claims.get("id")
+
+
 def python_endpoint(method, url, data, token):
     """
     Appel de l'API FastAPI
@@ -58,10 +74,8 @@ def python_endpoint(method, url, data, token):
     """
 
     try:
-        if data:
-            logging.info(f"Calling {method} {url} {data}")
-        else:
-            logging.info(f"Calling {method} {url}")
+        # Ni le contenu envoyé ni les paramètres de l'URL : ils portent des noms et des mails
+        logging.info("Calling %s %s user_id=%s", method, url_without_query(url), user_id_of(token))
         # Appel au "endpoint" (pas besoin de body car tout est dans la dépendance)
         if method == "get":
             headers = {
@@ -118,25 +132,30 @@ def python_endpoint(method, url, data, token):
         else:
             return pd.DataFrame()
 
-    except Timeout as e:
-        logging.exception(f"Timeout lors de l'appel à {url}")
-        # return pd.DataFrame()
-        raise e
+    # Le message d'une erreur de requests contient l'URL et ses paramètres : seul son type est
+    # journalisé, l'exception remonte entière à l'appelant.
+    except Timeout:
+        log_call_error("Timeout", method, url, token)
+        raise
 
-    except RequestException as e:
-        logging.exception(f"Erreur de connexion: {e}")
-        # return pd.DataFrame()
-        raise e
+    except RequestException as error:
+        log_call_error(f"Erreur de connexion ({type(error).__name__})", method, url, token)
+        raise
 
-    except ValueError as e:
-        logging.exception(f"Erreur lors du parsing de la réponse JSON: {e}")
-        # return pd.DataFrame()
-        raise e
+    except ValueError:
+        log_call_error("Réponse JSON illisible", method, url, token)
+        raise
 
-    except Exception as e:
-        logging.exception(f"Erreur inattendue: {e}")
-        # return pd.DataFrame()
-        raise e
+    except Exception as error:
+        log_call_error(f"Erreur inattendue ({type(error).__name__})", method, url, token)
+        raise
+
+
+def log_call_error(reason: str, method: str, url: str, token: str | None) -> None:
+    """Journalise l'échec d'un appel à l'API sans aucune donnée personnelle."""
+    logging.error(
+        "%s : %s %s user_id=%s", reason, method, url_without_query(url), user_id_of(token)
+    )
 
 
 def get_enseignants(token):
