@@ -19,7 +19,7 @@ BCRYPT_SALT_LAST_CHARACTERS = ".Oeu"
 class TestAccount:
     """Un compte de test : son identifiant, son prénom et, s'il en a un, son rôle."""
 
-    login: str
+    mail_local_part: str
     first_name: str
     role: PublicRole | None = None
 

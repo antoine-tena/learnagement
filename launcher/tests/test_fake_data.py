@@ -8,6 +8,7 @@ from pwdlib.hashers.bcrypt import BcryptHasher
 
 from launcher.fake_data import FakeDataSize, generate
 from launcher.fake_data.accounts import TEST_PASSWORD, hash_test_password
+from launcher.fake_data.generator import build_people
 from launcher.fake_data.sql import Raw, literal
 
 MAIL = re.compile(r"'[^']+@([a-z.]+)'")
@@ -30,6 +31,13 @@ def test_sizes_grow() -> None:
 def test_every_mail_is_on_the_reserved_domain() -> None:
     domains = set(MAIL.findall(generate(FakeDataSize.MEDIUM)))
     assert domains == {"example.org"}
+
+
+def test_internal_login_is_the_mail() -> None:
+    """Le jeton de l'API porte le mail comme login : il doit retrouver la personne."""
+    students, teachers, staff = build_people(random.Random(1), FakeDataSize.SMALL)
+    for person in [*students, *teachers, *staff]:
+        assert person.login == person.mail
 
 
 def test_file_declares_its_encoding() -> None:

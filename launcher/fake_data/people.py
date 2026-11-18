@@ -16,12 +16,17 @@ class Person:
     id: int
     first_name: str
     last_name: str
-    login: str
+    mail_local_part: str
     password: str | None = None
 
     @property
     def mail(self) -> str:
-        return f"{self.login}@{FAKE_MAIL_DOMAIN}"
+        return f"{self.mail_local_part}@{FAKE_MAIL_DOMAIN}"
+
+    @property
+    def login(self) -> str:
+        """Le login d'un compte interne est son mail : c'est lui que porte le jeton de l'API."""
+        return self.mail
 
 
 @dataclass(frozen=True)
@@ -62,6 +67,8 @@ def make_students(pool: NamePool, per_cohort: int) -> list[Student]:
         for _ in range(per_cohort):
             base = pool.person(len(students) + 1)
             students.append(
-                Student(base.id, base.first_name, base.last_name, base.login, cohort=cohort)
+                Student(
+                    base.id, base.first_name, base.last_name, base.mail_local_part, cohort=cohort
+                )
             )
     return students
