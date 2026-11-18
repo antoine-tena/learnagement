@@ -17,7 +17,7 @@
 
 ## [Dev/Prod environnement](prod.md)
 
-## [DB](../database/README)
+## [DB](../database/README.md)
 
 ## [Front NextJS](frontend/README.md)
 
