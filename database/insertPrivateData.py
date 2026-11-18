@@ -24,7 +24,7 @@ def main():
         basename = os.path.basename(filepath)
         # Construit le chemin cible avec le préfixe "5_"
         target_path = os.path.join(target_folder, f"{basename}")
-        
+
         # Construit le chemin relatif du fichier source par rapport au dossier cible
         relative_path = os.path.relpath(filepath, start=target_folder)
         source_path = os.path.join(source_folder , basename)

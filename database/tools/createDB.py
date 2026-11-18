@@ -1,7 +1,7 @@
 from ics import Calendar
 import requests
 import mysql.connector
-import config 
+import config
 
 def executeScriptsFromFile(cursor, filename):
     fd = open(filename, 'r')

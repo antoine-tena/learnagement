@@ -22,7 +22,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- =============================================================================
 -- CRÉATION DES PROMOTIONS MANQUANTES (Statuts FISA, FISEA, FISECP pour annee=4)
 -- =============================================================================
-INSERT INTO LNM_promo (id_promo, id_filiere, id_statut, annee, parcour, site, nbGroupeCM, nbGroupeTD, nbGroupeTP, id_responsable) VALUES 
+INSERT INTO LNM_promo (id_promo, id_filiere, id_statut, annee, parcour, site, nbGroupeCM, nbGroupeTD, nbGroupeTP, id_responsable) VALUES
 (1015, 3, 2, 4, NULL, 'Annecy', 1, 1, 2, NULL), (2015, 3, 3, 4, NULL, 'Annecy', 1, 1, 2, NULL), (3015, 3, 4, 4, NULL, 'Annecy', 1, 1, 2, NULL),
 (1018, 4, 2, 4, NULL, 'Annecy', 1, 1, 2, NULL), (2018, 4, 3, 4, NULL, 'Annecy', 1, 1, 2, NULL), (3018, 4, 4, 4, NULL, 'Annecy', 1, 1, 2, NULL),
 (1021, 5, 2, 4, NULL, 'Annecy', 1, 1, 2, NULL), (2021, 5, 3, 4, NULL, 'Annecy', 1, 1, 2, NULL), (3021, 5, 4, 4, NULL, 'Annecy', 1, 1, 2, NULL),

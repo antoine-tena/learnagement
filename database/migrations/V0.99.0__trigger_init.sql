@@ -22,9 +22,9 @@ DELIMITER ;;
 
 SELECT `id_module_sequencage`, orders, `id_intervenant_principal`, null
 
-FROM `MAQUETTE_module_sequencage`, 
+FROM `MAQUETTE_module_sequencage`,
 
-(VALUES ROW (1), ROW(2), ROW(3), ROW (4), ROW(5), ROW(6), ROW (7), ROW(8), ROW(9), 
+(VALUES ROW (1), ROW(2), ROW(3), ROW (4), ROW(5), ROW(6), ROW (7), ROW(8), ROW(9),
 
  ROW (10), ROW (11), ROW(12), ROW(13), ROW (14), ROW(15), ROW(16), ROW (17), ROW(18), ROW(19),
 
@@ -76,7 +76,7 @@ SELECT
 
   `learnagement`.`MAQUETTE_module_sequence`.`id_intervenant_principal`
 
-  
+
 
   FROM `MAQUETTE_module`
 
@@ -88,11 +88,11 @@ SELECT
 
   JOIN LNM_promo ON MAQUETTE_learning_unit.id_promo = LNM_promo.id_promo
 
-  
+
 
   JOIN `LNM_groupe` ON `LNM_promo`.`id_promo` = `LNM_groupe`.`id_promo`
 
-  
+
 
   JOIN `MAQUETTE_module_sequencage` ON (`MAQUETTE_module`.`id_module` = `MAQUETTE_module_sequencage`.`id_module`) AND (`LNM_groupe`.`id_groupe_type` = `MAQUETTE_module_sequencage`.`id_groupe_type`)
 
@@ -130,4 +130,3 @@ DELIMITER ;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-

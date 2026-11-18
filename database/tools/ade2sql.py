@@ -18,12 +18,12 @@ with mysql.connector.connect(**config.connection_params) as db :
         resultats = c.fetchall()
         for enseignant in resultats:
             enseignants[enseignant[1].upper()+ " "+enseignant[2].upper()] = enseignant[0]
-        
+
         c.execute(reqModules)
         resultats = c.fetchall()
         for module in resultats:
             modules[module[1]]=module[0]
- 
+
 
 
 # Parse the URL
@@ -31,7 +31,7 @@ for enseignant in enseignants.keys():
     if enseignant in  config.adeLinks:
         url = config.adeLinks[enseignant]
         cal = Calendar(requests.get(url).text)
- 
+
         # Print all the events
         for event in cal.events:
             #print("begin: ", event._begin)
@@ -43,7 +43,7 @@ for enseignant in enseignants.keys():
             for module in modules.keys():
                 if module in event.name:
                     date = event._begin.format('YYYY-MM-DD HH:mm')
-                    duree =  event._end_time - event._begin #don't cast duree in str it is used later as timedelta 
+                    duree =  event._end_time - event._begin #don't cast duree in str it is used later as timedelta
                     if "CM" in event.description:
                         #print("CM", date, duree, modules[module], enseignants[enseignant])
                         val = val + [("CM", date, str(duree), modules[module], enseignants[enseignant])]
