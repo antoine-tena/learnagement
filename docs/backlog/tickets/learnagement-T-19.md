@@ -1,7 +1,7 @@
 # learnagement#T-19 · Zod 4 et audit des dépendances du front
 - **Type**: bug
 - **Priority**: 🟠 important
-- **Status**: in progress — branch fix/t19, since 2026-11-18
+- **Status**: blocked — waiting for picomatch fix (@tailwindcss/typography)
 - **Opened**: 2026-10-30
 - **Effort**: S · **Owner**: @antoine-tena · **Due**: —
 - **Origin**: `pnpm audit` après learnagement#T-14
