@@ -14,7 +14,7 @@ import ModaleFiliere from "@/app/filieres/modaleFiliere";
 /**
  * Composant des filières
  * Affiche la liste des filières et gère l'ouverture de la modale
- * 
+ *
  * @returns {JSX.Element} Composant React
  */
 export default function ListFilieres({filieres} : {filieres: Filiere[]}){
@@ -24,7 +24,7 @@ export default function ListFilieres({filieres} : {filieres: Filiere[]}){
     const [attemptedExtensions, setAttemptedExtensions] = useState<{ [key: string]: boolean }>({});
 
     function filiereClicked(str: string){
-        let filiere:Filiere|undefined = filieres.find((element: Filiere): boolean => str == element.nom_filiere)
+        const filiere:Filiere|undefined = filieres.find((element: Filiere): boolean => str == element.nom_filiere)
 
         if(filiere != undefined){
             let nom_long:string = ""

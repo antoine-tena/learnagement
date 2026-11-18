@@ -3,9 +3,6 @@
     "@typescript-eslint/no-explicit-any": {
       "count": 1
     },
-    "prefer-const": {
-      "count": 1
-    },
     "react-hooks/set-state-in-effect": {
       "count": 1
     }
@@ -19,28 +16,10 @@
     "@typescript-eslint/no-explicit-any": {
       "count": 1
     },
-    "prefer-const": {
-      "count": 1
-    },
     "react-hooks/set-state-in-effect": {
       "count": 1
     },
     "react/no-unescaped-entities": {
-      "count": 1
-    }
-  },
-  "app/filieres/listFilieres.tsx": {
-    "prefer-const": {
-      "count": 1
-    }
-  },
-  "app/homepage/charge/donutCharge.tsx": {
-    "prefer-const": {
-      "count": 1
-    }
-  },
-  "app/homepage/charge/listCardsCharge.tsx": {
-    "prefer-const": {
       "count": 1
     }
   },
@@ -50,9 +29,6 @@
     }
   },
   "app/modules/listModules.tsx": {
-    "prefer-const": {
-      "count": 2
-    },
     "react-hooks/set-state-in-effect": {
       "count": 1
     }
@@ -80,9 +56,6 @@
   "app/modules/maquetteModule/maquetteModule.tsx": {
     "@typescript-eslint/no-explicit-any": {
       "count": 4
-    },
-    "prefer-const": {
-      "count": 11
     },
     "react-hooks/rules-of-hooks": {
       "count": 7

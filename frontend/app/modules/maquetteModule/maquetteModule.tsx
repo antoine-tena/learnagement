@@ -17,7 +17,7 @@ export default function maquetteModule({code_module}: {code_module: string; }) {
   useEffect(() => {
     setIsLoading(true);
 
-    let form_data = new FormData();
+    const form_data = new FormData();
 
     form_data.append("code_module", code_module);
     axios.post("/api/proxy/select/selectMaquette", form_data, {withCredentials: true})
@@ -47,7 +47,7 @@ export default function maquetteModule({code_module}: {code_module: string; }) {
 
   function getSeances(maquette: any) {
     /* liste des séances de cours dans le bon ordre */
-    let tmpSeances = [];
+    const tmpSeances = [];
 
     let index = 0;
     let i = 0;
@@ -79,16 +79,16 @@ export default function maquetteModule({code_module}: {code_module: string; }) {
   }
 
   function createNodes(edges: any) {
-    let seances = getSeances(edges); // Liste des séances dans le bon ordre (selon les liens)
-    let nodes = [];
+    const seances = getSeances(edges); // Liste des séances dans le bon ordre (selon les liens)
+    const nodes = [];
 
     let x = 0;
     let y = 0;
 
     for (let i = 0; i < seances.length; i++) {
       let color;
-      let seance = seances[i];
-      let type = seance.slice(0, 2);
+      const seance = seances[i];
+      const type = seance.slice(0, 2);
 
       if (type === "CM") {
         color = "bg-cm-red";
@@ -102,7 +102,7 @@ export default function maquetteModule({code_module}: {code_module: string; }) {
         color = "bg-other-pink";
       }
 
-      let node = {
+      const node = {
         id: seance,
         type: "customNode",
         position: { x: x, y: y },
@@ -124,13 +124,13 @@ export default function maquetteModule({code_module}: {code_module: string; }) {
   }
 
   function createEdges(maquette: any) {
-    let edges = [];
+    const edges = [];
 
     for (let i = 0; i < maquette.length; i++) {
-      let pred = maquette[i]["séance précédente"];
-      let suiv = maquette[i]["séance suivante"];
+      const pred = maquette[i]["séance précédente"];
+      const suiv = maquette[i]["séance suivante"];
 
-      let link = {
+      const link = {
         id: pred + "-" + suiv,
         source: pred,
         target: suiv,

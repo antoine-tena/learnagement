@@ -10,7 +10,7 @@ import React, {useEffect, useState} from "react";
 /**
  * Composant de la liste des compétences
  * Affiche la liste des compétences d'une filière
- * 
+ *
  * @param {infosCompetence[]} infosCompetences - Tableau des informations des compétences
  * @param {Function} setIdCompetenceClicked - Fonction pour mettre à jour la compétence sélectionnée
  * @returns {JSX.Element} Composant React
@@ -20,7 +20,7 @@ export default function ListCompetences({infosCompetences, setIdCompetenceClicke
 
     useEffect(() => {
         if (infosCompetences.length > 0){
-            let default_competence = infosCompetences[0].id_competence
+            const default_competence = infosCompetences[0].id_competence
             setCompetenceCLicked(default_competence)
             setIdCompetenceClicked(default_competence)
         }

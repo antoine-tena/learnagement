@@ -41,7 +41,7 @@ export default function DonutCharge({ label, dataDonut }: DonutChargeProps) {
         defaultColor: "rgba(159,159,159,0.1)",
     };
 
-    let bckgdColor: string[] = [];
+    const bckgdColor: string[] = [];
     let charge: number = dataDonut[0];
 
     // On choisit la couleur ou on cumule les charges selon le label

@@ -32,7 +32,7 @@ export default function ActivateAccount() {
 
     async function hashPassword(event:any) {
         event.preventDefault()
-        let form = event.currentTarget
+        const form = event.currentTarget
 
         try {
             setHash(await bcrypt.hash(pwd, 10))
