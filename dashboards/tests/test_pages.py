@@ -48,21 +48,39 @@ def test_every_menu_page_builds(main_module: ModuleType, key: str) -> None:
     assert isinstance(page, Component)
 
 
-def test_url_of_a_page_renders_that_page(main_module: ModuleType) -> None:
-    layout, _register = main_module.apps["app10_etudiant"]
-    page = main_module.render_page_content("", "/etudiant/app10_etudiant", "jeton")
-    assert str(page) == str(layout() if callable(layout) else layout)
+def render(main_module: ModuleType, pathname: str, role: str) -> str:
+    return str(main_module.render_page_content("", pathname, "jeton", role))
 
 
-def test_url_of_a_section_renders_its_landing(main_module: ModuleType) -> None:
-    page = main_module.render_page_content("", "/enseignant", "jeton")
-    assert "Section: Enseignant" in str(page)
+@pytest.mark.parametrize("role", ROLES)
+def test_own_pages_render(main_module: ModuleType, role: str) -> None:
+    for _label, key in build_menu_items("dev")[role]:
+        layout, _register = main_module.apps[key]
+        expected = str(layout() if callable(layout) else layout)
+        assert render(main_module, f"/{role}/{key}", role) == expected
 
 
-@pytest.mark.parametrize(
-    "pathname",
-    ["/etudiant/page_inconnue", "/inconnu/app10_etudiant"],
-)
+@pytest.mark.parametrize("role", ROLES)
+def test_own_section_renders_its_landing(main_module: ModuleType, role: str) -> None:
+    assert f"Section: {role.capitalize()}" in render(main_module, f"/{role}", role)
+
+
+@pytest.mark.parametrize(("role", "other"), [(r, o) for r in ROLES for o in ROLES if r != o])
+def test_pages_of_another_role_are_forbidden(
+    main_module: ModuleType, role: str, other: str
+) -> None:
+    for _label, key in build_menu_items("dev")[other]:
+        assert "403" in render(main_module, f"/{other}/{key}", role), (role, other, key)
+    assert "403" in render(main_module, f"/{other}", role)
+
+
+@pytest.mark.parametrize("role", ROLES)
+def test_page_out_of_the_role_menu_is_forbidden(main_module: ModuleType, role: str) -> None:
+    own = {key for _label, key in build_menu_items("dev")[role]}
+    for key in sorted(set(main_module.apps) - own):
+        assert "403" in render(main_module, f"/{role}/{key}", role), (role, key)
+
+
+@pytest.mark.parametrize("pathname", ["/etudiant/page_inconnue", "/inconnu/app10_etudiant"])
 def test_unknown_url_renders_a_404(main_module: ModuleType, pathname: str) -> None:
-    page = main_module.render_page_content("", pathname, "jeton")
-    assert "404" in str(page)
+    assert "404" in render(main_module, pathname, "etudiant")
