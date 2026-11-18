@@ -14,6 +14,7 @@ from pwdlib.hashers.bcrypt import BcryptHasher
 
 from launcher.config import GREEN, NC, RED
 from launcher.docker import docker_command
+from launcher.fake_data.install import offer_fake_data
 
 logger = logging.getLogger(__name__)
 
@@ -62,12 +63,7 @@ def prepare_initial_data() -> None:
         logger.info("%sData already exist in 'db/data'!%s", GREEN, NC)
     else:
         DATA_DIR.mkdir()
-        print(
-            "If you want an initial data set, put it into 'db/data' folder "
-            "with name matches with [0-9]*.sql."
-        )
-        print("Free data samples are available at 'db/freeData' folder.")
-        input("Then press enter")
+        offer_fake_data(DATA_DIR, os.environ["ENV"])
     subprocess.run([sys.executable, "insertPrivateData.py"], cwd=DB_DIR, check=True)
 
 

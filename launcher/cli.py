@@ -15,6 +15,8 @@ from click_default_group import DefaultGroup
 from launcher import compose, db, docker, instance
 from launcher.config import CONTAINERS, GREEN, NC, RED, YELLOW, envs
 from launcher.env import load_env
+from launcher.fake_data import DEFAULT_SEED, FakeDataSize
+from launcher.fake_data.install import write_fake_data
 from launcher.git import get_branch
 from launcher.tools import protect_tty
 
@@ -167,6 +169,22 @@ def export_instance() -> None:
 def import_instance(archive: Path) -> None:
     dotenv.load_dotenv()
     instance.import_archive(archive)
+
+
+@cli.command(
+    name="fake-data",
+    help="Write fictitious data on the public curricula into db/data (read at first start only)",
+)
+@click.option(
+    "--size",
+    type=click.Choice([size.value for size in FakeDataSize]),
+    default=FakeDataSize.SMALL.value,
+)
+@click.option("--seed", type=int, default=DEFAULT_SEED, help="Same seed, same file")
+@click.option("--output", default=db.DATA_DIR, type=click.Path(path_type=Path))
+def fake_data(size: str, seed: int, output: Path) -> None:
+    fake_file = write_fake_data(output, FakeDataSize(size), seed)
+    click.echo(f"Fictitious data written to '{fake_file}'; test accounts: see README.")
 
 
 @cli.command(help="Stop application")
