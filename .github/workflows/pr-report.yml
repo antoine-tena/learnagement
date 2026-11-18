@@ -27,16 +27,16 @@ jobs:
           ref: eb0dc112605e3ccda49cc80374ffd3185a96baf7
       - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
         with:
-          package_json_file: frontend/package.json
+          package_json_file: lab/javascript/nextjs/package.json
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version-file: frontend/.nvmrc
+          node-version-file: lab/javascript/nextjs/.nvmrc
       - name: Outils
         run: |
           uv tool install pre-commit
-          pnpm --dir frontend install --frozen-lockfile
-          pnpm --dir web install --frozen-lockfile
-          (cd web && composer install --no-interaction --no-progress)
+          pnpm --dir lab/javascript/nextjs install --frozen-lockfile
+          pnpm --dir app/web install --frozen-lockfile
+          (cd app/web && composer install --no-interaction --no-progress)
       - name: Rapport
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}

@@ -54,7 +54,7 @@ budget = 0
 [floors.front-test-density]
 rule = "test-density"
 id = "TEST-DENSITY"
-files = ["frontend/app/**", "frontend/components/**", "frontend/lib/**"]
+files = ["lab/javascript/nextjs/app/**", "lab/javascript/nextjs/components/**", "lab/javascript/nextjs/lib/**"]
 suffixes = [".ts", ".tsx", ".mjs"]
 test_suffixes = [".test.ts", ".test.tsx", ".spec.ts", ".spec.tsx"]
 floor = 0

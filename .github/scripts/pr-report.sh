@@ -43,7 +43,9 @@ tests_section() {
 
 routes_section() {
     echo "### Routes de l'API"
-    if ! git show "$BASE:openapi.json" >"$LOG_DIR/openapi-base.json" 2>/dev/null; then
+    # La base peut précéder le déplacement du schéma dans app/api/.
+    if ! git show "$BASE:app/api/openapi.json" >"$LOG_DIR/openapi-base.json" 2>/dev/null \
+        && ! git show "$BASE:openapi.json" >"$LOG_DIR/openapi-base.json" 2>/dev/null; then
         echo "➖ Pas d'openapi.json sur la branche de base : rien à comparer."
         return
     fi

@@ -51,7 +51,7 @@ learnagement/
 └── archive/             le code mort gardé pour mémoire
 ```
 
-Ces déplacements sont faits (T-47), sauf celui de `frontend/` ; chaque ancien chemin est dans
+Ces déplacements sont faits (T-47) ; chaque ancien chemin est dans
 [moved.md](moved.md).
 
 | Avant | Après |
@@ -61,7 +61,7 @@ Ces déplacements sont faits (T-47), sauf celui de `frontend/` ; chaque ancien c
 | `dashboards/` | `app/dashboards/` |
 | `assistant/` (la recherche vectorielle de `polytech_rag`, T-38) | `app/assistant/` |
 | `scraping/` | `app/importers/` |
-| `frontend/` (Next, absent de la production) | `lab/javascript/nextjs/`, si T-12 le retient |
+| `frontend/` (Next, absent de la production) | `lab/javascript/nextjs/` |
 | `db/sql/`, `db/freeData/`, `db/tools/` | `database/migrations/`, `database/open-data/`, `database/tools/` |
 | `docker/<conteneur>/` | `Containerfile` et `compose.yaml` dans le dossier de chaque application |
 | `docker/compose/`, `config/` | `deploy/` |

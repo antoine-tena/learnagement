@@ -3,7 +3,7 @@
   "env": {
     "ION_REPO_PROJECT": "learnagement",
     "ION_REPO_BACKEND_DIR": "app/api",
-    "ION_REPO_FRONTEND_DIR": "frontend",
+    "ION_REPO_FRONTEND_DIR": "lab/javascript/nextjs",
     "ION_REPO_TEST_ENV": "app/api/.env"
   },
   "autoCompactWindow": 400000,

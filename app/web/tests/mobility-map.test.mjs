@@ -1,5 +1,5 @@
 // Les deux pages de carte de mobilité (connectée, publique) font la même chose avec le même code.
-// pnpm --dir web test
+// pnpm --dir app/web test
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';

@@ -102,10 +102,10 @@ repos:
         files: ^app/dashboards/
 
       - id: eslint
-        name: eslint (frontend)
-        entry: bash -c 'cd frontend && pnpm exec eslint --fix "${@#frontend/}"' --
+        name: eslint (lab/javascript/nextjs)
+        entry: bash -c 'cd lab/javascript/nextjs && pnpm exec eslint --fix "${@#lab/javascript/nextjs/}"' --
         language: system
-        files: ^frontend/.*\.(vue|ts|tsx|mjs)$
+        files: ^lab/javascript/nextjs/.*\.(vue|ts|tsx|mjs)$
 
       # app/web/ : le PHP par app/web/tools/run.sh (le PHP de la machine, sinon podman), le JavaScript
       # par pnpm ; les règles et leur dette sont dans les fichiers de configuration de app/web/.
@@ -149,10 +149,10 @@ repos:
         files: ^app/api/
         pass_filenames: false
 
-      # openapi.json réécrit d'après le code : un changement de route s'y voit dans la PR.
+      # app/api/openapi.json réécrit d'après le code : un changement de route s'y voit dans la PR.
       - id: openapi-api
-        name: openapi.json (app/api)
-        entry: bash -c 'cd app/api && uv run python -m tools.export_openapi --output ../../openapi.json >/dev/null' --
+        name: app/api/openapi.json
+        entry: bash -c 'cd app/api && uv run python -m tools.export_openapi --output openapi.json >/dev/null' --
         language: system
         types: [python]
         files: ^app/api/

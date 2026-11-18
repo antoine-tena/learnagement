@@ -15,5 +15,6 @@ absent de la production, part dans le lab (`lab/javascript/nextjs/`), d'où ses 
 monter une à une. L'ancienne proposition (Next remplace le PHP page par page, learnagement#T-37) reste possible
 si Flavien la préfère.
 
-- [ ] Si Next part dans le lab : `frontend/` → `lab/javascript/nextjs/`, avec son conteneur (repris
-      de learnagement#T-47, `docs/moved.md` à compléter)
+- [x] Next dans le lab : `frontend/` → `lab/javascript/nextjs/`, avec son conteneur (repris de
+      learnagement#T-47), fait sur le fork sans attendre Flavien, qui peut encore en décider
+      autrement

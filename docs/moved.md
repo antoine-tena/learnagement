@@ -22,18 +22,23 @@ l'API, les variables d'environnement et les commandes du lanceur sont les mêmes
 | `docker/web/` (`apache.conf`, `ssl.conf`, `lnm-php.ini`, `entrypoint.sh`) | `app/web/container/` |
 | `docker/dashboards/Containerfile` | `app/dashboards/Containerfile` |
 | `docker/dashboards/entrypoint.sh` | `app/dashboards/container/entrypoint.sh` |
-| `docker/frontend/Containerfile` | `frontend/Containerfile` |
-| `docker/frontend/entrypoint.sh` | `frontend/container/entrypoint.sh` |
+| `docker/frontend/Containerfile` | `lab/javascript/nextjs/Containerfile` |
+| `docker/frontend/entrypoint.sh` | `lab/javascript/nextjs/container/entrypoint.sh` |
 | `docker/compose/backend.yml` | `app/api/compose.yaml` |
 | `docker/compose/web.yml` | `app/web/compose.yaml` |
 | `docker/compose/dashboards.yml` | `app/dashboards/compose.yaml` |
-| `docker/compose/frontend.yml` | `frontend/compose.yaml` |
+| `docker/compose/frontend.yml` | `lab/javascript/nextjs/compose.yaml` |
 | `docker/compose/` (MySQL, sauvegarde, phpMyAdmin, ETL) | `deploy/compose/` |
 | `docker/backup/`, `docker/phpmyadmin/` | `deploy/backup/`, `deploy/phpmyadmin/` |
 | `docker/compose.yaml` (écrit par le lanceur) | `deploy/compose.yaml` |
 | `config/env.skeleton`, `config/env.dev`, `config/env.prod` | `deploy/env.skeleton`, `deploy/env.dev`, `deploy/env.prod` |
+| `frontend/` | `lab/javascript/nextjs/` (le front Next.js, absent de la production) |
+| `openapi.json` | `app/api/openapi.json` |
+| `certs/` (ignoré) | `deploy/certs/` |
 
-`frontend/` reste à sa place tant que learnagement#T-12 n'a pas décidé de son sort.
+Nouveaux dossiers, un README chacun en attendant leur contenu : `lab/` et un dossier par langage
+(learnagement#T-50), `app/portal/` (learnagement#T-41), `archive/`, `database/fake-data/`,
+`docs/adr/`.
 
 ## Une instance existante (la production comprise)
 
@@ -47,11 +52,16 @@ mv db/data database/data
 mv db/backup database/backup
 mv db/docker-entrypoint-initdb.d database/docker-entrypoint-initdb.d
 mkdir -p deploy && mv docker/log deploy/log
+mv certs deploy/certs
 # Les anciennes copies du .env (elles contiennent les mots de passe) : le lanceur recopie
 # le .env dans les nouveaux dossiers au lancement.
-rm -f backend/.env web/.env dashboards/.env docker/.env db/.env
+rm -f backend/.env web/.env dashboards/.env docker/.env db/.env frontend/.env
 python Learnagement.py start
 ```
+
+`SSL_INTERNAL_DIR` et `SSL_EXTERNAL_DIR` d'un `.env` existant valent `./certs/…` : les passer à
+`./deploy/certs/internal/` et `./deploy/certs/external/`, comme le fait un `.env` neuf. Le
+`node_modules/` de Next se réinstalle dans `lab/javascript/nextjs/` au lancement.
 
 Sans ces déplacements, le lanceur ne retrouve pas `database/data` : il le croit vide et propose les
 données fictives (hors production). La base elle-même, dans son volume, n'est pas touchée.
