@@ -26,6 +26,7 @@ def test_command_names_stay_stable() -> None:
         "import-instance",
         "start",
         "stop",
+        "structuredb",
     }
 
 
@@ -99,6 +100,43 @@ def test_backup_keeps_the_password_out_of_the_arguments(
         assert not any(secret in argument for argument in command)
         assert kwargs["env"]["MYSQL_PWD"] == secret
     assert len(list(tmp_path.glob("*.sql"))) == 3
+
+
+def test_structure_keeps_views_routines_and_triggers_without_data(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("DOCKER_COMMAND", "docker")
+    monkeypatch.setenv("MYSQL_SERVER", "learnagement_data_mysql_test")
+    monkeypatch.setenv("MYSQL_USER_LOGIN", "user")
+    monkeypatch.setenv("MYSQL_USER_PASSWORD", "not-a-real-password")
+    monkeypatch.setenv("MYSQL_DB", "learnagement")
+    commands: list[list[str]] = []
+
+    def fake_run(command: list[str], **kwargs: Any) -> None:
+        commands.append(command)
+        kwargs["stdout"].write(b"CREATE TABLE t (c INT COMMENT 'sens');")
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+    target = tmp_path / "structure.sql"
+    db.extract_structure(target)
+
+    (command,) = commands
+    assert "--no-data" in command
+    assert "--routines" in command
+    assert "--ignore-views" not in command
+    assert "--skip-triggers" not in command
+    assert "COMMENT 'sens'" in target.read_text()
+
+
+def test_structuredb_writes_to_the_given_file(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    received: list[Path] = []
+    monkeypatch.setattr(db, "extract_structure", received.append)
+    target = tmp_path / "s.sql"
+    result = CliRunner().invoke(cli_module.cli, ["structuredb", "--output", str(target)])
+    assert result.exit_code == 0, result.output
+    assert received == [target]
 
 
 def test_gui_explains_the_missing_dependency() -> None:
