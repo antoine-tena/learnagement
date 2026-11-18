@@ -11,8 +11,8 @@ anciennes dans tout `frontend/` (`any`, `set-state-in-effect`, `prefer-const`) :
 modifie un de ces fichiers doit les corriger. À solder d'un coup. Ces erreurs sont gelées dans
 `frontend/eslint-suppressions.json` depuis le 2026-11-17.
 
-- [ ] `prefer-const` (18)
-- [ ] `any` remplacés par des types (25)
-- [ ] `react-hooks/set-state-in-effect` (5) et `rules-of-hooks` (7, `maquetteModule.tsx`)
-- [ ] le reste : `no-unescaped-entities`, `display-name`, `no-require-imports`
-- [ ] `eslint-suppressions.json` supprimé, `eslint .` sans erreur
+- [x] `prefer-const` (18)
+- [x] `any` remplacés par des types (25)
+- [x] `react-hooks/set-state-in-effect` (5) et `rules-of-hooks` (7, `maquetteModule.tsx`)
+- [x] le reste : `no-unescaped-entities`, `display-name`, `no-require-imports`
+- [x] `eslint-suppressions.json` supprimé, `eslint .` sans erreur
