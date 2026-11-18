@@ -1,4 +1,4 @@
-    # Sauvegarde quotidienne de la base (docker/backup/backup.sh) ; sonde en échec si la
+    # Sauvegarde quotidienne de la base (deploy/backup/backup.sh) ; sonde en échec si la
     # dernière sauvegarde a raté ou a plus de BACKUP_MAX_AGE_HOURS heures.
     data_mysql_backup_${INSTANCE_NAME}:
         container_name: learnagement_data_mysql_backup_${INSTANCE_NAME}
