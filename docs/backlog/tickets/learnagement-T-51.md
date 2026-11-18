@@ -1,9 +1,9 @@
 # learnagement#T-51 · Des données fictives pour travailler
 - **Type**: improvement
 - **Priority**: 🟡 normal
-- **Status**: todo
+- **Status**: in progress — branch feat/t51-donnees-fictives-travailler, since 2026-11-18
 - **Opened**: 2026-11-17
-- **Effort**: M · **Owner**: — · **Due**: —
+- **Effort**: M · **Owner**: @antoine-tena · **Due**: —
 - **Origin**: architecture cible (`docs/architecture.md`)
 
 Le développement, la recette, la CI, le lab et les sessions Claude tournent sur des données
