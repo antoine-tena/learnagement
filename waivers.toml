@@ -4,8 +4,8 @@
 
 [[waiver]]
 rule = "UV-PODMAN"
-paths = ["docker/**", "Learnagement.py", "launcher/**", "config/env.skeleton", "scraping/scripts/**"]
-reason = "Dette d'avant kiln : docker remplacé par podman (T-06) ; scripts de l'équipe gardés tels quels"
+paths = ["scraping/scripts/**"]
+reason = "Scripts de l'équipe gardés tels quels"
 by = "antoine-tena"
 since = 2026-11-17
 until = 2026-12-17

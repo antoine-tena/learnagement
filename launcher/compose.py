@@ -1,4 +1,4 @@
-"""Le fichier docker-compose.yml de l'instance, assemblé depuis `docker/compose/`, et son état."""
+"""Le fichier compose.yaml de l'instance, assemblé depuis `docker/compose/`, et son état."""
 
 import asyncio
 import json
@@ -36,7 +36,7 @@ COMPOSE_VARIABLES = (
 
 
 def render_compose(containers: list[str], variables: dict[str, str]) -> str:
-    """Le contenu de docker-compose.yml pour ces conteneurs."""
+    """Le contenu de compose.yaml pour ces conteneurs."""
     names = ["_head", *containers, "_tail"]
     content = "".join((FRAGMENTS_DIR / f"{name}.yml").read_text(encoding="utf-8") for name in names)
     for name in COMPOSE_VARIABLES:
@@ -45,7 +45,7 @@ def render_compose(containers: list[str], variables: dict[str, str]) -> str:
 
 
 def write_compose_file(containers: list[str]) -> None:
-    """Écrit docker-compose.yml, à chaque lancement, pour les conteneurs de l'environnement."""
+    """Écrit compose.yaml, à chaque lancement, pour les conteneurs de l'environnement."""
     logger.info("%sDocker configuration%s", GREEN, NC)
     COMPOSE_FILE.write_text(render_compose(containers, dict(os.environ)), encoding="utf-8")
 

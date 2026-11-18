@@ -18,7 +18,7 @@ __pycache__
 *#
 
 # private files that contain password, NEVER PUT IN ON GIT (must be replaced by .env)
-docker/docker-compose.yml
+docker/compose.yaml
 certs/
 *.pem
 *.key

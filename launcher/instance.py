@@ -95,7 +95,7 @@ def import_archive(archive: Path) -> None:
     shutil.unpack_archive(archive)
     shutil.copy(import_dir / "env", ENV_FILE)
     propagate_env()
-    shutil.copy(import_dir / "docker-compose.yml", docker.DOCKER_DIR)
+    shutil.copy(import_dir / docker.COMPOSE_FILE.name, docker.DOCKER_DIR)
     db.DATA_DIR.mkdir(exist_ok=True)  # So that Learnagement does not ask for free data
     for sql_file in db.SQL_DIR.iterdir():
         sql_file.unlink()

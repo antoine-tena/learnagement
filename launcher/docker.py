@@ -12,7 +12,7 @@ from launcher.config import GREEN, NC
 logger = logging.getLogger(__name__)
 
 DOCKER_DIR = Path("docker")
-COMPOSE_FILE = DOCKER_DIR / "docker-compose.yml"
+COMPOSE_FILE = DOCKER_DIR / "compose.yaml"
 
 
 def docker_command() -> list[str]:
