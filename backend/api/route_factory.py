@@ -1,16 +1,16 @@
 import inspect
-import logging
 import re
 from collections.abc import Callable
 from typing import Annotated
 
+import structlog
 from fastapi import APIRouter, Depends
 
 from api.dependencies import Rows, db_request, get_current_active_user
 from models.request import SQLRequest
 from models.user import User
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 # Clés de métadonnées à exclure du SQLRequest
 _META_KEYS = {"route", "tags", "summary", "description", "auth", "auto"}
@@ -35,7 +35,7 @@ def register_auto_routes(router: APIRouter, all_requests: dict) -> None:
         auth = definition.get("auth", True)
 
         if route is None:
-            logger.warning(f"Entrée '{key}' sans 'route' — ignorée")
+            logger.warning("api.route_definition_without_route", key=key)
             continue
 
         # Construit le dict SQLRequest sans les métadonnées
@@ -110,4 +110,4 @@ def register_auto_routes(router: APIRouter, all_requests: dict) -> None:
             summary=summary,
             description=desc,
         )
-        logger.info(f"Route générée : GET {route} ({key}) — params de route: {path_param_names}")
+        logger.info("api.route_generated", route=route, key=key, path_params=path_param_names)

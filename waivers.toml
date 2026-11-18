@@ -10,12 +10,3 @@ by = "antoine-tena"
 since = 2026-11-17
 until = 2026-12-17
 renewals = 1
-
-[[waiver]]
-rule = "LOGGING"
-paths = ["backend/**"]
-reason = "Dette d'avant kiln : logging et print remplacés par structlog (T-13)"
-by = "antoine-tena"
-since = 2026-11-17
-until = 2026-12-17
-renewals = 1

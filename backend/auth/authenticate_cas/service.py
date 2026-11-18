@@ -51,12 +51,12 @@ async def authenticate_cas(data: CasUserProvision) -> Token:
     user = pkg.get_user(data.login)
     main_role = ""
     if not user:
-        logger.info(f"Premier login CAS pour '{data.login}', provisionnement...")
+        logger.info("auth.cas_first_login")
 
         main_role = _determine_role_from_cas_groups(data.members)
 
         if main_role is None:
-            logger.error(f"Aucun groupe autorisé pour '{data.login}' : {data.members}")
+            logger.error("auth.cas_no_allowed_group", groups=data.members)
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Vous n'avez pas accès à cette application",
@@ -65,9 +65,7 @@ async def authenticate_cas(data: CasUserProvision) -> Token:
         user = pkg._create_cas_user(data, main_role=main_role)
 
     if not user:
-        logger.error(
-            f"Échec provisionnement CAS pour '{data.login}' avec le rôle principal '{main_role}'"
-        )
+        logger.error("auth.cas_provisioning_failed", main_role=main_role)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="CAS authentication failed"
         )
@@ -84,6 +82,6 @@ async def authenticate_cas(data: CasUserProvision) -> Token:
         },
     )
 
-    logger.info(f"CAS user {user.mail} connected with roles {user.roles}")
+    logger.info("auth.cas_login", user_id=user.id, roles=user.roles)
 
     return Token(access_token=access_token, token_type="bearer")

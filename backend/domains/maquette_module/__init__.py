@@ -1,5 +1,4 @@
-import logging
-
+import structlog
 from fastapi import APIRouter
 
 from api.dependencies import db_request
@@ -58,7 +57,7 @@ from .updates import (
     update_session,
 )
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 router = APIRouter()
 router.include_router(overview_router)

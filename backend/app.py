@@ -1,15 +1,12 @@
-import logging
 import os
-from collections.abc import Awaitable, Callable
-from typing import override
 
 import uvicorn
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 import init
 from auth import authenticate
-from core.config import TermColors
+from core.logging import logger, uvicorn_log_config
 from domains import (
     apc_competence,
     apc_data,
@@ -26,22 +23,6 @@ from domains import (
     maquette_module_creation,
 )
 from system import access_auth, check
-
-access_logger = logging.getLogger("uvicorn.access")
-
-
-class HealthFilter(logging.Filter):
-    @override
-    def filter(self, record: logging.LogRecord) -> bool:
-        return "/health" not in record.getMessage()
-
-
-access_logger.addFilter(HealthFilter())
-
-formatter = logging.Formatter(fmt="%(levelname)s:     %(filename)s:%(lineno)d - %(message)s")
-
-for handler in access_logger.handlers:
-    handler.setFormatter(formatter)
 
 # app = FastAPI(dependencies=[Depends(get_query_token)])
 origins = ["*"]
@@ -80,31 +61,15 @@ def health() -> object:
     return {"status": "ok"}
 
 
-# make health silent (without log)
-@app.middleware("http")
-async def silence_health_logs(
-    request: Request, call_next: Callable[[Request], Awaitable[Response]]
-) -> Response:
-    if request.url.path == "/health":
-        previous_state = access_logger.disabled
-        access_logger.disabled = True
-        try:
-            response = await call_next(request)
-        finally:
-            access_logger.disabled = previous_state
-        return response
-    return await call_next(request)
-
-
 @app.get("/", response_model=None)
 async def root() -> object:
     return {"message": "Hello, I'm Learnagement BackEnd!"}
 
 
 if __name__ == "__main__":
-    print(TermColors.OKGREEN + "Init BD framework..." + TermColors.ENDC)
+    logger.info("backend.init_database")
     init.init()
-    print(TermColors.OKGREEN + "Start backend Python..." + TermColors.ENDC)
+    logger.info("backend.start")
 
     is_prod = os.getenv("ENV", "dev") == "prod"
     ssl_dir = os.getenv("DOCKER_SSL_INTERNAL_DIR")
@@ -122,4 +87,4 @@ if __name__ == "__main__":
             }
         )
 
-    uvicorn.run(app, **uvicorn_kwargs)
+    uvicorn.run(app, log_config=uvicorn_log_config(), **uvicorn_kwargs)

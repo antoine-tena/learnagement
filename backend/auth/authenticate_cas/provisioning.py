@@ -59,7 +59,7 @@ def _determine_promo_from_cas_groups(members: list[str]) -> int | None:
     try:
         mapping = json.loads(raw)
     except json.JSONDecodeError as e:
-        logger.error(f"CAS_ETUDIANTS_2_PROMO mal formé dans .env {e}")
+        logger.error("auth.cas_promo_mapping_invalid", error=str(e))
         return None
 
     promo_name = next(
@@ -67,7 +67,7 @@ def _determine_promo_from_cas_groups(members: list[str]) -> int | None:
         None,
     )
     if promo_name is None:
-        logger.warning(f"Aucun groupe étudiant connu parmi : {member_cns}")
+        logger.warning("auth.cas_no_student_group", groups=member_cns)
         return None
 
     try:
@@ -83,7 +83,7 @@ def _determine_promo_from_cas_groups(members: list[str]) -> int | None:
                 {"promo_name": promo_name},
             ).scalar()
     except Exception as e:
-        logger.error(f"DB error lors de la résolution de promo '{promo_name}': {e}")
+        logger.error("auth.cas_promo_lookup_failed", promo=promo_name, error=str(e))
         return None
 
 
@@ -112,7 +112,7 @@ def _create_cas_user(data: CasUserProvision, main_role: str) -> UserInDB | None:
     elif main_role == "etudiant":
         id_promo = _determine_promo_from_cas_groups(data.members)
         if id_promo is None:
-            logger.error(f"Aucune promo trouvée pour '{data.login}' : {data.members}")
+            logger.error("auth.cas_promo_not_found", groups=data.members)
             return None
         params["id_promo"] = id_promo
         sql = """
@@ -121,16 +121,16 @@ def _create_cas_user(data: CasUserProvision, main_role: str) -> UserInDB | None:
             VALUES (:nom, :prenom, :mail, :login, 0, NULL, :id_promo)
         """
     else:
-        logger.error(f"Rôle inconnu '{main_role}' pour '{data.login}'")
+        logger.error("auth.cas_unknown_role", main_role=main_role)
         return None
 
     try:
         with pkg.get_connection() as conn:
             conn.execute(text(sql), params)
     except IntegrityError:
-        logger.warning(f"Utilisateur '{data.login}' déjà provisionné (accès concurrent)")
+        logger.warning("auth.cas_already_provisioned")
     except Exception as e:
-        logger.error(f"DB error during CAS provisioning: {e}")
+        logger.error("auth.cas_provisioning_db_error", error=str(e))
         return None
 
     return pkg.get_user(data.login)

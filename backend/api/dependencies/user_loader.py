@@ -53,7 +53,7 @@ def _fetch_administratif(conn: Connection, user_login: str) -> UserInDB | None:
 
     user_dict = dict(row)  # RowMapping est immuable : on copie
     if user_dict.get("intern_account") != 0 and not user_dict.get("password"):
-        logger.warning(f"Inactive user '{user_login}' try to connect")
+        logger.warning("auth.inactive_user", user_id=user_dict.get("id"))
         return None
 
     user_dict["main_role"] = "administratif"
@@ -102,7 +102,7 @@ def _fetch_enseignant(conn: Connection, user_login: str) -> UserInDB | None:
 
     user_dict = dict(row)
     if user_dict.get("intern_account") != 0 and not user_dict.get("password"):
-        logger.warning(f"Inactive user '{user_login}' try to connect")
+        logger.warning("auth.inactive_user", user_id=user_dict.get("id"))
         return None
 
     user_dict["main_role"] = "enseignant"
@@ -175,7 +175,7 @@ def _fetch_etudiant(conn: Connection, user_login: str) -> UserInDB | None:
 
     user_dict = dict(row)
     if user_dict.get("intern_account") != 0 and not user_dict.get("password"):
-        logger.warning(f"Inactive user '{user_login}' try to connect")
+        logger.warning("auth.inactive_user", user_id=user_dict.get("id"))
         return None
 
     user_dict["main_role"] = "etudiant"
@@ -195,15 +195,15 @@ def get_user(user_login: str) -> UserInDB | None:
                 if user:
                     break
     except SQLAlchemyError as e:
-        logger.exception(e)
+        logger.exception("auth.user_lookup_db_error")
         raise HTTPException(status_code=503, detail="Database unavailable") from e
     except Exception as e:
-        logger.exception(e)
+        logger.exception("auth.user_lookup_failed")
         raise HTTPException(status_code=500, detail="Undefined Get User Error") from e
 
     if user is not None:
-        logger.info(f"User {user_login} logged")
+        logger.info("auth.user_loaded", user_id=user.id)
     else:
-        logger.error(f"Loging error with login: {user_login}")
+        logger.error("auth.user_not_found")
 
     return user

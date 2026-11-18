@@ -15,6 +15,7 @@ dependencies = [
     "python-multipart==0.0.32",
     "sqlalchemy==2.1.4",
     "sqlglot==30.22.0",
+    "structlog>=26.1.0",
     "uvicorn==0.54.0",
 ]
 

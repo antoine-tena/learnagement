@@ -1,10 +1,10 @@
 """Routes FastAPI d'inspection des droits d'accès."""
 
 import inspect
-import logging
 import re
 from typing import Annotated
 
+import structlog
 from fastapi import APIRouter, Depends
 
 from api.dependencies import get_current_active_user
@@ -14,7 +14,7 @@ from system.tools import get_all_local_requests, get_all_requests
 from .sqlglot_lineage import build_lineage_tree
 from .tree import build_tree
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 router = APIRouter()
 
