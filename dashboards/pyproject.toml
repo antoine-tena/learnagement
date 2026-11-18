@@ -33,6 +33,11 @@ dev = [
     "ruff>=0.17.5",
 ]
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# Les modules des tableaux de bord s'importent depuis la racine de dashboards/ (`import auth`).
+pythonpath = ["."]
+
 [tool.ruff]
 line-length = 100
 target-version = "py314"
