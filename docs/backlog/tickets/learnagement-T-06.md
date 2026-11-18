@@ -19,7 +19,7 @@ Node 18 (fin de vie) → Node LTS.
 - [x] Images épinglées par digest (mysql, phpmyadmin, mageai, composer en plus de python et node)
 - [x] Sonde par service lancé (phpmyadmin ajouté ; l'ETL n'est dans aucun environnement)
 - [x] Node LTS : Node 26
-- [x] Essai en dev sous podman (2026-11-18, sans `web`) : images construites, sondes saines
-  après correction du venv non root, d'uv sur le DNS de podman, de phpMyAdmin et de Next.js
-  (`keep-id`) ; les dashboards mettent 6 min au premier démarrage (torch, learnagement#T-38)
+- [x] Essai en dev sous podman (2026-11-18, sans `web`) : images construites, sondes saines,
+  `start` prêt en 1 min 40 après correction du venv non root, d'uv sur le DNS de podman, de
+  phpMyAdmin, de Next.js (`keep-id`) et de l'attente des sondes du lanceur
 - [ ] Avant la release : podman sur le serveur de prod, ou la surcharge DOCKER_COMMAND dans son .env
