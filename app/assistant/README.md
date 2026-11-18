@@ -6,7 +6,7 @@ d'une question. Ce composant vit hors de l'image des tableaux de bord : son envi
 en version CPU) pèse 1,5 Go.
 
 Il n'est pas encore en production : aucun conteneur ne le lance, et l'assistant du tableau de bord
-APC (`dashboards/apc_dash/polytech_rag/`) lit les PDF directement, sans index. Le brancher sur
+APC (`app/dashboards/apc_dash/polytech_rag/`) lit les PDF directement, sans index. Le brancher sur
 `apc20_chatbot` reste à faire (learnagement#T-38).
 
 ## Construire l'index

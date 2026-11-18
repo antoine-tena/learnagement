@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 
 # Les PDF et l'index restent hors du repo (`**/data` est ignoré) : ASSISTANT_DATA_DIR les place
-# ailleurs, par défaut dans assistant/data/.
+# ailleurs, par défaut dans app/assistant/data/.
 DATA_DIR = Path(os.environ.get("ASSISTANT_DATA_DIR", Path(__file__).resolve().parents[2] / "data"))
 
 RAW_PDF_DIR = DATA_DIR / "raw_pdfs"

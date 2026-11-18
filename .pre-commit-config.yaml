@@ -74,18 +74,18 @@ repos:
         files: ^app/importers/
 
       - id: ruff-check-assistant
-        name: ruff check (assistant)
-        entry: bash -c 'cd assistant && uv run ruff check --fix --force-exclude "${@#assistant/}"' --
+        name: ruff check (app/assistant)
+        entry: bash -c 'cd app/assistant && uv run ruff check --fix --force-exclude "${@#app/assistant/}"' --
         language: system
         types: [python]
-        files: ^assistant/
+        files: ^app/assistant/
 
       - id: ruff-format-assistant
-        name: ruff format (assistant)
-        entry: bash -c 'cd assistant && uv run ruff format --force-exclude "${@#assistant/}"' --
+        name: ruff format (app/assistant)
+        entry: bash -c 'cd app/assistant && uv run ruff format --force-exclude "${@#app/assistant/}"' --
         language: system
         types: [python]
-        files: ^assistant/
+        files: ^app/assistant/
 
       - id: ruff-check-dashboards
         name: ruff check (app/dashboards)

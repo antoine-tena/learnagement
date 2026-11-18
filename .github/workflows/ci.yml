@@ -35,7 +35,7 @@ jobs:
   assistant:
     uses: antoine-tena/ion-repo/.github/workflows/python.yml@eb0dc112605e3ccda49cc80374ffd3185a96baf7 # develop
     with:
-      directory: assistant
+      directory: app/assistant
 
   # Les tableaux de bord Dash : ruff et mypy au niveau qui passe aujourd'hui (app/dashboards/
   # pyproject.toml), puis pytest (app/dashboards/tests/, sans réseau ni base) ; un job à part
