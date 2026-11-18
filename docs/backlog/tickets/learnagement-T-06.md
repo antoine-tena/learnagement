@@ -19,3 +19,4 @@ Node 18 (fin de vie) → Node LTS.
 - [x] Images épinglées par digest (mysql, phpmyadmin, mageai, composer en plus de python et node)
 - [x] Sonde par service lancé (phpmyadmin ajouté ; l'ETL n'est dans aucun environnement)
 - [x] Node LTS : Node 26
+- [ ] Avant la release : podman sur le serveur de prod, ou la surcharge DOCKER_COMMAND dans son .env
