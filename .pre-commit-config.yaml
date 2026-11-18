@@ -73,6 +73,20 @@ repos:
         types: [python]
         files: ^scraping/
 
+      - id: ruff-check-assistant
+        name: ruff check (assistant)
+        entry: bash -c 'cd assistant && uv run ruff check --fix --force-exclude "${@#assistant/}"' --
+        language: system
+        types: [python]
+        files: ^assistant/
+
+      - id: ruff-format-assistant
+        name: ruff format (assistant)
+        entry: bash -c 'cd assistant && uv run ruff format --force-exclude "${@#assistant/}"' --
+        language: system
+        types: [python]
+        files: ^assistant/
+
       - id: ruff-check-dashboards
         name: ruff check (dashboards)
         entry: bash -c 'cd dashboards && uv run ruff check --fix --force-exclude "${@#dashboards/}"' --

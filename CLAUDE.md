@@ -18,13 +18,14 @@ supprime un dossier, un domaine ou un point d'entrée.
   `generate-env`, `backupdb`…), dont le code est dans `launcher/` : `cli.py` (les commandes
   click), `instance.py` (changer d'environnement, remise à zéro, export, import), `docker.py` et
   `compose.py` (commandes compose, `compose.yaml` assemblé, attente des sondes), `db.py`
-  (initialisation, administrateur, sauvegardes), `backups/` (ancienne sauvegarde planifiée en Python,
+  (initialisation, administrateur, sauvegardes), `fake_data/` (le générateur de données fictives,
+  commande `fake-data`, proposé au premier lancement hors production), `backups/` (ancienne sauvegarde planifiée en Python,
   pas branchée), `env.py` (génération et propagation des `.env`), `git.py` (commit dans `.env.git`),
   `config.py` (conteneurs par environnement), `dev_hooks.py` (hooks de pré-commit, posés par
   `bootstrap.py`), `security.py` (certificats :
   `python -m launcher.security`), `tools.py`, `tests/`.
   `bootstrap.py` lance `Learnagement.py` avec `uv run`. Chaque composant Python (la racine pour
-  le lanceur, `backend/`, `dashboards/`, `scraping/`) a son `pyproject.toml` et son `uv.lock`.
+  le lanceur, `backend/`, `dashboards/`, `scraping/`, `assistant/`) a son `pyproject.toml` et son `uv.lock`.
 - `docker/` : un dossier par conteneur (`backend/`, `web/`, `frontend/`, `dashboards/`,
   `phpmyadmin/` : Containerfile, entrypoint), `backup/` (`backup.sh`, la sauvegarde quotidienne
   de la prod) et `compose/` (un fragment par conteneur), d'où le
@@ -37,9 +38,12 @@ supprime un dossier, un domaine ou un point d'entrée.
 - `web/` : le front principal, en PHP (Apache) ; `index.php` + `utils/router.php`, `views/`
   (pages, dont `views/dashboard/mobility-admin/`, `views/dashboard/stage/`), `components/`, `scripts/` (`dependance_module/`, `mobility-admin/`, `mobility-map/`, `mobility-map-open/`), `utils/apiProxy.php` (appels à l'API), `theme/` (dont `theme/theme/`, `theme/mobility-map-streetview/`), `assets/` ; `tools/run.sh` (PHP, ou podman sans PHP) et la
   configuration de PHP-CS-Fixer, PHPStan, deptrac, ESLint, Prettier (`package.json`).
-- `dashboards/` : les tableaux de bord Dash (`main.py`, `main_app/`, `pages/` : une page par vue (dont les paquets
+- `dashboards/` : les tableaux de bord Dash (`main.py`, `clock.py` (date du jour à Paris), `main_app/`, `pages/` : une page par vue (dont les paquets
   `modules_enseignant_edit/`, `stages_administratif/`, `checks_administratif/`) et son `_tools.py`), `apc_dash/` (approche par compétences, dont
-  `apc20_chatbot_tools/`, `apc20_competence_ac/`, `apc20_heatmap_apc/`, `apc20_ens_contribution/`, `apc20_ens_fiche_module/`, `apc20_ens_reseau_gaps/`, `apc20_metier_orientation/`, `app_reseaupolytech_etudiant/`).
+  `apc20_chatbot_tools/`, `apc20_competence_ac/`, `apc20_heatmap_apc/`, `apc20_ens_contribution/`, `apc20_ens_fiche_module/`, `apc20_ens_reseau_gaps/`, `apc20_metier_orientation/`, `app_reseaupolytech_etudiant/`, `polytech_rag/` : l'assistant qui lit les PDF, sans index).
+- `assistant/` : le paquet `learnagement_assistant`, la recherche vectorielle de l'assistant APC
+  (RAG : PDF → morceaux → vecteurs → index FAISS ; commandes `learnagement-assistant-chunks` et
+  `-index`), hors de l'image Dash ; pas encore en production.
 - `frontend/` : le front Next.js en cours de refonte (`app/`, proxy vers l'API).
 - `scraping/` : le paquet `learnagement_scraping` (commande `learnagement-scraping`) : `parsers.py`
   (HTML vers données), `browser.py` (Selenium), `db.py` (écritures), `cli.py` ; `out/` est ignoré.

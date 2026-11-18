@@ -1,9 +1,9 @@
 """Routes FastAPI de vérification de cohérence des données."""
 
 import inspect
-import logging
 from typing import Annotated
 
+import structlog
 from fastapi import APIRouter, Depends
 
 from api.dependencies import Rows, db_request, get_current_active_user
@@ -13,7 +13,7 @@ from models.user import User
 from .requests_base import BASE_REQUESTS
 from .requests_sequencage import SEQUENCAGE_REQUESTS
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 router = APIRouter()
 

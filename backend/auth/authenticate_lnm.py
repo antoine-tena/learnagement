@@ -20,11 +20,11 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 def __authenticate_user_lnm(user_login: str, password: str) -> UserInDB | None:
     user = get_user(user_login)
     if not user:
-        logger.info(f"User {user_login} does not exist")
+        logger.info("auth.lnm_unknown_user")
         return None
 
     if not verify_password(password, user.password):
-        logger.info(f"User {user_login} password does not match")
+        logger.info("auth.lnm_wrong_password", user_id=user.id)
         return None
     return user
 
@@ -50,7 +50,7 @@ async def login_for_access_token(
             "password2update": user.password2update,
         },
     )
-    logger.info(f"LNM user {user.mail} connected with roles {user.roles}")
+    logger.info("auth.lnm_login", user_id=user.id, roles=user.roles)
     return Token(access_token=access_token, token_type="bearer")
 
 

@@ -1,5 +1,4 @@
-import logging
-
+import structlog
 from fastapi import APIRouter
 
 from api.dependencies import db_request
@@ -36,7 +35,7 @@ from .students_list import (
     router as students_list_router,
 )
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 router = APIRouter()
 router.include_router(students_list_router)

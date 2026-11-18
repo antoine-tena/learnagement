@@ -1,14 +1,15 @@
-import { memo, useEffect } from "react";
+import { memo, type MouseEvent } from "react";
 import { Handle, Position } from "@xyflow/react";
 import axios from "axios";
 import { useInfosModuleStore } from "@/app/store/useInfosModuleStore";
+import type { CourseData, ModuleSequenceNodeData } from "@/app/modules/maquetteModule/types";
 
-function CustomNode({data, setDisplayCardCourse}: { data: any, setDisplayCardCourse: (course: any) => void}){
+function CustomNode({data, setDisplayCardCourse}: { data: ModuleSequenceNodeData, setDisplayCardCourse: (course: CourseData) => void}){
   const { module } = useInfosModuleStore();
 
-  const handleClick = (e: any) => {
+  const handleClick = (e: MouseEvent) => {
     e.stopPropagation();
-    
+
     const formData = new FormData();
     formData.append("input", data.label);
     formData.append("module", module.code_module);

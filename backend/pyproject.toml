@@ -10,11 +10,14 @@ dependencies = [
     "openpyxl==3.1.5",
     "pwdlib[bcrypt]==0.3.1",
     "pydantic==2.14.1",
+    "pydantic-settings>=2.16.3",
     "pyjwt==2.15.1",
     "python-dotenv==1.2.4",
     "python-multipart==0.0.32",
+    "slowapi>=0.1.10",
     "sqlalchemy==2.1.4",
     "sqlglot==30.22.0",
+    "structlog>=26.1.0",
     "uvicorn==0.54.0",
 ]
 

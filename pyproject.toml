@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Le lanceur de Learnagement."
 requires-python = ">=3.12"
 dependencies = [
+    "bcrypt==5.0.0",
     "click==8.5.0",
     "click-default-group==1.2.4",
     "cryptography==50.0.2",

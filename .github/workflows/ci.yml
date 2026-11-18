@@ -30,6 +30,12 @@ jobs:
       generate: "true"
       breaking-base: main
 
+  # L'assistant APC (RAG), hors de l'image Dash : ruff, mypy strict, pytest.
+  assistant:
+    uses: antoine-tena/ion-repo/.github/workflows/python.yml@eb0dc112605e3ccda49cc80374ffd3185a96baf7 # develop
+    with:
+      directory: assistant
+
   # Les tableaux de bord Dash : ruff et mypy au niveau qui passe aujourd'hui (dashboards/
   # pyproject.toml) ; pas encore de tests, d'où un job à part plutôt que python.yml.
   dashboards:

@@ -38,6 +38,7 @@ qu'il prend dans le code et la table qui le porte aujourd'hui.
 | étudiant | `student` | `LNM_etudiant` |
 | enseignant | `teacher` | `LNM_enseignant` |
 | administratif | `staff` | `LNM_administratif` |
+| personne, dans une seule des trois tables (login, mail) | `person` | `LNM_etudiant`, `LNM_enseignant`, `LNM_administratif` |
 | utilisateur connecté, quel que soit son rôle | `user` | (modèle `User`) |
 | rôle | `role` | `LNM_role`, `LNM_*_as_role` |
 | groupe (CM, TD, TP) | `student_group` | `LNM_groupe`, `LNM_etudiant_as_groupe` |
@@ -122,6 +123,15 @@ qu'il prend dans le code et la table qui le porte aujourd'hui.
 |---|---|---|
 | requête stockée | `stored_query` | `MRDBF_system_request` |
 | vue stockée (affichage, contrôle, modification) | `stored_view` | `VIEW_display`, `VIEW_check`, `VIEW_updatable` |
+
+### Données de travail
+
+| Métier | Code | Table |
+|---|---|---|
+| données fictives (personnes inventées, pour le dev, la recette, la CI) | `fake_data` | |
+| jeu public (maquettes publiques de Polytech Annecy-Chambéry) | `public_set` | |
+| compte de test (mot de passe connu, un par rôle) | `test_account` | |
+| cours magistral (CM) | `lecture` | `MAQUETTE_module_sequencage` |
 
 ## À confirmer avec Flavien
 

@@ -14,6 +14,7 @@ from pwdlib.hashers.bcrypt import BcryptHasher
 
 from launcher.config import GREEN, NC, RED
 from launcher.docker import docker_command
+from launcher.fake_data.install import offer_fake_data
 
 logger = logging.getLogger(__name__)
 
@@ -22,12 +23,9 @@ INIT_DIR = DB_DIR / "docker-entrypoint-initdb.d"
 SQL_DIR = DB_DIR / "sql"
 DATA_DIR = DB_DIR / "data"
 TRANSIENT_ERRORS = ("doesn't exist", "unknown database", "can't connect", "access denied")
-DUMP_OPTIONS = (
-    "--ignore-views",
-    "--skip-comments",
-    "--skip-extended-insert",
-    "--no-tablespaces",
-)
+STRUCTURE_OPTIONS = ("--skip-comments", "--no-tablespaces")
+ROOT_LOGIN = "root"
+DUMP_OPTIONS = (*STRUCTURE_OPTIONS, "--ignore-views", "--skip-extended-insert")
 
 password_hash = PasswordHash((BcryptHasher(),))
 
@@ -36,9 +34,9 @@ def mysql_container() -> str:
     return os.environ["MYSQL_SERVER"]
 
 
-def _client_env() -> dict[str, str]:
+def _client_env(password_variable: str = "MYSQL_USER_PASSWORD") -> dict[str, str]:
     """L'environnement du client : `podman exec -e MYSQL_PWD` y lit le mot de passe."""
-    return {**os.environ, "MYSQL_PWD": os.environ["MYSQL_USER_PASSWORD"]}
+    return {**os.environ, "MYSQL_PWD": os.environ[password_variable]}
 
 
 def _exec_in_mysql() -> list[str]:
@@ -62,12 +60,7 @@ def prepare_initial_data() -> None:
         logger.info("%sData already exist in 'db/data'!%s", GREEN, NC)
     else:
         DATA_DIR.mkdir()
-        print(
-            "If you want an initial data set, put it into 'db/data' folder "
-            "with name matches with [0-9]*.sql."
-        )
-        print("Free data samples are available at 'db/freeData' folder.")
-        input("Then press enter")
+        offer_fake_data(DATA_DIR, os.environ["ENV"])
     subprocess.run([sys.executable, "insertPrivateData.py"], cwd=DB_DIR, check=True)
 
 
@@ -147,7 +140,12 @@ async def create_administrator_with_retry(max_retries: int = 10, retry_delay: in
     )
 
 
-def _dump(target: Path, *options: str) -> None:
+def _dump(
+    target: Path,
+    *options: str,
+    base: tuple[str, ...] = DUMP_OPTIONS,
+    is_root: bool = False,
+) -> None:
     """mysqldump dans `target`, écrit d'un coup : jamais de sauvegarde à moitié écrite."""
     part = target.with_name(target.name + ".part")
     try:
@@ -157,13 +155,13 @@ def _dump(target: Path, *options: str) -> None:
                     *_exec_in_mysql(),
                     "mysqldump",
                     "-u",
-                    os.environ["MYSQL_USER_LOGIN"],
-                    *DUMP_OPTIONS,
+                    ROOT_LOGIN if is_root else os.environ["MYSQL_USER_LOGIN"],
+                    *base,
                     *options,
                     os.environ["MYSQL_DB"],
                 ],
                 stdout=file,
-                env=_client_env(),
+                env=_client_env("MYSQL_ROOT_PASSWORD" if is_root else "MYSQL_USER_PASSWORD"),
                 check=True,
             )
         part.replace(target)
@@ -183,3 +181,13 @@ def backup(folder: Path) -> None:
     _dump(folder / f"0_struct_{stamp}.sql", "--no-data", "--skip-triggers")
     _dump(folder / f"5_data_{stamp}.sql", "--no-create-info", "--skip-triggers")
     _dump(folder / f"99_trigger_{stamp}.sql", "--no-create-info", "--no-data")
+
+
+def extract_structure(target: Path) -> None:
+    """La structure seule (tables et leurs commentaires, vues, routines, triggers), sans données.
+
+    En root : les migrations créent les routines en root, l'utilisateur de l'app ne les lit pas.
+    """
+    logger.info("%sStructure DB%s -> %s", GREEN, NC, target)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    _dump(target, "--no-data", "--routines", base=STRUCTURE_OPTIONS, is_root=True)

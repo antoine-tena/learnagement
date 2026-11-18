@@ -39,9 +39,9 @@ def db_request(requester: User, request: SQLRequest, conn: Connection | None = N
     import api.dependencies as pkg
 
     if requester:
-        logger.info(f"User {requester.id} has role {requester.roles} requests {request}")
+        logger.info("sql.request", user_id=requester.id, roles=requester.roles, request=request)
     else:
-        logger.info(f"Anonymous user requests {request}")
+        logger.info("sql.request", user_id=None, request=request)
 
     check_access(request=request, user=requester)
 
@@ -56,6 +56,6 @@ def db_request(requester: User, request: SQLRequest, conn: Connection | None = N
     except PoolTimeout as e:
         raise HTTPException(status_code=503, detail="Database busy, retry later") from e
     except Exception as e:
-        logger.exception(e)
+        logger.exception("sql.request_failed", request=request)
         raise HTTPException(status_code=500, detail="Database request failed") from e
     return rows

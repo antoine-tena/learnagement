@@ -1,10 +1,10 @@
 """Fonctions d'introspection des clés primaires, secondaires et étrangères MySQL."""
 
 import os
-import traceback
 from typing import Any
 
 import mysql.connector
+import structlog
 from mysql.connector.abstracts import MySQLConnectionAbstract
 from mysql.connector.pooling import PooledMySQLConnection
 
@@ -12,6 +12,8 @@ HOST = os.getenv("MYSQL_SERVER")
 USER = os.getenv("MYSQL_USER_LOGIN")
 PASSWORD = os.getenv("MYSQL_USER_PASSWORD")
 DATABASE = os.getenv("MYSQL_DB")
+
+logger = structlog.get_logger(__name__)
 
 # A connection as mysql.connector.connect returns it.
 type Connection = MySQLConnectionAbstract | PooledMySQLConnection
@@ -28,9 +30,8 @@ def request(query: str, param: tuple[Any, ...] = ()) -> list[Any]:
     try:
         cursor.execute(query, param)
         rows = cursor.fetchall()
-    except mysql.connector.Error as err:
-        print("Impossible d'exécuter la requête :", err)
-        print(traceback.format_exc())
+    except mysql.connector.Error:
+        logger.exception("init.query_failed")
         return []
     finally:
         cursor.close()
@@ -55,9 +56,8 @@ def get_primary_key_fields(conn: Connection, table_name: str) -> list[Any]:
     try:
         cursor.execute(query)
         rows = cursor.fetchall()
-    except mysql.connector.Error as err:
-        print("Impossible d'exécuter la requête :", err)
-        print(traceback.format_exc())
+    except mysql.connector.Error:
+        logger.exception("init.query_failed")
         return []
     finally:
         cursor.close()
@@ -86,9 +86,8 @@ def get_secondary_key_fields(conn: Connection, table_name: str) -> list[Any]:
     try:
         cursor.execute(query)
         rows = cursor.fetchall()
-    except mysql.connector.Error as err:
-        print("Impossible d'exécuter la requête :", err)
-        print(traceback.format_exc())
+    except mysql.connector.Error:
+        logger.exception("init.query_failed")
         return []
     finally:
         cursor.close()
@@ -116,9 +115,8 @@ def get_foreign_keys(conn: Connection, table_name: str) -> dict[Any, Any]:
     try:
         cursor.execute(query)
         rows = cursor.fetchall()
-    except mysql.connector.Error as err:
-        print(f"Impossible d'exécuter la requête : {err}")
-        print(traceback.format_exc())
+    except mysql.connector.Error:
+        logger.exception("init.query_failed")
         return {}
     finally:
         cursor.close()

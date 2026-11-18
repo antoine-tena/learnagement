@@ -56,7 +56,7 @@ learnagement/
 | `backend/` | `app/api/` |
 | `web/` | `app/web/` |
 | `dashboards/` | `app/dashboards/` |
-| `dashboards/apc_dash/polytech_rag/` | `app/assistant/` (T-38) |
+| `assistant/` (la recherche vectorielle de `polytech_rag`, T-38) | `app/assistant/` |
 | `scraping/` | `app/importers/` |
 | `frontend/` (Next, absent de la production) | `lab/javascript/nextjs/`, si T-12 le retient |
 | `db/sql/`, `db/freeData/`, `db/tools/` | `database/migrations/`, `database/open-data/`, `database/tools/` |

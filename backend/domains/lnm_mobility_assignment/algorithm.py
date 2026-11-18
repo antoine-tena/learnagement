@@ -1,11 +1,12 @@
 """Algorithme Round-Robin d'affectation pour la mobilité internationale."""
 
-import logging
 from typing import Any
+
+import structlog
 
 from .schemas import MobilityQuota
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 def run_round_robin_assignment(
@@ -93,10 +94,11 @@ def run_round_robin_assignment(
 
             if not cond1:
                 logger.debug(
-                    "Étudiant %s — vœu université %s sem %s refusé : places globales épuisées",
-                    id_etudiant,
-                    id_university,
-                    id_semestre,
+                    "mobility.wish_refused",
+                    reason="global_places_full",
+                    id_etudiant=id_etudiant,
+                    id_university=id_university,
+                    id_semestre=id_semestre,
                 )
                 continue
 
@@ -109,10 +111,11 @@ def run_round_robin_assignment(
 
             if not cond2:
                 logger.debug(
-                    "Étudiant %s — vœu université %s sem %s refusé : places spécialité épuisées",
-                    id_etudiant,
-                    id_university,
-                    id_semestre,
+                    "mobility.wish_refused",
+                    reason="specialty_places_full",
+                    id_etudiant=id_etudiant,
+                    id_university=id_university,
+                    id_semestre=id_semestre,
                 )
                 continue
 
@@ -125,10 +128,11 @@ def run_round_robin_assignment(
 
             if not cond3:
                 logger.debug(
-                    "Étudiant %s — vœu université %s sem %s refusé : quota filière épuisé",
-                    id_etudiant,
-                    id_university,
-                    id_semestre,
+                    "mobility.wish_refused",
+                    reason="filiere_quota_full",
+                    id_etudiant=id_etudiant,
+                    id_university=id_university,
+                    id_semestre=id_semestre,
                 )
                 continue
 
@@ -152,9 +156,7 @@ def run_round_robin_assignment(
             break  # passer à l'étudiant suivant
 
         if not assigned:
-            logger.debug(
-                "Étudiant %s — aucun vœu accepté, non inséré dans MOB_assignment.", id_etudiant
-            )
+            logger.debug("mobility.student_unassigned", id_etudiant=id_etudiant)
             # SUPPRESSION À LA DEMANDE DE L'UTILISATEUR :
             # Il n'y a plus d'affectation par défaut au stage pour les étudiants non affectés
             # (ni pour les retardataires, ni pour ceux dont les vœux ont tous été refusés).

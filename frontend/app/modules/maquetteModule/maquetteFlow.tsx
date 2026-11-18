@@ -8,25 +8,20 @@ import {
   useEdgesState,
   addEdge,
   MarkerType,
+  type Connection,
+  type Edge,
+  type EdgeTypes,
+  type NodeProps,
+  type NodeTypes,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import FloatingEdge from "./floatingEdge";
 import CustomNode from "@/app/modules/maquetteModule/customNode";
 import floatingConnectionLine from "@/app/modules/maquetteModule/floatingConnectionLine";
-import CourseCard from "../maquetteSequence/courseCard";
+import CourseCard from "@/app/modules/maquetteSequence/courseCard";
+import type { CourseData, ModuleSequenceNode } from "@/app/modules/maquetteModule/types";
 
-interface CourseData {
-  label?: string;
-  moduleCode?: string;
-  session?: string;
-  duration?: number;
-  color?: string;
-  typeCourse?: string;
-  currentNumber?: number;
-  totalNumber?: number;
-}
-
-export default function MaquetteFlow({initialNodes, initialEdges, setWidth}:{ initialNodes: any, initialEdges: any, setWidth: any}) {
+export default function MaquetteFlow({initialNodes, initialEdges, setWidth}:{ initialNodes: ModuleSequenceNode[], initialEdges: Edge[], setWidth: (width: number) => void}) {
   const componentRef = useRef<HTMLDivElement>(null);
   const { fitView } = useReactFlow();
   const [majWidth, setMajWidth] = useState(0);
@@ -66,7 +61,7 @@ export default function MaquetteFlow({initialNodes, initialEdges, setWidth}:{ in
   }, []);
 
   const onConnect = useCallback(
-    (params: any) =>
+    (params: Connection) =>
       setEdges((eds) =>
         addEdge(
           {
@@ -80,13 +75,13 @@ export default function MaquetteFlow({initialNodes, initialEdges, setWidth}:{ in
     [setEdges]
   );
 
-  const nodeTypes = {
-    customNode: (nodeProps: any) => (
+  const nodeTypes: NodeTypes = {
+    customNode: (nodeProps: NodeProps<ModuleSequenceNode>) => (
       <CustomNode {...nodeProps} setDisplayCardCourse={setDisplayCardCourse} />
     ),
   };
 
-  const edgeTypes: Record<string, any> = {
+  const edgeTypes: EdgeTypes = {
     floating: FloatingEdge,
   };
 

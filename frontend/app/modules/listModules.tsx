@@ -19,29 +19,23 @@ import axios from "axios";
 /**
  * Composant de la liste des modules
  * Affiche la liste des modules avec leur statut (avec ou sans APC)
- * 
+ *
  * @returns {JSX.Element} Composant React
  */
 export default function ListModule(){
     const {listModules} = useListModulesStore()
-    const [moduleClicked, setModuleClicked] = useState(-1)
     const [idModulesHasApc, setIdModulesHasApc] = useState<string[]>([])
 
     const searchParams = useSearchParams()
     const  id_module = searchParams.get("id_module")
+    const moduleClicked = id_module != undefined ? parseInt(id_module) : -1
 
     useEffect(() => {
-        if (id_module != undefined){
-            setModuleClicked(parseInt(id_module))
-        }
-    }, [searchParams]);
-
-    useEffect(() => {
-        let form_data = new FormData
+        const form_data = new FormData
         form_data.append("indexBy", "id_module")
         axios.post("/api/proxy/list/listModulesOfAllAPC", form_data, {withCredentials: true})
             .then(response => {
-                let data = response.data
+                const data = response.data
                 setIdModulesHasApc(Object.keys(data))
             })
     }, []);
@@ -57,7 +51,7 @@ export default function ListModule(){
                     className={`clickable-animation w-[95%] h-20 mb-2.5 pl-2.5 rounded-lg cursor-pointer ${
                         hasAPC ?
                             `hover:bg-usmb-blue ${ moduleClicked === module.id_module ? "bg-usmb-blue" : "bg-usmb-cyan" }`
-                        : `border border-red-500 text-gray-300 hover:bg-red-500/80 ${moduleClicked === module.id_module ? "bg-red-500/80" : "bg-red-500/60"   }` 
+                        : `border border-red-500 text-gray-300 hover:bg-red-500/80 ${moduleClicked === module.id_module ? "bg-red-500/80" : "bg-red-500/60"   }`
                         }`
                     }
                 >
